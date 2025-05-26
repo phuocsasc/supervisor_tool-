@@ -1024,7 +1024,7 @@
                   row_title_bottom_nv.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
                   const mainCategories = errorCategories.map(cat => cat.name);
                   const chartData = [];
-                  chartData.push(['Danh mục 1', 'CÓ', 'KHÔNG', 'CHƯA KIỂM TRA']);
+                  chartData.push(['Danh mục 1', 'CÓ (đạt yêu cầu)', 'KHÔNG (chưa đạt yêu cầu)', 'CHƯA KIỂM TRA']);
                   mainCategories.forEach(cat => {
                         const yesCount = flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'CÓ').length;
                         const noCount = flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'KHÔNG').length;
@@ -1032,6 +1032,84 @@
                         chartData.push([cat, yesCount, noCount, notCheckedCount]);
                   });
                   chartData.forEach(row => worksheet.addRow(row));
+
+                  // Dòng đầu của chartData chính là tiêu đề
+                  const titleRow = worksheet.getRow(worksheet.rowCount - chartData.length + 1);
+                  titleRow.font = {
+                        bold: true,
+                        color: { argb: 'FFFFFFFF' } // Màu trắng
+                  };
+
+                  titleRow.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF4472C4' } // Màu nền xanh dương đậm (hoặc chọn mã khác)
+                  };
+
+                  // Căn giữa các cột từ CÓ → CHƯA KIỂM TRA
+                  [1, 2, 3, 4].forEach(index => {
+                        titleRow.getCell(index).alignment = { horizontal: 'center', vertical: 'middle' };
+                  });
+
+
+                  // ✅ Tô màu 3 cột dữ liệu
+                  const startRowIndex = worksheet.rowCount - chartData.length + 1;
+                  for (let i = 1; i < chartData.length; i++) {
+                        const excelRow = worksheet.getRow(startRowIndex + i);
+                        excelRow.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
+                        excelRow.getCell(2).alignment = { horizontal: 'center' };
+                        excelRow.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC7CE' } };
+                        excelRow.getCell(3).alignment = { horizontal: 'center' };
+                        excelRow.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7E6E6' } };
+                        excelRow.getCell(4).alignment = { horizontal: 'center' };
+                  }
+
+                  // +++ THÊM PHẦN TÍNH TỔNG +++
+                  // Tính tổng số lượng CÓ, KHÔNG, CHƯA KIỂM TRA
+                  let totalYes = 0, totalNo = 0, totalNotChecked = 0;
+                  for (let i = 1; i < chartData.length; i++) {
+                        totalYes += chartData[i][1];
+                        totalNo += chartData[i][2];
+                        totalNotChecked += chartData[i][3];
+                  }
+
+                  // Thêm dòng tổng kết
+                  const totalRow = worksheet.addRow([
+                        'Tổng cộng',
+                        totalYes,
+                        totalNo,
+                        totalNotChecked
+                  ]);
+
+                  // Định dạng dòng tổng kết
+                  totalRow.font = { bold: true };
+                  totalRow.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFD3D3D3' } // Màu xám nhạt
+                  };
+
+                  // Căn giữa các ô số
+                  [2].forEach(colIndex => {
+                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
+                        totalRow.getCell(2).font = {
+                              bold: true,
+                              color: { argb: 'FF12D659' }
+                        };
+                  });
+                  [3].forEach(colIndex => {
+                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
+                        totalRow.getCell(3).font = {
+                              bold: true,
+                              color: { argb: 'FFDC1111' }
+                        };
+                        
+                  });
+                  [4].forEach(colIndex => {
+                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
+                  });
+
+
                   // Tạo canvas để vẽ biểu đồ
                   const chartCanvas = document.createElement('canvas');
                   // Chỉnh width (độ rộng) và height (độ cao) ở đây
