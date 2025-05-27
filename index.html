@@ -211,30 +211,6 @@
                                           công!</p>
                               </div>
                         </div>
-                        <div class="bg-white rounded-lg shadow p-4 sm:p-6 mt-6">
-                              <h2 class="text-lg sm:text-xl font-semibold text-blue-700 mb-3 flex items-center">
-                                    <i class="fas fa-layer-group mr-2"></i> GỘP DANH SÁCH NHÂN VIÊN
-                              </h2>
-                              <div class="mb-3">
-                                    <label class="block text-gray-700 text-sm font-medium mb-1">Chọn các file giám sát
-                                          nhân viên</label>
-                                    <input type="file" id="mergeFiles" accept=".xlsx" multiple class="hidden">
-                                    <button id="selectMergeFilesBtn"
-                                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded btn-hover mb-2">
-                                          <i class="fas fa-folder-open mr-1"></i> Chọn File
-                                    </button>
-                                    <div id="fileListDisplay" class="space-y-1 text-sm text-gray-700"></div>
-                                    <p class="text-xs text-gray-500 mt-1">Định dạng .xlsx, chỉ lấy các sheet bắt đầu
-                                          bằng NV_</p>
-                              </div>
-                              <button id="mergeBtn"
-                                    class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md btn-hover">
-                                    <i class="fas fa-file-archive mr-1"></i> Gộp Danh Mục
-                              </button>
-                        </div>
-
-                        <canvas id="chartTempCanvas" width="800" height="400" style="display:none;"></canvas>
-
 
                         <div class="bg-white rounded-lg shadow p-4 sm:p-6">
                               <h2 class="text-lg sm:text-xl font-semibold text-blue-700 mb-3 flex items-center">
@@ -295,7 +271,6 @@
                               </div>
                         </div>
                   </div>
-
 
                   <div class="lg:col-span-2">
                         <div class="bg-white rounded-lg shadow p-4 sm:p-6 h-full">
@@ -439,13 +414,8 @@
             let currentErrorForModal = null;
             let chartInstances = {};
             let summaryChartInstance = null;
+
             // DOM Elements
-            //new
-            const selectMergeFilesBtn = document.getElementById('selectMergeFilesBtn');
-            const mergeFilesInput = document.getElementById('mergeFiles');
-            const fileListDisplay = document.getElementById('fileListDisplay');
-            const selectedFiles = new Map();
-            const mergeBtn = document.getElementById("mergeBtn");
             const errorFileInput = document.getElementById('errorFile');
             const selectFileBtn = document.getElementById('selectFileBtn');
             const fileName = document.getElementById('fileName');
@@ -486,6 +456,7 @@
             const modalYesBtn = document.getElementById('modalYesBtn');
             const modalNoBtn = document.getElementById('modalNoBtn');
             const closeErrorModal = document.getElementById('closeErrorModal');
+
             // Event Listeners
             selectFileBtn.addEventListener('click', () => errorFileInput.click());
             errorFileInput.addEventListener('change', handleFileSelect);
@@ -502,195 +473,8 @@
             modalYesBtn.addEventListener('click', () => handleModalEvaluation('CÓ'));
             modalNoBtn.addEventListener('click', () => handleModalEvaluation('KHÔNG'));
             closeErrorModal.addEventListener('click', () => errorModal.classList.add('hidden'));
-            mergeBtn.addEventListener('click', mergeEmployeeFiles);
-            // Functions
-            selectMergeFilesBtn.addEventListener('click', () => mergeFilesInput.click());
-            mergeFilesInput.addEventListener('change', (e) => {
-                  const newFiles = Array.from(e.target.files);
-                  newFiles.forEach(file => {
-                        if (!selectedFiles.has(file.name)) {
-                              selectedFiles.set(file.name, file);
-                        }
-                  });
-                  mergeFilesInput.value = ''; // Cho phép chọn lại file cũ
-                  updateFileListDisplay();
-            });
-            //hàm gộp file
-            async function mergeEmployeeFiles() {
-                  const files = Array.from(selectedFiles.values());
-                  if (!files.length) {
-                        alert("Vui lòng chọn ít nhất một file Excel");
-                        return;
-                  }
-                  const workbook = new ExcelJS.Workbook();
-                  for (const file of files) {
-                        const arrayBuffer = await file.arrayBuffer();
-                        const tempWorkbook = new ExcelJS.Workbook();
-                        await tempWorkbook.xlsx.load(arrayBuffer);
-                        for (const worksheet of tempWorkbook.worksheets) {
-                              if (worksheet.name !== "Tổng hợp") {
-                                    try {
-                                          const email = worksheet.getRow(3).getCell(2).value || 'unknown';
-                                          const namePart = typeof email === 'string' ? email.split('@')[0] : 'unknown';
-                                          let sheetName = namePart.replace(/[^a-zA-Z0-9_-]/g, '_') || 'sheet';
-                                          let count = 1;
-                                          const originalName = sheetName;
-                                          while (workbook.getWorksheet(sheetName)) {
-                                                sheetName = `${originalName}_${count++}`;
-                                          }
-                                          const newSheet = workbook.addWorksheet(sheetName);
-                                          worksheet.eachRow((row, rowIndex) => {
-                                                const newRow = newSheet.addRow(row.values);
-                                                // Định dạng thông tin trên cùng
-                                                if (rowIndex >= 1 && rowIndex <= 5) {
-                                                      newRow.getCell(1).font = { bold: true };
-                                                }
-                                                // Định dạng tiêu đề bảng
-                                                if (rowIndex === 7) {
-                                                      newRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                                                      newRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
-                                                }
-                                                // Định dạng kết quả cột 6
-                                                const resultCell = newRow.getCell(6);
-                                                if (resultCell.value === 'CÓ') {
-                                                      resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
-                                                } else if (resultCell.value === 'KHÔNG') {
-                                                      resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC7CE' } };
-                                                } else if (resultCell.value === 'CHƯA KIỂM TRA') {
-                                                      resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7E6E6' } };
-                                                }
-                                                // ✅ Định dạng dòng tổng hợp danh mục
-                                                if (row.getCell(1).value === 'Tổng hợp đánh giá theo danh mục 1') {
-                                                      newRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                                                      newRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
-                                                }// ✅ Định dạng dòng Danh Mục
-                                                if (row.getCell(1).value === 'STT') {
-                                                      newRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                                                      newRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
-                                                }
-                                          });
-                                          // Định dạng cột
-                                          newSheet.columns.forEach(col => col.width = 15);
-                                          newSheet.getColumn(1).width = 20;
-                                          newSheet.getColumn(2).width = 25;
-                                          newSheet.getColumn(3).width = 40;
-                                          newSheet.getColumn(4).width = 45;
-                                          newSheet.getColumn(5).width = 45;
-                                          newSheet.getColumn(6).width = 15;
-                                          // Rebuild biểu đồ
-                                          const chartData = extractChartDataFromSheet(worksheet);
-                                          const base64Image = await generateChartImage(chartData);
-                                          if (base64Image) {
-                                                const base64 = base64Image.split(',')[1];
-                                                const binary = atob(base64);
-                                                const bytes = new Uint8Array(binary.length);
-                                                for (let i = 0; i < binary.length; i++) {
-                                                      bytes[i] = binary.charCodeAt(i);
-                                                }
-                                                const imageId = workbook.addImage({
-                                                      buffer: bytes,
-                                                      extension: 'png',
-                                                });
-                                                const imageRow = newSheet.rowCount + 2;
-                                                newSheet.addImage(imageId, {
-                                                      tl: { col: 1, row: imageRow },
-                                                      br: { col: 6, row: imageRow + 20 }
-                                                });
-                                                for (let i = 0; i < 20; i++) newSheet.addRow([]);
-                                          }
-                                    } catch (err) {
-                                          console.warn("⚠️ Lỗi khi xử lý sheet:", err);
-                                    }
-                              }
-                        }
-                  }
-                  const dateStr = new Date().toISOString().split("T")[0];
-                  const fileName = `TongHopDanhGia_${dateStr}.xlsx`;
-                  const buffer = await workbook.xlsx.writeBuffer();
-                  saveAs(new Blob([buffer]), fileName);
-            }
 
-            function extractChartDataFromSheet(sheet) {
-                  const result = [];
-                  const startRow = sheet.rowCount - 20;
-                  for (let i = startRow; i <= sheet.rowCount; i++) {
-                        const row = sheet.getRow(i);
-                        const category = row.getCell(1).value;
-                        const yes = row.getCell(2).value;
-                        const no = row.getCell(3).value;
-                        const notChecked = row.getCell(4).value;
-                        if (category && typeof yes === 'number') {
-                              result.push({ category, yes, no, notChecked });
-                        }
-                  }
-                  return result;
-            }
-            async function generateChartImage(data) {
-                  return new Promise((resolve) => {
-                        const canvas = document.getElementById("chartTempCanvas");
-                        const ctx = canvas.getContext("2d");
-                        if (window.tempChart) {
-                              window.tempChart.destroy();
-                        }
-                        window.tempChart = new Chart(ctx, {
-                              type: "bar",
-                              data: {
-                                    labels: data.map(d => d.category),
-                                    datasets: [
-                                          {
-                                                label: "CÓ",
-                                                data: data.map(d => d.yes),
-                                                backgroundColor: 'rgba(0, 176, 80, 0.5)',
-                                                borderColor: 'rgba(0, 176, 80, 1)',
-                                                borderWidth: 1
-                                          },
-                                          {
-                                                label: "KHÔNG",
-                                                data: data.map(d => d.no),
-                                                backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                                                borderColor: 'rgba(255, 0, 0, 1)',
-                                                borderWidth: 1
-                                          },
-                                          {
-                                                label: "CHƯA KIỂM TRA",
-                                                data: data.map(d => d.notChecked),
-                                                backgroundColor: 'rgba(165, 165, 165, 0.5)',
-                                                borderColor: 'rgba(165, 165, 165, 1)',
-                                                borderWidth: 1
-                                          }
-                                    ]
-                              },
-                              options: {
-                                    responsive: false,
-                                    animation: {
-                                          onComplete: () => {
-                                                resolve(canvas.toDataURL('image/png'));
-                                          }
-                                    }
-                              }
-                        });
-                  });
-            }
-            //hàm hiện thị danh sách nhân viên
-            function updateFileListDisplay() {
-                  fileListDisplay.innerHTML = '';
-                  selectedFiles.forEach((file, name) => {
-                        const fileItem = document.createElement('div');
-                        fileItem.className = 'flex justify-between items-center bg-gray-100 px-3 py-1 rounded';
-                        const fileName = document.createElement('span');
-                        fileName.textContent = name;
-                        const removeBtn = document.createElement('button');
-                        removeBtn.innerHTML = '<i class="fas fa-times text-red-500"></i>';
-                        removeBtn.className = 'ml-2 hover:text-red-700';
-                        removeBtn.onclick = () => {
-                              selectedFiles.delete(name);
-                              updateFileListDisplay();
-                        };
-                        fileItem.appendChild(fileName);
-                        fileItem.appendChild(removeBtn);
-                        fileListDisplay.appendChild(fileItem);
-                  });
-            }
+            // Functions
             function handleFileSelect(e) {
                   const file = e.target.files[0];
                   if (file) {
@@ -701,20 +485,24 @@
                         importBtn.disabled = true;
                   }
             }
+
             function importErrorCategories() {
                   const file = errorFileInput.files[0];
                   if (!file) return;
+
                   const reader = new FileReader();
                   reader.onload = function (e) {
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                         const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+
                         errorCategories = processErrorData(jsonData);
                         importStatus.classList.remove('hidden');
                         errorTreeContainer.classList.remove('hidden');
                         noDataMessage.classList.add('hidden');
                         generateErrorTree();
+
                         // Thêm hiệu ứng fade-in
                         setTimeout(() => {
                               importStatus.classList.add('fade-in');
@@ -722,19 +510,23 @@
                   };
                   reader.readAsArrayBuffer(file);
             }
+
             function processErrorData(data) {
                   const categories = [];
                   const categoryMap = {};
+
                   data.forEach(row => {
                         const cat1 = row['Danh mục 1']?.trim();
                         const cat2 = row['Danh mục 2']?.trim();
                         const cat3 = row['Danh mục 3']?.trim();
                         const cat4 = row['Danh mục 4']?.trim();
+
                         if (cat1 && !categoryMap[cat1]) {
                               const newCat = { name: cat1, children: [] };
                               categories.push(newCat);
                               categoryMap[cat1] = newCat;
                         }
+
                         if (cat2 && cat1) {
                               const parent = categoryMap[cat1];
                               const existingChild = parent.children.find(c => c.name === cat2);
@@ -745,6 +537,7 @@
                                     categoryMap[key] = newCat;
                               }
                         }
+
                         if (cat3 && cat2 && cat1) {
                               const key = `${cat1}|${cat2}`;
                               const parent = categoryMap[key];
@@ -756,6 +549,7 @@
                                     categoryMap[newKey] = newCat;
                               }
                         }
+
                         if (cat4 && cat3 && cat2 && cat1) {
                               const key = `${cat1}|${cat2}|${cat3}`;
                               const parent = categoryMap[key];
@@ -766,8 +560,10 @@
                               }
                         }
                   });
+
                   return categories;
             }
+
             function generateErrorTree() {
                   errorTree.innerHTML = '';
                   errorCategories.forEach((category, index) => {
@@ -775,15 +571,20 @@
                         errorTree.appendChild(categoryElement);
                   });
             }
+
             function createCategoryElement(category, number, level = 1) {
                   const hasChildren = category.children && category.children.length > 0;
                   const isLeaf = !hasChildren;
+
                   const categoryElement = document.createElement('div');
                   categoryElement.className = `tree-item ${hasChildren ? 'mb-1' : ''}`;
+
                   const header = document.createElement('div');
                   header.className = `flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer error-card ${isLeaf ? 'border border-gray-200' : ''}`;
+
                   const titleContainer = document.createElement('div');
                   titleContainer.className = 'flex items-center flex-grow';
+
                   if (hasChildren) {
                         const toggleIcon = document.createElement('i');
                         toggleIcon.className = 'fas fa-chevron-down tree-toggle text-gray-500 mr-2 text-sm';
@@ -798,11 +599,14 @@
                         spacer.className = 'w-5 mr-2';
                         titleContainer.appendChild(spacer);
                   }
+
                   const title = document.createElement('span');
                   title.className = 'font-medium text-gray-700 text-sm sm:text-base';
                   title.textContent = `${number}. ${category.name}`;
                   titleContainer.appendChild(title);
+
                   header.appendChild(titleContainer);
+
                   if (isLeaf) {
                         const checkBtn = document.createElement('button');
                         checkBtn.className = 'ml-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex items-center btn-hover';
@@ -816,11 +620,13 @@
                               }
                         });
                         header.appendChild(checkBtn);
+
                         if (currentEvaluations[category.name]) {
                               const statusBadge = document.createElement('span');
                               statusBadge.className = `ml-2 px-2 py-1 rounded text-xs font-medium ${currentEvaluations[category.name] === 'CÓ' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
                               statusBadge.textContent = currentEvaluations[category.name];
                               header.appendChild(statusBadge);
+
                               if (currentEvaluations[category.name] === 'KHÔNG') {
                                     header.classList.add('has-error');
                               } else {
@@ -828,7 +634,9 @@
                               }
                         }
                   }
+
                   categoryElement.appendChild(header);
+
                   if (hasChildren) {
                         const content = document.createElement('div');
                         content.className = 'ml-4 mt-1 hidden';
@@ -838,12 +646,15 @@
                         });
                         categoryElement.appendChild(content);
                   }
+
                   return categoryElement;
             }
+
             function toggleCategory(icon, content) {
                   icon.classList.toggle('collapsed');
                   content.classList.toggle('hidden');
             }
+
             function toggleAllCategories(expand) {
                   const toggles = document.querySelectorAll('.tree-toggle');
                   const contents = document.querySelectorAll('.tree-item > div:not(:first-child)');
@@ -856,9 +667,11 @@
                         else content.classList.add('hidden');
                   });
             }
+
             function showEvaluationOptions(category) {
                   const existingOptions = document.querySelectorAll('.evaluation-options');
                   existingOptions.forEach(option => option.remove());
+
                   const categoryElements = document.querySelectorAll('.tree-item span');
                   let targetElement = null;
                   for (let el of categoryElements) {
@@ -867,12 +680,15 @@
                               break;
                         }
                   }
+
                   if (!targetElement) return;
+
                   // Thêm hiệu ứng selected
                   targetElement.classList.add('selected-error');
                   setTimeout(() => {
                         targetElement.classList.remove('selected-error');
                   }, 1000);
+
                   const optionsContainer = document.createElement('div');
                   optionsContainer.className = 'evaluation-options grid grid-cols-2 gap-2 mt-2 ml-7 fade-in';
                   const yesBtn = document.createElement('button');
@@ -883,6 +699,7 @@
                         updateEvaluationUI(targetElement, category.name, 'CÓ');
                         optionsContainer.remove();
                   });
+
                   const noBtn = document.createElement('button');
                   noBtn.className = 'bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded flex items-center justify-center text-sm btn-hover';
                   noBtn.innerHTML = '<i class="fas fa-times mr-1"></i> KHÔNG (Lỗi)';
@@ -891,16 +708,19 @@
                         updateEvaluationUI(targetElement, category.name, 'KHÔNG');
                         optionsContainer.remove();
                   });
+
                   optionsContainer.appendChild(yesBtn);
                   optionsContainer.appendChild(noBtn);
                   targetElement.parentNode.insertBefore(optionsContainer, targetElement.nextSibling);
             }
+
             function showMobileEvaluationModal(category) {
                   currentErrorForModal = category;
                   errorModalTitle.textContent = `Đánh giá lỗi: ${category.name}`;
                   errorModalContent.textContent = `Bạn có muốn đánh giá "${category.name}"?`;
                   errorModal.classList.remove('hidden');
             }
+
             function handleModalEvaluation(result) {
                   if (!currentErrorForModal) return;
                   recordEvaluation(currentErrorForModal.name, result);
@@ -918,12 +738,14 @@
                   errorModal.classList.add('hidden');
                   currentErrorForModal = null;
             }
+
             function recordEvaluation(categoryName, result) {
                   currentEvaluations[categoryName] = result;
                   if (employeeName.value && supervisorName.value) {
                         saveDataBtn.disabled = false;
                   }
             }
+
             function showSaveConfirmation() {
                   if (!employeeName.value || !supervisorName.value) {
                         alert('Vui lòng nhập đầy đủ thông tin người giám sát và nhân viên');
@@ -936,6 +758,7 @@
                   confirmEmployeeName.textContent = employeeName.value;
                   saveConfirmationModal.classList.remove('hidden');
             }
+
             async function saveAndExport() {
                   // Tạo dữ liệu đánh giá
                   const evaluation = {
@@ -949,35 +772,47 @@
                         date: new Date().toISOString(),
                         evaluations: { ...currentEvaluations }
                   };
+
                   // Tạo workbook Excel
                   const workbook = new ExcelJS.Workbook();
                   workbook.creator = 'Hệ thống giám sát lỗi nhân viên';
                   workbook.created = new Date();
+
                   // Tạo sheet cho nhân viên
                   await createEmployeeSheet(workbook, evaluation);
+
                   // Tạo tên file theo cấu trúc
                   const supervisorEmailPart = evaluation.supervisorEmail.split('@')[0] || 'unknown';
                   const employeeEmailPart = evaluation.employee.email.split('@')[0] || 'unknown';
                   const branchPart = evaluation.employee.branch.replace(/\s+/g).toLowerCase() || 'unknown';
                   const today = new Date();
                   const datePart = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
                   const fileName = `${supervisorEmailPart}-${employeeEmailPart}-${branchPart}-${datePart}.xlsx`;
+
+
                   // Xuất file
                   const buffer = await workbook.xlsx.writeBuffer();
                   saveAs(new Blob([buffer]), fileName);
+
                   // Hiển thị thông báo thành công
                   saveConfirmationModal.classList.add('hidden');
                   saveSuccessMessage.textContent = `Đã xuất file đánh giá cho ${evaluation.employee.name}`;
                   saveSuccessModal.classList.remove('hidden');
+
                   // Hiển thị thông tin nhân viên hiện tại
                   currentEmployeeDiv.classList.remove('hidden');
                   currentEmployeeName.textContent = `${employeeName.value}`;
                   currentEmployeeEmail.textContent = `${employeeEmail.value}`;
                   currentEmployeeBranch.textContent = `${employeeBranch.value}`;
             }
+
+
+
             async function createEmployeeSheet(workbook, evaluation) {
                   const sheetName = evaluation.employee.name
                   const worksheet = workbook.addWorksheet(sheetName);
+
                   // Thông tin cơ bản
                   const row_info1 = worksheet.addRow(['Tên người giám sát:', evaluation.supervisor]);
                   const row_info2 = worksheet.addRow(['Email người giám sát:', evaluation.supervisorEmail]);
@@ -986,14 +821,17 @@
                   const row_info5 = worksheet.addRow(['Chi nhánh:', evaluation.employee.branch]);
                   const row_info6 = worksheet.addRow(['Ngày đánh giá:', new Date(evaluation.date).toLocaleDateString('vi-VN')]);
                   worksheet.addRow([]);
+
                   // Định dạng các dòng thông tin
                   [row_info1, row_info2, row_info3, row_info4, row_info5, row_info6].forEach(row => {
                         row.getCell(1).font = { bold: true };
                   });
+
                   // Tiêu đề bảng
                   const headerRow = worksheet.addRow(['STT', 'Danh mục 1', 'Danh mục 2', 'Danh mục 3', 'Danh mục 4', 'Kết quả']);
                   headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                   headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
+
                   // Lấy danh sách lỗi phẳng
                   const flatErrors = flattenCategories(errorCategories);
                   flatErrors.forEach((error, i) => {
@@ -1006,6 +844,7 @@
                               error.path[3] || '',
                               result
                         ]);
+
                         // Định dạng ô kết quả
                         const resultCell = row.getCell(6);
                         if (result === 'CÓ') {
@@ -1016,8 +855,10 @@
                               resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7E6E6' } };
                         }
                   });
+
                   worksheet.addRow([]);
                   worksheet.addRow([]);
+
                   // Thống kê theo danh mục 1 ==================================================================================================
                   const row_title_bottom_nv = worksheet.addRow(['Tổng hợp đánh giá theo danh mục 1']);
                   row_title_bottom_nv.font = { bold: true, color: { argb: 'FFFFFFFF' } };
@@ -1110,6 +951,7 @@
                   });
 
                   //  =================================================================================================================
+
                   // Tạo canvas để vẽ biểu đồ
                   const chartCanvas = document.createElement('canvas');
                   // Chỉnh width (độ rộng) và height (độ cao) ở đây
@@ -1118,6 +960,7 @@
                   chartCanvas.style.width = '1200px'; // Giữ tỷ lệ tương ứng với width phía trên
                   chartCanvas.style.height = '600px'; // Giữ tỷ lệ tương ứng với height phía trên
                   document.body.appendChild(chartCanvas); // Thêm vào DOM tạm thời
+
                   // Vẽ biểu đồ
                   const ctx = chartCanvas.getContext('2d');
                   const chart = new Chart(ctx, {
@@ -1169,8 +1012,10 @@
                               }
                         }
                   });
+
                   // Chờ biểu đồ render xong
                   await new Promise(resolve => setTimeout(resolve, 1000));
+
                   // Thêm biểu đồ vào sheet
                   try {
                         const imageData = chartCanvas.toDataURL('image/png');
@@ -1180,15 +1025,18 @@
                         for (let i = 0; i < binaryString.length; i++) {
                               bytes[i] = binaryString.charCodeAt(i);
                         }
+
                         const imageId = workbook.addImage({
                               buffer: bytes,
                               extension: 'png'
                         });
+
                         const imageRow = worksheet.rowCount + 2;
                         worksheet.addImage(imageId, {
                               tl: { col: 1, row: imageRow },
                               br: { col: 6, row: imageRow + 20 }
                         });
+
                         for (let i = 0; i < 20; i++) {
                               worksheet.addRow([]);
                         }
@@ -1199,6 +1047,7 @@
                         document.body.removeChild(chartCanvas);
                         chart.destroy();
                   }
+
                   // Điều chỉnh độ rộng cột
                   worksheet.columns.forEach(column => column.width = 15);
                   worksheet.getColumn(1).width = 30;
@@ -1208,6 +1057,7 @@
                   worksheet.getColumn(5).width = 45;
                   worksheet.getColumn(6).width = 15;
             }
+
             function continueEvaluation() {
                   currentEvaluations = {};
                   employeeName.value = '';
@@ -1218,6 +1068,7 @@
                   saveSuccessModal.classList.add('hidden');
                   saveDataBtn.disabled = true;
             }
+
             function searchErrors() {
                   const searchTerm = errorSearch.value.toLowerCase();
                   if (!searchTerm) {
@@ -1246,6 +1097,7 @@
                         }
                   });
             }
+
             function toggleMobileView() {
                   const isExpanded = errorTree.classList.contains('mobile-expanded');
                   if (isExpanded) {
@@ -1256,13 +1108,16 @@
                         mobileExpandBtn.innerHTML = '<i class="fas fa-compress"></i>';
                   }
             }
+
             function updateEvaluationUI(targetElement, categoryName, result) {
                   const oldBadge = targetElement.querySelector('.evaluation-badge');
                   if (oldBadge) oldBadge.remove();
+
                   const badge = document.createElement('span');
                   badge.className = `evaluation-badge ml-2 px-2 py-1 rounded text-xs font-medium ${result === 'CÓ' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
                   badge.textContent = result;
                   targetElement.appendChild(badge);
+
                   if (result === 'CÓ') {
                         targetElement.classList.remove('has-error');
                         targetElement.classList.add('no-error');
@@ -1270,10 +1125,12 @@
                         targetElement.classList.remove('no-error');
                         targetElement.classList.add('has-error');
                   }
+
                   if (employeeName.value && supervisorName.value) {
                         saveDataBtn.disabled = false;
                   }
             }
+
             function flattenCategories(categories, path = [], result = []) {
                   categories.forEach(cat => {
                         const newPath = [...path, cat.name];
@@ -1285,6 +1142,7 @@
                   });
                   return result;
             }
+
             function resetSystem() {
                   if (confirm('Bạn có chắc chắn muốn làm mới hệ thống? Tất cả dữ liệu sẽ bị xóa.')) {
                         errorCategories = [];
@@ -1306,26 +1164,22 @@
                         importBtn.disabled = true;
                         saveDataBtn.disabled = true;
                         // exportBtn.disabled = true;
+
+
                         // Xóa tất cả biểu đồ
                         Object.values(chartInstances).forEach(chart => chart.destroy());
                         chartInstances = {};
+
                         if (summaryChartInstance) {
                               summaryChartInstance.destroy();
                               summaryChartInstance = null;
                         }
+
                         chartContainer.innerHTML = '';
                         chartContainer.classList.add('hidden');
                   }
             }
       </script>
-      <p
-            style="border-radius: 8px; text-align: center; font-size: 12px; color: #fff; margin-top: 16px;position: fixed; left: 8px; bottom: 8px; z-index: 10; background: rgba(0, 0, 0, 0.8); padding: 4px 8px;">
-            Made with <img src="https://enzostvs-deepsite.hf.space/logo.svg" alt="DeepSite Logo"
-                  style="width: 16px; height: 16px; vertical-align: middle;display:inline-block;margin-right:3px;filter:brightness(0) invert(1);"><a
-                  href="https://enzostvs-deepsite.hf.space" style="color: #fff;text-decoration: underline;"
-                  target="_blank">DeepSite</a> - 🧬 <a
-                  href="https://enzostvs-deepsite.hf.space?remix=baothienOU/employee-supervision"
-                  style="color: #fff;text-decoration: underline;" target="_blank">Remix</a></p>
 </body>
 
 </html>
