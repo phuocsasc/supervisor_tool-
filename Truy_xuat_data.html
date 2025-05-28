@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Tổ Chức File Excel</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+      <style>
+            .drop-zone {
+                  transition: all 0.3s ease;
+            }
+
+            .drop-zone--over {
+                  border-color: #3b82f6;
+                  background-color: #eff6ff;
+            }
+
+            .progress-bar {
+                  transition: width 0.3s ease;
+            }
+
+            .file-item {
+                  transition: all 0.2s ease;
+            }
+
+            .file-item:hover {
+                  transform: translateY(-2px);
+            }
+
+            @keyframes spin {
+                  from {
+                        transform: rotate(0deg);
+                  }
+
+                  to {
+                        transform: rotate(360deg);
+                  }
+            }
+
+            .spin {
+                  animation: spin 1s linear infinite;
+            }
+
+            .error-dot {
+                  display: inline-block;
+                  width: 8px;
+                  height: 8px;
+                  border-radius: 50%;
+                  background-color: #ef4444;
+                  margin-right: 6px;
+            }
+      </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+      <div class="container mx-auto p-4 max-w-4xl">
+            <header class="mb-8 text-center">
+                  <h1 class="text-3xl font-bold text-blue-600 mb-2">Tổ Chức File Excel</h1>
+                  <p class="text-gray-600">Tải lên file Excel để tự động tổ chức theo Người giám sát, Nhân viên và Chi
+                        nhánh</p>
+            </header>
+
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                  <div id="drop-zone"
+                        class="drop-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 hover:border-blue-400">
+                        <div class="flex flex-col items-center justify-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500 mb-4" fill="none"
+                                    viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                              </svg>
+                              <h3 class="text-lg font-medium text-gray-700 mb-2">Kéo thả file Excel vào đây</h3>
+                              <p class="text-gray-500 mb-4">hoặc</p>
+                              <button id="file-input-btn"
+                                    class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Chọn
+                                    File</button>
+                              <input type="file" id="file-input" class="hidden" accept=".xlsx" multiple>
+                        </div>
+                  </div>
+
+                  <div class="mt-6">
+                        <div class="flex items-center justify-between mb-2">
+                              <span class="text-gray-700">Tùy chọn đầu ra:</span>
+                              <div class="flex space-x-4">
+                                    <label class="inline-flex items-center">
+                                          <input type="checkbox"
+                                                class="form-checkbox text-blue-500 rounded border-gray-300" checked
+                                                id="supervisor-option">
+                                          <span class="ml-2 text-gray-700">Người giám sát</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                          <input type="checkbox"
+                                                class="form-checkbox text-blue-500 rounded border-gray-300" checked
+                                                id="employee-option">
+                                          <span class="ml-2 text-gray-700">Nhân viên</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                          <input type="checkbox"
+                                                class="form-checkbox text-blue-500 rounded border-gray-300" checked
+                                                id="branch-option">
+                                          <span class="ml-2 text-gray-700">Chi nhánh</span>
+                                    </label>
+                              </div>
+                        </div>
+                  </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                  <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">Xử lý</h2>
+                        <div class="flex space-x-2">
+                              <button id="refresh-btn" class="flex items-center text-gray-600 hover:text-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
+                                          fill="currentColor">
+                                          <path fill-rule="evenodd"
+                                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
+                                                clip-rule="evenodd" />
+                                    </svg>
+                                    Làm mới
+                              </button>
+                              <button id="export-btn"
+                                    class="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 ml-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
+                                          fill="currentColor">
+                                          <path fill-rule="evenodd"
+                                                d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                                                clip-rule="evenodd" />
+                                    </svg>
+                                    Xuất dữ liệu
+                              </button>
+                        </div>
+                  </div>
+                  <div class="mb-4">
+                        <div class="flex justify-between mb-1">
+                              <span class="text-sm font-medium text-blue-600" id="progress-status">Sẵn sàng</span>
+                              <span class="text-sm font-medium text-gray-600" id="progress-percent">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                              <div class="bg-blue-600 h-2.5 rounded-full progress-bar" id="progress-bar"
+                                    style="width: 0%"></div>
+                        </div>
+                  </div>
+                  <div class="mb-2">
+                        <span class="text-sm text-gray-600">
+                              Tổng số file: <span id="file-count" class="font-medium">0</span>
+                        </span>
+                        <span id="error-indicator" class="hidden ml-3">
+                              <span class="error-dot"></span>
+                              <span class="text-sm text-gray-600">
+                                    Lỗi: <span id="error-preview-count" class="font-medium text-red-500">0</span>
+                              </span>
+                        </span>
+                  </div>
+                  <div id="file-list" class="space-y-2 max-h-64 overflow-y-auto">
+                        <!-- Files will be listed here -->
+                  </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md p-6" id="results-section" style="display: none;">
+                  <h2 class="text-xl font-semibold text-gray-800 mb-4">Kết quả</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-green-50 p-4 rounded-lg">
+                              <div class="flex items-center justify-between">
+                                    <span class="text-green-600 font-medium">File thành công</span>
+                                    <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                          id="success-count">0</span>
+                              </div>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                              <div class="flex items-center justify-between">
+                                    <span class="text-red-600 font-medium">File lỗi</span>
+                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                          id="error-count">0</span>
+                              </div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                              <div class="flex items-center justify-between">
+                                    <span class="text-blue-600 font-medium">Tổng số file</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                          id="total-count">0</span>
+                              </div>
+                        </div>
+                  </div>
+                  <div class="mt-4" id="error-list">
+                        <!-- Errors will be listed here -->
+                  </div>
+            </div>
+      </div>
+
+      <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                  const dropZone = document.getElementById('drop-zone');
+                  const fileInput = document.getElementById('file-input');
+                  const fileInputBtn = document.getElementById('file-input-btn');
+                  const fileList = document.getElementById('file-list');
+                  const progressBar = document.getElementById('progress-bar');
+                  const progressStatus = document.getElementById('progress-status');
+                  const progressPercent = document.getElementById('progress-percent');
+                  const resultsSection = document.getElementById('results-section');
+                  const successCount = document.getElementById('success-count');
+                  const errorCount = document.getElementById('error-count');
+                  const totalCount = document.getElementById('total-count');
+                  const errorList = document.getElementById('error-list');
+                  const fileCount = document.getElementById('file-count');
+                  const errorIndicator = document.getElementById('error-indicator');
+                  const errorPreviewCount = document.getElementById('error-preview-count');
+                  const refreshBtn = document.getElementById('refresh-btn');
+                  const exportBtn = document.getElementById('export-btn');
+
+                  const supervisorOption = document.getElementById('supervisor-option');
+                  const employeeOption = document.getElementById('employee-option');
+                  const branchOption = document.getElementById('branch-option');
+
+                  let files = [];
+                  let successfulFiles = 0;
+                  let errorFiles = 0;
+                  let processingComplete = false;
+
+                  // Prevent default drag behaviors
+                  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                        dropZone.addEventListener(eventName, preventDefaults, false);
+                        document.body.addEventListener(eventName, preventDefaults, false);
+                  });
+
+                  // Highlight drop zone when item is dragged over it
+                  ['dragenter', 'dragover'].forEach(eventName => {
+                        dropZone.addEventListener(eventName, highlight, false);
+                  });
+
+                  ['dragleave', 'drop'].forEach(eventName => {
+                        dropZone.addEventListener(eventName, unhighlight, false);
+                  });
+
+                  // Handle dropped files
+                  dropZone.addEventListener('drop', handleDrop, false);
+
+                  // Handle selected files via button
+                  fileInputBtn.addEventListener('click', () => fileInput.click());
+                  fileInput.addEventListener('change', handleFiles);
+
+                  // Refresh button click handler
+                  refreshBtn.addEventListener('click', handleRefresh);
+
+                  // Export button click handler
+                  exportBtn.addEventListener('click', handleExport);
+
+                  function preventDefaults(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                  }
+
+                  function highlight() {
+                        dropZone.classList.add('drop-zone--over');
+                  }
+
+                  function unhighlight() {
+                        dropZone.classList.remove('drop-zone--over');
+                  }
+
+                  function handleDrop(e) {
+                        const dt = e.dataTransfer;
+                        const newFiles = dt.files;
+                        addFiles(newFiles);
+                  }
+
+                  function handleFiles(e) {
+                        const newFiles = e.target.files;
+                        addFiles(newFiles);
+                  }
+
+                  function addFiles(newFiles) {
+                        files = [...files, ...newFiles];
+                        updateFileList();
+                        startProcessing();
+                  }
+
+                  function updateFileList() {
+                        fileList.innerHTML = '';
+                        files.forEach((file, index) => {
+                              const isError = file.error !== undefined;
+
+                              const fileItem = document.createElement('div');
+                              fileItem.className = `file-item flex items-center justify-between ${isError ? 'bg-red-50' : 'bg-gray-50'} p-3 rounded-lg`;
+                              fileItem.innerHTML = `
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ${isError ? 'text-red-500' : 'text-green-500'} mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+                        </svg>
+                        <div>
+                            <span class="text-sm font-medium ${isError ? 'text-red-600' : 'text-gray-700'} truncate max-w-xs">${file.name}</span>
+                            ${isError ? '<div class="text-xs text-red-500">' + file.error + '</div>' : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-xs font-medium ${isError ? 'text-red-500' : 'text-gray-500'}">${formatFileSize(file.size)}</span>
+                        <button class="ml-2 text-red-500 hover:text-red-700" data-index="${index}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                              fileList.appendChild(fileItem);
+                        });
+
+                        // Update file count
+                        fileCount.textContent = files.length;
+
+                        // Update error preview
+                        const errorFilesCount = files.filter(f => f.error).length;
+                        if (errorFilesCount > 0) {
+                              errorIndicator.classList.remove('hidden');
+                              errorPreviewCount.textContent = errorFilesCount;
+                        } else {
+                              errorIndicator.classList.add('hidden');
+                        }
+
+                        // Add event listeners to remove buttons
+                        document.querySelectorAll('#file-list button').forEach(button => {
+                              button.addEventListener('click', (e) => {
+                                    const index = parseInt(e.currentTarget.getAttribute('data-index'));
+                                    files.splice(index, 1);
+                                    updateFileList();
+                                    processingComplete = false;
+                              });
+                        });
+                  }
+
+                  function formatFileSize(bytes) {
+                        if (bytes === 0) return '0 Bytes';
+                        const k = 1024;
+                        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                        const i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                  }
+
+                  function startProcessing() {
+                        if (files.length === 0) {
+                              progressStatus.textContent = 'Sẵn sàng';
+                              progressBar.style.width = '0%';
+                              progressPercent.textContent = '0%';
+                              resultsSection.style.display = 'none';
+                              return;
+                        }
+
+                        // Reset processing status
+                        processingComplete = false;
+
+                        // Reset counters
+                        successfulFiles = 0;
+                        errorFiles = 0;
+                        errorList.innerHTML = '';
+
+                        // Show processing UI
+                        progressBar.style.width = '0%';
+                        progressStatus.textContent = 'Đang xử lý...';
+                        progressPercent.textContent = '0%';
+                        progressBar.className = 'bg-blue-600 h-2.5 rounded-full progress-bar';
+                        resultsSection.style.display = 'none';
+                  }
+
+                  function handleExport() {
+                        if (files.length === 0) {
+                              alert('Vui lòng thêm file trước khi xuất dữ liệu!');
+                              return;
+                        }
+
+                        if (!processingComplete) {
+                              processFiles();
+                        } else {
+                              generateZip();
+                        }
+                  }
+
+                  function processFiles() {
+                        // Reset counters
+                        successfulFiles = 0;
+                        errorFiles = 0;
+                        errorList.innerHTML = '';
+
+                        let processedFiles = 0;
+
+                        function processNextFile(index) {
+                              if (index >= files.length) {
+                                    // All files processed
+                                    processingComplete = true;
+                                    completeProcessing();
+                                    return;
+                              }
+
+                              const file = files[index];
+                              const fileName = file.name;
+                              const fileExtension = fileName.slice(fileName.lastIndexOf('.')).toLowerCase();
+
+                              // Update progress
+                              processedFiles++;
+                              const progress = Math.round((processedFiles / files.length) * 100);
+                              progressBar.style.width = `${progress}%`;
+                              progressPercent.textContent = `${progress}%`;
+
+                              // Validate file extension
+                              if (fileExtension !== '.xlsx') {
+                                    errorFiles++;
+                                    files[index].error = "Định dạng file không hợp lệ (phải là .xlsx)";
+                                    addError(fileName, "Định dạng file không hợp lệ (phải là .xlsx)");
+                                    updateFileList();
+                                    processNextFile(index + 1);
+                                    return;
+                              }
+
+                              // Validate file name pattern
+                              const parts = fileName.split('-');
+                              if (parts.length < 6) {
+                                    errorFiles++;
+                                    files[index].error = "Tên file không đúng định dạng (thiếu thông tin)";
+                                    addError(fileName, "Tên file không đúng định dạng (thiếu thông tin)");
+                                    updateFileList();
+                                    processNextFile(index + 1);
+                                    return;
+                              }
+
+                              // Mark as successfully processed
+                              successfulFiles++;
+                              files[index].error = undefined;
+                              updateFileList();
+
+                              // Process next file
+                              processNextFile(index + 1);
+                        }
+
+                        // Start processing first file
+                        processNextFile(0);
+                  }
+
+                  function addError(fileName, errorMessage) {
+                        const errorItem = document.createElement('div');
+                        errorItem.className = 'text-sm p-2 bg-red-50 rounded mb-1';
+                        errorItem.innerHTML = `
+                    <span class="font-medium text-red-600">${fileName}</span>: 
+                    <span class="text-red-500">${errorMessage}</span>
+                `;
+                        errorList.appendChild(errorItem);
+                  }
+
+                  function completeProcessing() {
+                        // Update UI
+                        progressStatus.textContent = 'Hoàn thành';
+                        progressBar.className = 'bg-green-600 h-2.5 rounded-full progress-bar';
+
+                        // Show results
+                        resultsSection.style.display = 'block';
+                        successCount.textContent = successfulFiles;
+                        errorCount.textContent = errorFiles;
+                        totalCount.textContent = files.length;
+
+                        // Check if we need to generate ZIP immediately
+                        if (successfulFiles > 0) {
+                              generateZip();
+                        } else {
+                              alert('Không có file nào hợp lệ để xuất dữ liệu. Vui lòng kiểm tra lại các file của bạn.');
+                        }
+                  }
+
+                  function generateZip() {
+                        const zip = new JSZip();
+                        const supervisorsFolder = zip.folder("Người Giám Sát");
+                        const employeesFolder = zip.folder("Nhân Viên Được Đánh Giá");
+                        const branchesFolder = zip.folder("Chi Nhánh");
+
+                        let zipProgress = 0;
+
+                        // Add all successful files to the zip
+                        files.forEach((file, index) => {
+                              if (file.error) return; // Skip error files
+
+                              const fileName = file.name;
+                              const parts = fileName.split('-');
+                              const supervisorEmail = parts[0];
+                              const employeeEmail = parts[1];
+                              const branchName = parts[2];
+
+                              // Add to Supervisor folder
+                              if (supervisorOption.checked) {
+                                    const supervisorSubfolder = supervisorsFolder.folder(supervisorEmail);
+                                    supervisorSubfolder.file(fileName, file);
+                              }
+
+                              // Add to Employee folder
+                              if (employeeOption.checked) {
+                                    const employeeSubfolder = employeesFolder.folder(employeeEmail);
+                                    employeeSubfolder.file(fileName, file);
+                              }
+
+                              // Add to Branch folder
+                              if (branchOption.checked) {
+                                    const branchSubfolder = branchesFolder.folder(branchName);
+                                    branchSubfolder.file(fileName, file);
+                              }
+
+                              // Update progress text
+                              zipProgress++;
+                              progressStatus.textContent = `Đang tạo file ZIP (${zipProgress}/${successfulFiles})`;
+                        });
+
+                        // Generate and download ZIP
+                        zip.generateAsync({ type: 'blob' }).then(function (content) {
+                              saveAs(content, "Tong_Hop_Du_Lieu.zip");
+                              progressStatus.textContent = 'Tải xuống hoàn tất';
+                        });
+                  }
+
+                  function handleRefresh() {
+                        // Reset everything
+                        files = [];
+                        successfulFiles = 0;
+                        errorFiles = 0;
+                        processingComplete = false;
+
+                        // Reset UI
+                        fileList.innerHTML = '';
+                        errorList.innerHTML = '';
+                        fileCount.textContent = '0';
+                        errorIndicator.classList.add('hidden');
+                        progressBar.style.width = '0%';
+                        progressStatus.textContent = 'Sẵn sàng';
+                        progressPercent.textContent = '0%';
+                        resultsSection.style.display = 'none';
+                        successCount.textContent = '0';
+                        errorCount.textContent = '0';
+                        totalCount.textContent = '0';
+
+                        // Reset file input
+                        fileInput.value = '';
+                  }
+            });
+      </script>
+</body>
+
+</html>
