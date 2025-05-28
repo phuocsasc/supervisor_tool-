@@ -4,7 +4,7 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Tool Thống kê Chi Nhánh</title>
+      <title>Tổng Quan Chi Nhánh</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -29,16 +29,18 @@
                               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded btn-hover">
                               <i class="fas fa-folder-open mr-1"></i> Chọn File
                         </button>
-                        <div id="fileListDisplay" class="mt-2 space-y-1 text-sm text-gray-700"></div>
+                        <div id="fileListDisplay"
+                              class="mt-2 space-y-1 text-sm text-gray-700 max-h-[160px] overflow-y-auto pr-1"></div>
+
                         <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx</p>
                   </div>
                   <button id="generateSummaryBtn"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
-                        <i class="fas fa-chart-pie mr-1"></i> Xử lý dữ liệu
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 mt-3 rounded btn-hover">
+                        <i class="fas fa-chart-pie mr-1"></i> Tạo Báo Cáo Tổng Hợp
                   </button>
                   <button id="exportExcelBtn"
-                        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 mt-3 rounded btn-hover">
-                        <i class="fas fa-file-export mr-1"></i> Xuất File Excel
+                        class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 mt-3 rounded btn-hover">
+                        <i class="fas fa-file-export mr-1"></i> Xuất báo cáo Excel
                   </button>
                   <button id="resetPageBtn"
                         class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 mt-3 rounded btn-hover">
@@ -47,21 +49,22 @@
 
 
             </div>
-            <div id="branchReportContainer" class="mt-8 hidden">
+            <div id="branchReportContainer" class="mt-8 hidden">formatter
                   <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh</h3>
-                  <div class="overflow-x-auto">
+                  <div class="overflow-x-auto max-h-[320px] overflow-y-auto rounded border border-gray-300">
                         <table class="min-w-full bg-white rounded shadow text-sm">
-                              <thead class="bg-blue-600 text-white">
+                              <thead class="bg-blue-600 text-white sticky top-0 z-10">
                                     <tr>
-                                          <th class="py-2 px-4">Tên người giám sát</th>
-                                          <th class="py-2 px-4">Tên nhân viên</th>
-                                          <th class="py-2 px-4">Email</th>
-                                          <th class="py-2 px-4">Chi nhánh</th>
-                                          <th class="py-2 px-4">Ngày đánh giá</th>
-                                          <th class="py-2 px-4">Tổng tiêu chí</th>
-                                          <th class="py-2 px-4">CÓ</th>
-                                          <th class="py-2 px-4">KHÔNG</th>
-                                          <th class="py-2 px-4">CHƯA KIỂM TRA</th>
+                                          <th class="py-2 px-4 bg-blue-600">STT</th>
+                                          <th class="py-2 px-4 bg-blue-600">Email người giám sát</th>
+                                          <th class="py-2 px-4 bg-blue-600">Tên nhân viên</th>
+                                          <th class="py-2 px-4 bg-blue-600">Email</th>
+                                          <th class="py-2 px-4 bg-blue-600">Chi nhánh</th>
+                                          <th class="py-2 px-4 bg-blue-600">Ngày đánh giá</th>
+                                          <th class="py-2 px-4 bg-blue-600">Tổng tiêu chí</th>
+                                          <th class="py-2 px-4 bg-blue-600">CÓ</th>
+                                          <th class="py-2 px-4 bg-blue-600">KHÔNG</th>
+                                          <th class="py-2 px-4 bg-blue-600">CHƯA KIỂM TRA</th>
                                     </tr>
                               </thead>
                               <tbody id="branchReportBody"></tbody>
@@ -114,7 +117,7 @@
 
             document.getElementById("exportExcelBtn").addEventListener("click", async () => {
                   const workbook = new ExcelJS.Workbook();
-                  const sheet = workbook.addWorksheet("Báo Cáo Chi Nhánh");
+                  const sheet = workbook.addWorksheet("Thong Ke Chi Nhan");
 
                   const canvas1 = document.getElementById("branchBarChart");
                   const pieCanvases = document.querySelectorAll("#pieChartContainer canvas");
@@ -145,23 +148,27 @@
                   // 🟦 Tên chi nhánh
                   // Lấy tên chi nhánh từ dòng đầu tiên có sẵn trong bảng
                   const firstBranchRow = document.querySelector("#branchReportBody tr");
-                  const branchNameRaw = firstBranchRow?.querySelector("td:nth-child(4)")?.textContent || "ChiNhanh";
+                  const branchNameRaw = firstBranchRow?.querySelector("td:nth-child(5)")?.textContent || "ChiNhanh";
                   const branchName = branchNameRaw.replace(/[^a-zA-ZÀ-ỹ0-9 ]/g, "");
 
 
                   // Lấy ngày hiện tại định dạng dd-MM-yyyy
-                  const today = new Date();
-                  const dateStr = today.toLocaleDateString('vi-VN').replaceAll('/', '-');
+                  // const today = new Date();
+                  // const dateStr = today.toLocaleDateString('vi-VN').replaceAll('/', '-');
+                  const now = new Date();
+                  const yyyy = now.getFullYear();
+                  const mm = String(now.getMonth() + 1).padStart(2, '0');
+                  const dd = String(now.getDate()).padStart(2, '0');
 
                   // Gộp tên file
-                  const fileName = `Báo Cáo Chi Nhánh ${branchName} ${dateStr}.xlsx`;
+                  const fileName = `ThongKeChiNhanh_${branchName}_${yyyy}-${mm}-${dd}.xlsx`;
                   const titleRow = sheet.addRow([branchName]);
                   sheet.mergeCells(`A1:I1`);
                   titleRow.font = { bold: true, size: 14, color: { argb: 'FF1F4E78' } };
                   titleRow.alignment = { horizontal: 'center' };
 
                   // 🟦 Header bảng
-                  const header = ["Tên Người Giám Sát", "Tên nhân viên", "Email", "Chi nhánh", "Ngày đánh giá", "Tổng tiêu chí", "CÓ", "KHÔNG", "CHƯA KIỂM TRA"]
+                  const header = ["STT", "Email Người Giám Sát", "Tên nhân viên", "Email", "Chi nhánh", "Ngày đánh giá", "Tổng tiêu chí", "CÓ", "KHÔNG", "CHƯA KIỂM TRA"]
                   const headerRow = sheet.addRow(header);
                   // Tự động điều chỉnh độ rộng cho từng cột
                   sheet.columns.forEach(column => {
@@ -186,12 +193,25 @@
                   }
 
                   headerRow.alignment = { horizontal: 'center' };
-
-                  // 🟦 Dữ liệu bảng
+                  //Dữ liệu bảng
+                  let index = 1;
                   document.querySelectorAll("#branchReportBody tr").forEach(tr => {
-                        const cells = Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
-                        sheet.addRow(cells);
+                        const tds = tr.querySelectorAll("td");
+                        const rowData = [
+                              index++,
+                              `${tds[1].textContent.trim()}`, // Email người giám sát đã hiển thị đúng
+                              tds[2].textContent.trim(), // Tên nhân viên
+                              tds[3].textContent.trim(), // Email
+                              tds[4].textContent.trim(), // Chi nhánh
+                              tds[5].textContent.trim(), // Ngày đánh giá
+                              tds[6].textContent.trim(), // Tổng tiêu chí
+                              tds[7].textContent.trim(), // CÓ
+                              tds[8].textContent.trim(), // KHÔNG
+                              tds[9].textContent.trim()  // CHƯA KIỂM TRA
+                        ];
+                        sheet.addRow(rowData);
                   });
+
 
                   // 🖼 Chèn biểu đồ
                   // 🖼️ Chèn biểu đồ cột (to hơn 0.5x)
@@ -222,7 +242,7 @@
                         labelRow.commit();
 
                         // Chỉ cần tạo khoảng trống một lần sau ảnh + tên
-                        for (let i = 0; i < 13; i++) sheet.addRow([]);
+                        for (let i = 0; i < 4; i++) sheet.addRow([]);
                   }
 
 
@@ -258,12 +278,36 @@
                         titleRow.commit();
 
                         // Di chuyển vị trí hình tiếp theo
-                        colOffset += 5;
+                        colOffset += 4;
                         if ((i + 1) % chartPerRow === 0) {
                               colOffset = 1;
                               rowOffset += 15;
                         }
                   }
+                  // ✅ Chèn chú thích dưới cùng bảng Excel
+                  let legendStartRow = sheet.rowCount + 2;
+                  const legendItems = [
+                        { label: "CÓ", color: "00B050" },            // Xanh lá
+                        { label: "KHÔNG", color: "FF0000" },         // Đỏ
+                        { label: "CHƯA KIỂM TRA", color: "A5A5A5" }  // Xám
+                  ];
+
+                  sheet.addRow([]); // khoảng trống
+
+                  legendItems.forEach((item, i) => {
+                        const row = sheet.getRow(legendStartRow + i);
+                        row.getCell(2).value = item.label;
+                        row.getCell(2).font = { bold: true };
+
+                        row.getCell(1).fill = {
+                              type: 'pattern',
+                              pattern: 'solid',
+                              fgColor: { argb: `FF${item.color}` }
+                        };
+
+                        row.height = 18;
+                        row.commit();
+                  });
 
 
                   const buffer = await workbook.xlsx.writeBuffer();
@@ -486,7 +530,9 @@
                                                 },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                      return value > 0 ? `${Math.round((value / total) * 100)}%` : '';  // hiển thị phần trăm
+                                                      return value > 0
+                                                            ? `${((value / total) * 100).toFixed(2)}%`
+                                                            : '';
                                                 }
                                           }
                                     }
@@ -531,6 +577,7 @@
                   branchReportBody.innerHTML = '';
                   branchReportContainer.classList.remove('hidden');
 
+                  let index = 1; // Khởi tạo STT
                   for (const file of files) {
                         const data = await file.arrayBuffer();
                         const workbook = XLSX.read(data, { type: 'array' });
@@ -538,25 +585,26 @@
                         const sheet = workbook.Sheets[sheetName];
                         const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA } = getSummaryFromSheet(sheet, file.name);
 
-
-
                         const row = document.createElement('tr');
                         row.className = 'border-b';
 
                         row.innerHTML = `
-  <td class="py-2 px-4">${supervisor}</td>
-<td class="py-2 px-4">${fullName}</td> 
-  <td class="py-2 px-4">${email}</td>
-  <td class="py-2 px-4">${branch}</td>
-  <td class="py-2 px-4">${date}</td>
-  <td class="py-2 px-4 text-center">${TOTAL_CRITERIA}</td>
-  <td class="py-2 px-4 text-center">${CÓ}</td>
-  <td class="py-2 px-4 text-center">${KHÔNG}</td>
-  <td class="py-2 px-4 text-center">${CHUA}</td>
-`;
+        <td class="py-2 px-4 text-center">${index}</td>
+        <td class="py-2 px-4">${supervisor}@gmail.com</td>
+        <td class="py-2 px-4">${fullName}</td> 
+        <td class="py-2 px-4">${email}</td>
+        <td class="py-2 px-4">${branch}</td>
+        <td class="py-2 px-4">${date}</td>
+        <td class="py-2 px-4 text-center">${TOTAL_CRITERIA}</td>
+        <td class="py-2 px-4 text-center">${CÓ}</td>
+        <td class="py-2 px-4 text-center">${KHÔNG}</td>
+        <td class="py-2 px-4 text-center">${CHUA}</td>
+    `;
 
                         branchReportBody.appendChild(row);
+                        index++;
                   }
+
 
             });
       </script>

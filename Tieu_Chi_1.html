@@ -185,7 +185,8 @@
                         </div>
                         <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx">
                         <!-- Error Alert -->
-                        <div id="errorAlert" class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                        <div id="errorAlert"
+                              class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
                               <div class="flex">
                                     <div class="flex-shrink-0 pt-0.5">
                                           <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
@@ -203,9 +204,10 @@
                                     </button>
                               </div>
                         </div>
-                        
+
                         <!-- Success Alert -->
-                        <div id="successAlert" class="hidden fade-in bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
+                        <div id="successAlert"
+                              class="hidden fade-in bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
                               <div class="flex">
                                     <div class="flex-shrink-0 pt-0.5">
                                           <i class="fas fa-check-circle text-green-500 text-xl"></i>
@@ -237,7 +239,8 @@
                                           Xử lý dữ liệu
                                     </button>
                               </div>
-                              <div id="fileList" class="space-y-3 divide-y divide-gray-100 max-h-[300px] overflow-y-auto pr-2"></div>
+                              <div id="fileList"
+                                    class="space-y-3 divide-y divide-gray-100 max-h-[300px] overflow-y-auto pr-2"></div>
                         </div>
 
                         <!-- Processing Area -->
@@ -279,9 +282,10 @@
                                     </h3>
                                     <div class="scrollable-table-container border border-gray-200 rounded-lg shadow-sm">
                                           <table id="summaryTable" class="min-w-full divide-y divide-gray-200">
-                                                <thead class="bg-gray-50">
+                                                <thead class="bg-gray-100">
                                                       <tr>
-                                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                                                   STT
                                                             </th>
                                                             <th scope="col"
@@ -313,11 +317,12 @@
                                                 <tbody id="summaryTableBody" class="bg-white divide-y divide-gray-200">
                                                       <!-- Data will be inserted here -->
                                                 </tbody>
-                                                <tfoot class="bg-gray-50">
+                                                <tfoot class="bg-gray-300 ">
                                                       <tr>
                                                             <td class="px-6 py-3 text-sm font-semibold text-gray-900">
                                                                   Tổng cộng</td>
-                                                            <td class="px-6 py-3 text-sm font-semibold text-gray-900">#</td>
+                                                            <td class="px-6 py-3 text-sm font-semibold text-gray-900">#
+                                                            </td>
                                                             <td id="totalCriteria"
                                                                   class="px-6 py-3 text-sm text-gray-500">0</td>
                                                             <td id="totalYes"
@@ -359,7 +364,16 @@
                                           class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                                           <canvas id="progressChart"></canvas>
                                     </div>
-                                    
+                                    <!-- Biểu đồ tròn tiêu chí -->
+                                    <div id="pieChartContainer" class="mt-8 hidden">
+                                          <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                                <i class="fas fa-chart-pie mr-2"></i>
+                                                Biểu đồ đánh giá theo 5 tiêu chí đầu tiên
+                                          </h3>
+                                          <div id="pieChartGrid"
+                                                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                                    </div>
+
                               </div>
 
                               <!-- Export Button -->
@@ -372,7 +386,7 @@
                               </div>
                         </div>
 
-                        
+
                   </div>
             </div>
       </div>
@@ -479,7 +493,7 @@
                                           // Extract required data
                                           const extractedData = extractDataFromSheet(firstSheet, file.name);
 
-                                          resolve(extractedData);
+                                          resolve({ ...extractedData, rawData: data });
                                     } catch (error) {
                                           reject(error);
                                     }
@@ -593,6 +607,9 @@
                         // Update summary table and chart
                         updateSummaryTable(allFiles);
                         createOrUpdateChart(allFiles);
+                        setTimeout(() => {
+                              drawTop5CategoryCharts(allFiles);
+                        }, 50)
 
                         // Show processing section
                         processingSection.classList.remove('hidden');
@@ -797,8 +814,8 @@
                   totalNo.textContent = totalNoCount;
                   totalPending.textContent = totalPendingCount;
 
-                  const totalRateValue = totalCriteriaCount > 0
-                        ? Math.round((totalYesCount / (totalYesCount + totalNoCount)) * 100)
+                  const totalRateValue = files.length > 0
+                        ? Math.round(files.reduce((sum, file) => sum + file.rate, 0) / files.length)
                         : 0;
 
                   totalRate.textContent = `${totalRateValue}%`;
@@ -808,6 +825,7 @@
                               ? 'px-6 py-3 text-sm font-medium text-yellow-600'
                               : 'px-6 py-3 text-sm font-medium text-red-600';
             }
+
 
             function changeChartType(type) {
                   if (!progressChart) return;
@@ -974,25 +992,18 @@
                   if (allFiles.length === 0) return;
 
                   try {
-                        // Add loading state to button
                         exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang xuất...';
                         exportBtn.disabled = true;
 
-                        // Create a new workbook
                         const workbook = new ExcelJS.Workbook();
                         const worksheet = workbook.addWorksheet("Thống kê");
 
-                        // Add employee info
                         worksheet.getCell('A1').value = `Tên nhân viên: ${employeeData.name}`;
                         worksheet.getCell('A1').font = { bold: true };
-
                         worksheet.getCell('A2').value = `Email: ${employeeData.email}`;
                         worksheet.getCell('A3').value = `Chi nhánh: ${employeeData.branch}`;
-
-                        // Add empty row
                         worksheet.addRow([]);
 
-                        // Add headers
                         worksheet.getCell('A5').value = 'STT';
                         worksheet.getCell('B5').value = 'Ngày đánh giá';
                         worksheet.getCell('C5').value = 'Tổng tiêu chí';
@@ -1001,14 +1012,9 @@
                         worksheet.getCell('F5').value = 'Tổng Chưa Kiểm Tra';
                         worksheet.getCell('G5').value = 'Tỉ lệ % CÓ (đạt yêu cầu)';
 
-                        // Style header row
                         ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5'].forEach(cell => {
                               worksheet.getCell(cell).font = { bold: true };
-                              worksheet.getCell(cell).fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFD9E1F2' }
-                              };
+                              worksheet.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9E1F2' } };
                               worksheet.getCell(cell).border = {
                                     top: { style: 'thin', color: { argb: 'FF8EA9DB' } },
                                     left: { style: 'thin', color: { argb: 'FF8EA9DB' } },
@@ -1018,41 +1024,38 @@
                               worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
                         });
 
-                        // Add data rows (sorted by date)
                         let totalYes = 0, totalNo = 0, totalPending = 0, totalCriteria = 0;
                         sortFilesByDate(allFiles).forEach((file, index) => {
                               const row = worksheet.getRow(6 + index);
-
-                              row.getCell(1).value = index + 1; // STT
+                              row.getCell(1).value = index + 1;
                               row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
                               row.getCell(2).value = file.dateStr;
                               row.getCell(3).value = file.totalCriteria;
                               row.getCell(4).value = file.hasCount;
                               row.getCell(5).value = file.noCount;
                               row.getCell(6).value = file.notCheckedCount;
-                              row.getCell(7).value = { formula: `ROUND((${file.hasCount}/${file.hasCount + file.noCount})*100,0)&"%"` };
+                              const rateValue = (file.hasCount + file.noCount) > 0
+                                    ? Math.round((file.hasCount / (file.hasCount + file.noCount)) * 100)
+                                    : 0;
+                              row.getCell(7).value = `${rateValue}%`;
+
                               row.getCell(7).alignment = { vertical: 'middle', horizontal: 'right' };
 
-
-
-                              // Apply different colors based on rate
                               const rate = (file.hasCount / (file.hasCount + file.noCount)) * 100;
                               if (rate >= 90) {
-                                    row.getCell(7).font = { color: { argb: 'FF548235' }, bold: true }; // Green
+                                    row.getCell(7).font = { color: { argb: 'FF548235' }, bold: true };
                               } else if (rate >= 70) {
-                                    row.getCell(7).font = { color: { argb: 'FFF1C933' }, bold: true }; // Yellow
+                                    row.getCell(7).font = { color: { argb: 'FFF1C933' }, bold: true };
                               } else {
-                                    row.getCell(7).font = { color: { argb: 'FFC00000' }, bold: true }; // Red
+                                    row.getCell(7).font = { color: { argb: 'FFC00000' }, bold: true };
                               }
 
-                              // Update totals
                               totalYes += file.hasCount;
                               totalNo += file.noCount;
                               totalPending += file.notCheckedCount;
                               totalCriteria += file.totalCriteria;
                         });
 
-                        // Style data rows
                         for (let i = 6; i < 6 + allFiles.length; i++) {
                               ['A', 'B', 'C', 'D', 'E', 'F'].forEach(col => {
                                     worksheet.getCell(`${col}${i}`).border = {
@@ -1062,42 +1065,35 @@
                                           right: { style: 'thin', color: { argb: 'FFD9D9D9' } }
                                     };
                               });
-
-                              // Color CÓ and KHÔNG cells
-                              worksheet.getCell(`D${i}`).fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFE2EFDA' } // Light green
-                              };
-                              worksheet.getCell(`E${i}`).fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFFCE4D6' } // Light red
-                              };
+                              worksheet.getCell(`D${i}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE2EFDA' } };
+                              worksheet.getCell(`E${i}`).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFCE4D6' } };
                         }
 
-                        // Add totals row
                         const totalRowNum = 6 + allFiles.length + 1;
                         worksheet.getCell(`A${totalRowNum}`).value = 'Tổng cộng';
                         worksheet.getCell(`A${totalRowNum}`).font = { bold: true };
                         worksheet.getCell(`B${totalRowNum}`).value = '#';
                         worksheet.getCell(`C${totalRowNum}`).value = totalCriteria;
                         worksheet.getCell(`D${totalRowNum}`).value = totalYes;
-                        worksheet.getCell(`D${totalRowNum}`).font = { color: { argb: 'FF548235' }, bold: true }; // Green
-
+                        worksheet.getCell(`D${totalRowNum}`).font = { color: { argb: 'FF548235' }, bold: true };
                         worksheet.getCell(`E${totalRowNum}`).value = totalNo;
-                        worksheet.getCell(`E${totalRowNum}`).font = { color: { argb: 'FFC00000' }, bold: true }; // Red
-
+                        worksheet.getCell(`E${totalRowNum}`).font = { color: { argb: 'FFC00000' }, bold: true };
                         worksheet.getCell(`F${totalRowNum}`).value = totalPending;
-                        worksheet.getCell(`G${totalRowNum}`).value = { formula: `ROUND((${totalYes}/${totalYes + totalNo})*100,0)&"%"` };
+                        const totalRate = (totalYes + totalNo) > 0
+                              ? Math.round((totalYes / (totalYes + totalNo)) * 100)
+                              : 0;
+
+                        const averageRate = allFiles.length > 0
+                              ? Math.round(allFiles.reduce((sum, file) => sum + ((file.hasCount + file.noCount) > 0
+                                    ? (file.hasCount / (file.hasCount + file.noCount)) * 100 : 0), 0) / allFiles.length)
+                              : 0;
+                        worksheet.getCell(`G${totalRowNum}`).value = `${averageRate}%`;
 
 
-                        // Style totals row
+
                         ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(col => {
                               worksheet.getCell(`${col}${totalRowNum}`).fill = {
-                                    type: 'pattern',
-                                    pattern: 'solid',
-                                    fgColor: { argb: 'FFF2F2F2' } // Light gray
+                                    type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF2F2F2' }
                               };
                               worksheet.getCell(`${col}${totalRowNum}`).border = {
                                     top: { style: 'double', color: { argb: 'FF0070C0' } },
@@ -1108,33 +1104,60 @@
                               }
                         });
 
-                        // Auto column width
                         worksheet.columns.forEach(column => {
                               let maxLength = 0;
                               column.eachCell({ includeEmpty: true }, cell => {
                                     const columnLength = cell.value ? cell.value.toString().length : 0;
-                                    if (columnLength > maxLength) {
-                                          maxLength = columnLength;
-                                    }
+                                    if (columnLength > maxLength) maxLength = columnLength;
                               });
                               column.width = maxLength < 12 ? 12 : maxLength + 2;
                         });
 
-                        // Add chart image (if available)
                         if (progressChart) {
                               const chartImage = await getChartImage();
                               if (chartImage) {
-                                    const imageId = workbook.addImage({
-                                          base64: chartImage,
-                                          extension: 'png',
-                                    });
-
-                                    // Add chart after the data table
+                                    const imageId = workbook.addImage({ base64: chartImage, extension: 'png' });
                                     worksheet.addImage(imageId, `A${totalRowNum + 3}:F${totalRowNum + 25}`);
                               }
                         }
 
-                        // Generate file
+                        const pieCanvases = document.querySelectorAll('#pieChartGrid canvas');
+                        if (pieCanvases.length > 0) {
+                              let rowOffset = totalRowNum + 30;
+                              let colOffset = 1;
+                              let chartPerRow = 3;
+                              for (let i = 0; i < pieCanvases.length; i++) {
+                                    const canvas = pieCanvases[i];
+                                    const title = canvas.parentElement.querySelector('div')?.textContent || `Tiêu chí ${i + 1}`;
+                                    const dataUrl = canvas.toDataURL('image/png');
+                                    const base64 = dataUrl.split(',')[1];
+                                    const binary = atob(base64);
+                                    const bytes = new Uint8Array(binary.length);
+                                    for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+                                    const imageId = workbook.addImage({ buffer: bytes, extension: 'png' });
+                                    worksheet.addImage(imageId, { tl: { col: colOffset, row: rowOffset }, ext: { width: 220, height: 220 } });
+                                    const labelCell = worksheet.getCell(rowOffset + 15, colOffset + 1);
+                                    labelCell.value = title;
+                                    labelCell.font = { bold: true };
+                                    labelCell.alignment = { horizontal: 'center' };
+                                    worksheet.mergeCells(rowOffset + 15, colOffset + 1, rowOffset + 15, colOffset + 2);
+                                    colOffset += 4;
+                                    if ((i + 1) % chartPerRow === 0) {
+                                          colOffset = 1;
+                                          rowOffset += 20;
+                                    }
+                              }
+                              const legendRow = worksheet.getRow(rowOffset + 20);
+                              legendRow.getCell(1).value = 'Chú thích:';
+                              legendRow.getCell(2).value = 'CÓ';
+                              legendRow.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF00B050' } };
+                              legendRow.getCell(3).value = 'KHÔNG';
+                              legendRow.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFF0000' } };
+                              legendRow.getCell(4).value = 'CHƯA KIỂM TRA';
+                              legendRow.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFA5A5A5' } };
+                              legendRow.commit();
+                        }
+
                         const buffer = await workbook.xlsx.writeBuffer();
                         const now = new Date();
                         const yyyy = now.getFullYear();
@@ -1142,17 +1165,13 @@
                         const dd = String(now.getDate()).padStart(2, '0');
                         const cleanEmail = employeeData.email.split('@')[0].trim() || 'unknown';
                         const fileName = `ThongKeNhanVien_${cleanEmail}_${yyyy}-${mm}-${dd}.xlsx`;
-                        
 
                         saveAs(new Blob([buffer]), fileName);
-
                         showSuccess('Xuất file thành công', `File Excel đã được tải xuống thành công.`);
-
                   } catch (error) {
                         showError('Lỗi xuất file', 'Không thể tạo file Excel. Vui lòng thử lại.');
                         console.error(error);
                   } finally {
-                        // Reset button state
                         exportBtn.innerHTML = '<i class="fas fa-file-export mr-2"></i> Xuất File Excel';
                         exportBtn.disabled = false;
                   }
@@ -1180,6 +1199,88 @@
                         resolve(image);
                   });
             }
+            //Circle Chart
+            function drawTop5CategoryCharts(files) {
+                  const container = document.getElementById('pieChartContainer');
+                  const grid = document.getElementById('pieChartGrid');
+                  container.classList.remove('hidden');
+                  grid.innerHTML = ''; // Clear cũ
+
+                  const categoryList = []; // tên 5 tiêu chí
+                  const categoryStats = {}; // { Tiêu chí A: {CÓ: x, KHÔNG: y, CHƯA KIỂM TRA: z} }
+
+                  for (const file of files) {
+                        const buffer = file.rawData.buffer || file.rawData; // convert Uint8Array → ArrayBuffer
+                        const workbook = XLSX.read(buffer, { type: 'array' });
+
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                        for (let i = 7; i < rows.length; i++) {
+                              const cat = rows[i]?.[1];
+                              const result = rows[i]?.[5]?.toString().trim().toUpperCase();
+
+                              if (!cat || !['CÓ', 'KHÔNG', 'CHƯA KIỂM TRA'].includes(result)) continue;
+
+                              if (categoryList.length < 5 && !categoryList.includes(cat)) {
+                                    categoryList.push(cat);
+                              }
+
+                              if (categoryList.includes(cat)) {
+                                    if (!categoryStats[cat]) {
+                                          categoryStats[cat] = { 'CÓ': 0, 'KHÔNG': 0, 'CHƯA KIỂM TRA': 0 };
+                                    }
+                                    categoryStats[cat][result]++;
+                              }
+                        }
+                  }
+
+                  categoryList.forEach((cat) => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'text-center';
+
+                        const canvas = document.createElement('canvas');
+                        canvas.className = 'w-full max-w-[260px] h-auto mx-auto';
+                        wrapper.appendChild(canvas);
+
+                        const caption = document.createElement('div');
+                        caption.className = 'font-semibold text-sm text-gray-800 mt-2';
+                        caption.textContent = cat;
+                        wrapper.appendChild(caption);
+
+                        grid.appendChild(wrapper);
+
+                        const stats = categoryStats[cat] || { 'CÓ': 0, 'KHÔNG': 0, 'CHƯA KIỂM TRA': 0 };
+
+                        new Chart(canvas, {
+                              type: 'pie',
+                              data: {
+                                    labels: ['CÓ', 'KHÔNG', 'CHƯA KIỂM TRA'],
+                                    datasets: [{
+                                          data: [stats['CÓ'], stats['KHÔNG'], stats['CHƯA KIỂM TRA']],
+                                          backgroundColor: ['#00B050', '#FF0000', '#A5A5A5']
+                                    }]
+                              },
+                              options: {
+                                    responsive: true,
+                                    plugins: {
+                                          legend: { display: false },
+                                          datalabels: {
+                                                color: '#fff',
+                                                font: { weight: 'bold' },
+                                                formatter: (value, ctx) => {
+                                                      const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                                      const percent = total ? Math.round((value / total) * 100) : 0;
+                                                      return percent > 0 ? `${percent}%` : '';
+                                                }
+                                          }
+                                    }
+                              },
+                              plugins: [ChartDataLabels]
+                        });
+                  });
+            }
+
 
             function showError(title, message) {
                   errorTitle.textContent = title;
