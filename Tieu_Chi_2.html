@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Tool Thống kê Chi Nhánh</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-gray-50 min-h-screen py-10">
+      <div class="max-w-5xl mx-auto px-4">
+            <div class="bg-white rounded-lg shadow p-6">
+                  <h2 class="text-xl sm:text-2xl font-semibold text-blue-700 mb-4 flex items-center">
+                        <i class="fas fa-chart-column mr-2"></i> TỔNG HỢP ĐÁNH GIÁ THEO CHI NHÁNH
+                  </h2>
+                  <div class="mb-3">
+                        <label class="block text-gray-700 text-sm font-medium mb-1">Chọn các file đánh giá nhân viên
+                              trong chi nhánh</label>
+                        <input type="file" id="summaryFiles" accept=".xlsx" multiple class="hidden">
+                        <button id="chooseSummaryFilesBtn"
+                              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded btn-hover">
+                              <i class="fas fa-folder-open mr-1"></i> Chọn File
+                        </button>
+                        <div id="fileListDisplay" class="mt-2 space-y-1 text-sm text-gray-700"></div>
+                        <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx</p>
+                  </div>
+                  <button id="generateSummaryBtn"
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
+                        <i class="fas fa-chart-pie mr-1"></i> Xử lý dữ liệu
+                  </button>
+                  <button id="exportExcelBtn"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 mt-3 rounded btn-hover">
+                        <i class="fas fa-file-export mr-1"></i> Xuất File Excel
+                  </button>
+                  <button id="resetPageBtn"
+                        class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 mt-3 rounded btn-hover">
+                        <i class="fas fa-rotate-left mr-1"></i> Làm mới
+                  </button>
+
+
+            </div>
+            <div id="branchReportContainer" class="mt-8 hidden">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh</h3>
+                  <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded shadow text-sm">
+                              <thead class="bg-blue-600 text-white">
+                                    <tr>
+                                          <th class="py-2 px-4">Tên người giám sát</th>
+                                          <th class="py-2 px-4">Tên nhân viên</th>
+                                          <th class="py-2 px-4">Email</th>
+                                          <th class="py-2 px-4">Chi nhánh</th>
+                                          <th class="py-2 px-4">Ngày đánh giá</th>
+                                          <th class="py-2 px-4">Tổng tiêu chí</th>
+                                          <th class="py-2 px-4">CÓ</th>
+                                          <th class="py-2 px-4">KHÔNG</th>
+                                          <th class="py-2 px-4">CHƯA KIỂM TRA</th>
+                                    </tr>
+                              </thead>
+                              <tbody id="branchReportBody"></tbody>
+                        </table>
+                  </div>
+            </div>
+
+            <div id="chartContainer" class="mt-8 hidden">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Biểu đồ đánh giá theo nhân viên</h3>
+                  <canvas id="branchBarChart" class="bg-white p-4 rounded shadow"></canvas>
+            </div>
+
+            <div id="summaryTableContainer" class="mt-8 hidden">
+                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Tổng hợp đánh giá theo danh mục 1</h3>
+                  <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white rounded shadow text-sm">
+                              <thead>
+                                    <tr class="bg-blue-700 text-white">
+                                          <th class="py-2 px-4 text-left">Danh mục 1</th>
+                                          <th class="py-2 px-4 text-center">CÓ (đạt yêu cầu)</th>
+                                          <th class="py-2 px-4 text-center">KHÔNG (chưa đạt yêu cầu)</th>
+                                          <th class="py-2 px-4 text-center">CHƯA KIỂM TRA</th>
+                                    </tr>
+                              </thead>
+                              <tbody id="summaryTableBody"></tbody>
+                        </table>
+                  </div>
+            </div>
+
+            <!-- Biểu đồ tròn theo từng danh mục -->
+            <div id="pieChartContainer" class="mt-8 hidden"></div>
+      </div>
+
+      <script>
+            const chooseSummaryFilesBtn = document.getElementById('chooseSummaryFilesBtn');
+            const summaryFilesInput = document.getElementById('summaryFiles');
+            const fileListDisplay = document.getElementById('fileListDisplay');
+            const chartContainer = document.getElementById('chartContainer');
+            const summaryTableContainer = document.getElementById('summaryTableContainer');
+            const summaryTableBody = document.getElementById('summaryTableBody');
+
+            let selectedFiles = new Map();
+            let selectedBranch = null;
+            chooseSummaryFilesBtn.addEventListener('click', () => summaryFilesInput.click());
+            document.getElementById("resetPageBtn").addEventListener("click", () => {
+                  if (confirm("Bạn có chắc chắn muốn làm mới toàn bộ trang?")) {
+                        location.reload();
+                  }
+            });
+
+            document.getElementById("exportExcelBtn").addEventListener("click", async () => {
+                  const workbook = new ExcelJS.Workbook();
+                  const sheet = workbook.addWorksheet("Báo Cáo Chi Nhánh");
+
+                  const canvas1 = document.getElementById("branchBarChart");
+                  const pieCanvases = document.querySelectorAll("#pieChartContainer canvas");
+
+                  // ✅ Định nghĩa HÀM trước khi sử dụng
+                  const addImageFromCanvas = async (canvas, rowOffset) => {
+                        const dataUrl = canvas.toDataURL("image/png");
+                        const base64 = dataUrl.split(',')[1];
+                        const binary = atob(base64);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+
+                        const imageId = workbook.addImage({
+                              buffer: bytes,
+                              extension: 'png'
+                        });
+
+                        sheet.addImage(imageId, {
+                              tl: { col: colOffset, row: rowOffset },
+                              ext: { width: 320, height: 240 }  // ✅ cố định kích thước pixel
+                        });
+
+
+                        // Tạo khoảng trống sau ảnh
+                        for (let i = 0; i < 14; i++) sheet.addRow([]);
+                  };
+
+                  // 🟦 Tên chi nhánh
+                  // Lấy tên chi nhánh từ dòng đầu tiên có sẵn trong bảng
+                  const firstBranchRow = document.querySelector("#branchReportBody tr");
+                  const branchNameRaw = firstBranchRow?.querySelector("td:nth-child(4)")?.textContent || "ChiNhanh";
+                  const branchName = branchNameRaw.replace(/[^a-zA-ZÀ-ỹ0-9 ]/g, "");
+
+
+                  // Lấy ngày hiện tại định dạng dd-MM-yyyy
+                  const today = new Date();
+                  const dateStr = today.toLocaleDateString('vi-VN').replaceAll('/', '-');
+
+                  // Gộp tên file
+                  const fileName = `Báo Cáo Chi Nhánh ${branchName} ${dateStr}.xlsx`;
+                  const titleRow = sheet.addRow([branchName]);
+                  sheet.mergeCells(`A1:I1`);
+                  titleRow.font = { bold: true, size: 14, color: { argb: 'FF1F4E78' } };
+                  titleRow.alignment = { horizontal: 'center' };
+
+                  // 🟦 Header bảng
+                  const header = ["Tên Người Giám Sát", "Tên nhân viên", "Email", "Chi nhánh", "Ngày đánh giá", "Tổng tiêu chí", "CÓ", "KHÔNG", "CHƯA KIỂM TRA"]
+                  const headerRow = sheet.addRow(header);
+                  // Tự động điều chỉnh độ rộng cho từng cột
+                  sheet.columns.forEach(column => {
+                        let maxLength = 0;
+                        column.eachCell({ includeEmpty: true }, cell => {
+                              const cellLength = cell.value ? cell.value.toString().length : 0;
+                              maxLength = Math.max(maxLength, cellLength);
+                        });
+                        column.width = maxLength + 2; // cộng thêm padding
+                  });
+
+                  headerRow.font = { bold: true, color: { argb: "FFFFFFFF" } };
+                  const headerFill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FF0070C0' }
+                  };
+
+                  for (let i = 1; i <= header.length; i++) {
+                        const cell = headerRow.getCell(i);
+                        cell.fill = headerFill;
+                  }
+
+                  headerRow.alignment = { horizontal: 'center' };
+
+                  // 🟦 Dữ liệu bảng
+                  document.querySelectorAll("#branchReportBody tr").forEach(tr => {
+                        const cells = Array.from(tr.querySelectorAll("td")).map(td => td.textContent.trim());
+                        sheet.addRow(cells);
+                  });
+
+                  // 🖼 Chèn biểu đồ
+                  // 🖼️ Chèn biểu đồ cột (to hơn 0.5x)
+                  {
+                        const chartBarDataUrl = canvas1.toDataURL("image/png");
+                        const chartBase64 = chartBarDataUrl.split(',')[1];
+                        const chartBinary = atob(chartBase64);
+                        const chartBytes = new Uint8Array(chartBinary.length);
+                        for (let i = 0; i < chartBinary.length; i++) chartBytes[i] = chartBinary.charCodeAt(i);
+
+                        const chartImgId = workbook.addImage({
+                              buffer: chartBytes,
+                              extension: 'png'
+                        });
+
+                        const chartStartRow = sheet.rowCount + 2;
+                        sheet.addImage(chartImgId, {
+                              tl: { col: 1, row: chartStartRow },
+                              br: { col: 8, row: chartStartRow + 20 } // kéo ngang hơn (từ col 1 → 8)
+                        });
+
+                        // 🏷️ Thêm tên bên dưới ảnh và căn giữa
+                        const labelRow = sheet.getRow(chartStartRow + 21);
+                        labelRow.getCell(1).value = "Biểu đồ đánh giá theo nhân viên";
+                        sheet.mergeCells(`A${chartStartRow + 21}:H${chartStartRow + 21}`); // đồng nhất dòng
+                        labelRow.font = { bold: true, size: 12 };
+                        labelRow.alignment = { horizontal: "center" };
+                        labelRow.commit();
+
+                        // Chỉ cần tạo khoảng trống một lần sau ảnh + tên
+                        for (let i = 0; i < 13; i++) sheet.addRow([]);
+                  }
+
+
+                  let rowOffset = sheet.rowCount + 2;
+                  let colOffset = 1;
+                  let chartPerRow = 3;
+
+                  for (let i = 0; i < pieCanvases.length; i++) {
+                        const canvas = pieCanvases[i];
+                        const chartName = canvas.parentElement.querySelector('div')?.textContent || `Danh mục ${i + 1}`;
+
+                        const dataUrl = canvas.toDataURL("image/png");
+                        const base64 = dataUrl.split(',')[1];
+                        const binary = atob(base64);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+
+                        const imageId = workbook.addImage({
+                              buffer: bytes,
+                              extension: 'png'
+                        });
+
+                        // Vẽ hình vào vị trí cụ thể
+                        sheet.addImage(imageId, {
+                              tl: { col: colOffset, row: rowOffset },
+                              ext: { width: 240, height: 240 }  // ✅ giữ đúng hình tròn
+                        });
+
+                        // Thêm tên bên dưới ảnh
+                        const titleRow = sheet.getRow(rowOffset + 13);
+                        titleRow.getCell(colOffset + 1).value = chartName;
+                        titleRow.getCell(colOffset + 1).font = { bold: true };
+                        titleRow.commit();
+
+                        // Di chuyển vị trí hình tiếp theo
+                        colOffset += 5;
+                        if ((i + 1) % chartPerRow === 0) {
+                              colOffset = 1;
+                              rowOffset += 15;
+                        }
+                  }
+
+
+                  const buffer = await workbook.xlsx.writeBuffer();
+                  saveAs(new Blob([buffer]), fileName);
+            });
+
+
+            summaryFilesInput.addEventListener('change', () => {
+                  const files = Array.from(summaryFilesInput.files);
+                  files.forEach(async (file) => {
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const parts = file.name.replace(".xlsx", "").split("-");
+                        const branch = parts[2] || "N/A";
+
+                        if (!selectedBranch) {
+                              selectedBranch = branch;  // Lưu chi nhánh đầu tiên
+                        }
+
+                        if (branch !== selectedBranch) {
+                              alert("Tất cả các file phải thuộc cùng một chi nhánh.");
+                              return;
+                        }
+
+                        if (!selectedFiles.has(file.name)) {
+                              selectedFiles.set(file.name, file);
+                        }
+
+                        renderFileList();
+                  });
+
+                  summaryFilesInput.value = '';
+                  renderFileList();
+            });
+
+            function renderFileList() {
+                  fileListDisplay.innerHTML = '';
+                  selectedFiles.forEach((file, name) => {
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-between items-center bg-gray-100 px-3 py-1 rounded';
+                        const span = document.createElement('span');
+                        span.textContent = name;
+                        const btn = document.createElement('button');
+                        btn.innerHTML = '<i class="fas fa-times text-red-500"></i>';
+                        btn.className = 'ml-2 hover:text-red-700';
+                        btn.onclick = () => {
+                              selectedFiles.delete(name);
+                              if (selectedFiles.size === 0) selectedBranch = null;
+                              renderFileList();
+                        };
+                        div.appendChild(span);
+                        div.appendChild(btn);
+                        fileListDisplay.appendChild(div);
+                  });
+            }
+
+            function getSummaryFromSheet(sheet, fileName) {
+                  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                  // Tách dữ liệu từ tên file
+                  const parts = fileName.replace(".xlsx", "").split("-");
+                  const supervisor = parts[0] || "N/A";      // Tên nhân viên giám sát
+                  const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";       // Tên nhân viên chi nhánh
+                  const branch = parts[2] || "N/A";          // Chi nhánh
+                  const date = parts.slice(3).join("-");          // Ngày đánh giá
+                  const fullName = rows[2]?.[1] || "N/A"; // ✅ đúng ô B3
+                  const resultCounts = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
+                  const categoryStats = {};
+
+                  for (let i = 7; i < rows.length; i++) {
+                        const cat = rows[i]?.[1];
+                        const result = rows[i]?.[5]?.toString().trim();
+                        if (!cat || !resultCounts.hasOwnProperty(result)) continue;
+
+                        resultCounts[result]++;
+                        if (!categoryStats[cat]) categoryStats[cat] = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
+                        categoryStats[cat][result]++;
+                  }
+
+                  return {
+                        supervisor,
+                        email,
+                        fullName,
+                        branch,
+                        date,
+                        ...resultCounts,
+                        categoryStats
+                  };
+            }
+
+
+            document.getElementById('generateSummaryBtn').addEventListener('click', async () => {
+                  const files = Array.from(selectedFiles.values());
+                  if (!files.length) return alert('Chưa chọn file.');
+
+                  const summaryMap = new Map(); // key = email|branch
+                  const categoryTotals = {};
+                  const TOTAL_CRITERIA = 115;
+
+                  for (const file of files) {
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, categoryStats } = getSummaryFromSheet(sheet, file.name);
+
+                        const key = `${fullName}|${branch}`;
+
+                        if (!summaryMap.has(key)) {
+                              summaryMap.set(key, { fullName, email, branch, CÓ: 0, KHÔNG: 0, CHUA: 0, count: 0 });
+                        }
+
+                        const r = summaryMap.get(key);
+
+                        r.CÓ += CÓ;
+
+                        r.KHÔNG += KHÔNG;
+                        r.CHUA += CHUA;
+                        r.count++;
+
+                        for (const [cat, values] of Object.entries(categoryStats)) {
+                              if (!categoryTotals[cat]) categoryTotals[cat] = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
+                              categoryTotals[cat]["CÓ"] += values["CÓ"];
+                              categoryTotals[cat]["KHÔNG"] += values["KHÔNG"];
+                              categoryTotals[cat]["CHƯA KIỂM TRA"] += values["CHƯA KIỂM TRA"];
+                        }
+                  }
+
+                  // Chuẩn bị dữ liệu biểu đồ phần trăm
+                  const labels = [];
+                  const dataYes = [];
+                  const dataNo = [];
+                  const dataNA = [];
+
+                  for (const { fullName, branch, CÓ, KHÔNG, CHUA, count } of summaryMap.values()) {
+                        labels.push(`${fullName} (${branch})`);
+                        dataYes.push(Math.round(((CÓ / count) / TOTAL_CRITERIA) * 10000) / 100);
+                        dataNo.push(Math.round(((KHÔNG / count) / TOTAL_CRITERIA) * 10000) / 100);
+                        dataNA.push(Math.round(((CHUA / count) / TOTAL_CRITERIA) * 10000) / 100);
+                  }
+
+                  const ctx = document.getElementById('branchBarChart').getContext('2d');
+                  chartContainer.classList.remove('hidden');
+                  new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                              labels,
+                              datasets: [
+                                    { label: '% CÓ', data: dataYes, backgroundColor: 'rgba(0, 176, 80, 0.6)' },
+                                    { label: '% KHÔNG', data: dataNo, backgroundColor: 'rgba(255, 0, 0, 0.6)' },
+                                    { label: '% CHƯA KIỂM TRA', data: dataNA, backgroundColor: 'rgba(165, 165, 165, 0.6)' }
+                              ]
+                        },
+                        options: {
+                              rotation: -90,
+                              circumference: 360,
+                              cutout: '60%',
+                              responsive: true,
+                              plugins: {
+                                    legend: { display: false },
+                                    datalabels: {
+                                          color: '#fff',
+                                          font: { weight: 'bold' },
+                                          formatter: (value, ctx) => {
+                                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                                return value > 0 ? `${Math.round((value / total) * 100)}%` : '';
+                                          }
+                                    }
+                              }
+                        }
+
+                  });
+
+                  // Tạo biểu đồ doughnut cho từng danh mục
+                  const pieChartContainer = document.getElementById('pieChartContainer');
+                  pieChartContainer.innerHTML = ''; // clear cũ
+                  pieChartContainer.classList.remove('hidden');
+
+                  // Tạo container grid chứa các biểu đồ tròn
+                  const pieContainer = document.createElement('div');
+                  pieContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6';
+                  pieChartContainer.appendChild(pieContainer);
+
+                  // Tạo biểu đồ tròn từng danh mục
+                  for (const [cat, vals] of Object.entries(categoryTotals)) {
+                        const chartWrapper = document.createElement('div');
+                        chartWrapper.className = 'text-center';
+
+                        const canvas = document.createElement('canvas');
+                        canvas.className = 'w-full max-w-[280px] h-auto mx-auto';
+                        chartWrapper.appendChild(canvas);
+
+                        const title = document.createElement('div');
+                        title.className = 'font-semibold text-sm text-gray-800 mt-2';
+                        title.textContent = cat;
+                        chartWrapper.appendChild(title);
+
+                        pieContainer.appendChild(chartWrapper);
+
+                        new Chart(canvas, {
+                              type: 'pie',
+                              data: {
+                                    labels: ['CÓ', 'KHÔNG', 'CHƯA KIỂM TRA'],
+                                    datasets: [{
+                                          data: [vals["CÓ"], vals["KHÔNG"], vals["CHƯA KIỂM TRA"]],
+                                          backgroundColor: ['#00B050', '#FF0000', '#A5A5A5']
+                                    }]
+                              },
+                              options: {
+                                    responsive: true,
+                                    plugins: {
+                                          legend: {
+                                                display: false
+                                          },
+                                          datalabels: {
+                                                color: '#fff',
+                                                font: {
+                                                      weight: 'bold'
+                                                },
+                                                formatter: (value, ctx) => {
+                                                      const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                                      return value > 0 ? `${Math.round((value / total) * 100)}%` : '';  // hiển thị phần trăm
+                                                }
+                                          }
+                                    }
+                              },
+                              plugins: [ChartDataLabels]  // ✅ Bật plugin
+                        });
+
+
+                  }
+
+                  // ✅ Tạo chú thích chung bên dưới
+                  const legendWrapper = document.createElement('div');
+                  legendWrapper.className = 'flex justify-center items-center gap-6 mt-6 flex-wrap text-sm text-gray-800 font-medium';
+
+                  const legends = [
+                        { color: '#00B050', label: 'CÓ' },
+                        { color: '#FF0000', label: 'KHÔNG' },
+                        { color: '#A5A5A5', label: 'CHƯA KIỂM TRA' }
+                  ];
+
+                  legends.forEach(({ color, label }) => {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center gap-2';
+
+                        const box = document.createElement('div');
+                        box.className = 'w-4 h-4 rounded';
+                        box.style.backgroundColor = color;
+
+                        const text = document.createElement('span');
+                        text.textContent = label;
+
+                        item.appendChild(box);
+                        item.appendChild(text);
+                        legendWrapper.appendChild(item);
+                  });
+
+                  pieChartContainer.appendChild(legendWrapper);
+
+                  // Hiển thị bảng báo cáo chi nhánh
+                  const branchReportContainer = document.getElementById('branchReportContainer');
+                  const branchReportBody = document.getElementById('branchReportBody');
+                  branchReportBody.innerHTML = '';
+                  branchReportContainer.classList.remove('hidden');
+
+                  for (const file of files) {
+                        const data = await file.arrayBuffer();
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const sheetName = workbook.SheetNames[0];
+                        const sheet = workbook.Sheets[sheetName];
+                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA } = getSummaryFromSheet(sheet, file.name);
+
+
+
+                        const row = document.createElement('tr');
+                        row.className = 'border-b';
+
+                        row.innerHTML = `
+  <td class="py-2 px-4">${supervisor}</td>
+<td class="py-2 px-4">${fullName}</td> 
+  <td class="py-2 px-4">${email}</td>
+  <td class="py-2 px-4">${branch}</td>
+  <td class="py-2 px-4">${date}</td>
+  <td class="py-2 px-4 text-center">${TOTAL_CRITERIA}</td>
+  <td class="py-2 px-4 text-center">${CÓ}</td>
+  <td class="py-2 px-4 text-center">${KHÔNG}</td>
+  <td class="py-2 px-4 text-center">${CHUA}</td>
+`;
+
+                        branchReportBody.appendChild(row);
+                  }
+
+            });
+      </script>
+</body>
+
+</html>

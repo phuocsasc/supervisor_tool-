@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Tool Thống Kê Nhân Viên</title>
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <style>
+            /* Custom styles */
+            .gradient-header {
+                  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            }
+
+            .dropzone {
+                  border: 2px dashed #3b82f6;
+                  transition: all 0.3s ease;
+                  background-color: #f8fafc;
+            }
+
+            .dropzone:hover {
+                  background-color: #f0f9ff;
+                  border-color: #1d4ed8;
+                  transform: translateY(-2px);
+            }
+
+            .dropzone.active {
+                  background-color: #e0f2fe;
+                  border-color: #1d4ed8;
+                  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+            }
+
+            #chartContainer {
+                  height: 400px;
+                  position: relative;
+            }
+
+            .file-item {
+                  transition: all 0.2s ease;
+            }
+
+            .file-item:hover {
+                  background-color: #f8fafc;
+                  transform: translateX(2px);
+            }
+
+            .scrollable-table-container {
+                  max-height: 400px;
+                  overflow-y: auto;
+                  scrollbar-width: thin;
+                  scrollbar-color: #3b82f6 #f1f1f1;
+            }
+
+            .scrollable-table-container::-webkit-scrollbar {
+                  width: 8px;
+                  height: 8px;
+            }
+
+            .scrollable-table-container::-webkit-scrollbar-track {
+                  background: #f1f1f1;
+                  border-radius: 10px;
+            }
+
+            .scrollable-table-container::-webkit-scrollbar-thumb {
+                  background-color: #3b82f6;
+                  border-radius: 10px;
+            }
+
+            /* Sticky table header */
+            .scrollable-table-container thead th {
+                  position: sticky;
+                  top: 0;
+                  background-color: #f9fafb;
+                  z-index: 10;
+                  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Animations */
+            @keyframes fadeIn {
+                  from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                  }
+
+                  to {
+                        opacity: 1;
+                        transform: translateY(0);
+                  }
+            }
+
+            .fade-in {
+                  animation: fadeIn 0.3s ease-out forwards;
+            }
+
+            /* Pulse animation for buttons */
+            @keyframes pulse {
+                  0% {
+                        transform: scale(1);
+                  }
+
+                  50% {
+                        transform: scale(1.05);
+                  }
+
+                  100% {
+                        transform: scale(1);
+                  }
+            }
+
+            .pulse:hover {
+                  animation: pulse 1.5s infinite;
+            }
+
+            /* Tooltip */
+            .tooltip {
+                  position: relative;
+                  display: inline-block;
+            }
+
+            .tooltip .tooltip-text {
+                  visibility: hidden;
+                  width: 200px;
+                  background-color: #333;
+                  color: #fff;
+                  text-align: center;
+                  border-radius: 6px;
+                  padding: 5px;
+                  position: absolute;
+                  z-index: 1;
+                  bottom: 125%;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  opacity: 0;
+                  transition: opacity 0.3s;
+            }
+
+            .tooltip:hover .tooltip-text {
+                  visibility: visible;
+                  opacity: 1;
+            }
+      </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+      <div class="container mx-auto px-4 py-8">
+            <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                  <!-- Header -->
+                  <div class="gradient-header py-5 px-6">
+                        <div class="flex items-center justify-between">
+                              <div>
+                                    <h1 class="text-2xl font-bold text-white flex items-center">
+                                          <i class="fas fa-chart-line mr-3"></i>
+                                          Thống Kê Tiến Độ Nhân Viên Kỹ Thuật
+                                    </h1>
+                                    <p class="text-blue-100 mt-1 flex items-center">
+                                          <i class="fas fa-info-circle mr-2"></i>
+                                          Công cụ tổng hợp dữ liệu đánh giá theo tháng
+                                    </p>
+                              </div>
+                        </div>
+                  </div>
+
+                  <!-- Main Content -->
+                  <div class="p-6">
+                        <!-- Dropzone -->
+                        <div id="dropzone"
+                              class="dropzone rounded-xl p-8 mb-6 text-center cursor-pointer transition-all duration-300">
+                              <div class="flex flex-col items-center justify-center">
+                                    <div class="bg-blue-100 p-4 rounded-full mb-4">
+                                          <i class="fas fa-cloud-upload-alt text-blue-500 text-3xl"></i>
+                                    </div>
+                                    <h3 class="mt-2 text-lg font-medium text-gray-800">Kéo & thả file Excel vào đây</h3>
+                                    <p class="mt-1 text-sm text-gray-500">hoặc click để chọn file</p>
+                                    <p class="mt-2 text-xs text-gray-400 flex items-center">
+                                          <i class="fas fa-info-circle mr-1"></i>
+                                          Chỉ chấp nhận file kết quả từ Tool 1 (.xlsx)
+                                    </p>
+                              </div>
+                        </div>
+                        <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx">
+                        <!-- Error Alert -->
+                        <div id="errorAlert" class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                              <div class="flex">
+                                    <div class="flex-shrink-0 pt-0.5">
+                                          <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                          <h3 class="text-sm font-medium text-red-800" id="errorTitle">Có lỗi xảy ra
+                                          </h3>
+                                          <div class="mt-2 text-sm text-red-700" id="errorMessage">
+                                                <!-- Error details will be inserted here -->
+                                          </div>
+                                    </div>
+                                    <button id="closeErrorBtn"
+                                          class="ml-auto -mx-1.5 -my-1.5 bg-red-50 rounded-lg p-1.5 inline-flex h-8 w-8 text-red-500 hover:text-red-700">
+                                          <i class="fas fa-times"></i>
+                                    </button>
+                              </div>
+                        </div>
+                        
+                        <!-- Success Alert -->
+                        <div id="successAlert" class="hidden fade-in bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
+                              <div class="flex">
+                                    <div class="flex-shrink-0 pt-0.5">
+                                          <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                          <h3 class="text-sm font-medium text-green-800" id="successTitle">Thành công
+                                          </h3>
+                                          <div class="mt-2 text-sm text-green-700" id="successMessage">
+                                                <!-- Success message will be inserted here -->
+                                          </div>
+                                    </div>
+                                    <button id="closeSuccessBtn"
+                                          class="ml-auto -mx-1.5 -my-1.5 bg-green-50 rounded-lg p-1.5 inline-flex h-8 w-8 text-green-500 hover:text-green-700">
+                                          <i class="fas fa-times"></i>
+                                    </button>
+                              </div>
+                        </div>
+                        <!-- Selected Files -->
+                        <div id="fileListContainer" class="mb-6 hidden fade-in">
+                              <div
+                                    class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+                                    <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                                          <i class="fas fa-file-excel text-green-600 mr-2"></i>
+                                          File đã chọn (<span id="fileCount">0</span>)
+                                    </h3>
+                                    <button id="runBtn"
+                                          class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center transition duration-200 shadow-md hover:shadow-lg pulse">
+                                          <i class="fas fa-cogs mr-2"></i>
+                                          Xử lý dữ liệu
+                                    </button>
+                              </div>
+                              <div id="fileList" class="space-y-3 divide-y divide-gray-100 max-h-[300px] overflow-y-auto pr-2"></div>
+                        </div>
+
+                        <!-- Processing Area -->
+                        <div id="processingSection" class="hidden fade-in">
+                              <!-- Employee Info -->
+                              <div id="employeeInfo"
+                                    class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl mb-8 border border-blue-100">
+                                    <h3 class="text-lg font-semibold mb-3 text-blue-800 flex items-center">
+                                          <i class="fas fa-user-circle mr-2"></i>
+                                          Thông tin nhân viên
+                                    </h3>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                          <div class="bg-white p-3 rounded-lg shadow-sm">
+                                                <p class="text-sm text-gray-500"><i class="fas fa-user mr-2"></i>Tên
+                                                      nhân viên</p>
+                                                <p id="employeeName" class="font-medium text-gray-800 mt-1 truncate">-
+                                                </p>
+                                          </div>
+                                          <div class="bg-white p-3 rounded-lg shadow-sm">
+                                                <p class="text-sm text-gray-500"><i
+                                                            class="fas fa-envelope mr-2"></i>Email</p>
+                                                <p id="employeeEmail" class="font-medium text-gray-800 mt-1 truncate">-
+                                                </p>
+                                          </div>
+                                          <div class="bg-white p-3 rounded-lg shadow-sm">
+                                                <p class="text-sm text-gray-500"><i class="fas fa-building mr-2"></i>Chi
+                                                      nhánh</p>
+                                                <p id="employeeBranch" class="font-medium text-gray-800 mt-1 truncate">-
+                                                </p>
+                                          </div>
+                                    </div>
+                              </div>
+
+                              <!-- Summary Table -->
+                              <div class="mb-8">
+                                    <h3 class="text-lg font-semibold mb-4 text-gray-700 flex items-center">
+                                          <i class="fas fa-table mr-2"></i>
+                                          Bảng tổng hợp dữ liệu
+                                    </h3>
+                                    <div class="scrollable-table-container border border-gray-200 rounded-lg shadow-sm">
+                                          <table id="summaryTable" class="min-w-full divide-y divide-gray-200">
+                                                <thead class="bg-gray-50">
+                                                      <tr>
+                                                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  STT
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  Ngày đánh giá
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  Tổng tiêu chí
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  CÓ
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  KHÔNG
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  Chưa kiểm tra
+                                                            </th>
+                                                            <th scope="col"
+                                                                  class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                                  Tỉ lệ % CÓ (đạt yêu cầu)
+                                                            </th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="summaryTableBody" class="bg-white divide-y divide-gray-200">
+                                                      <!-- Data will be inserted here -->
+                                                </tbody>
+                                                <tfoot class="bg-gray-50">
+                                                      <tr>
+                                                            <td class="px-6 py-3 text-sm font-semibold text-gray-900">
+                                                                  Tổng cộng</td>
+                                                            <td class="px-6 py-3 text-sm font-semibold text-gray-900">#</td>
+                                                            <td id="totalCriteria"
+                                                                  class="px-6 py-3 text-sm text-gray-500">0</td>
+                                                            <td id="totalYes"
+                                                                  class="px-6 py-3 text-sm font-medium text-green-600">0
+                                                            </td>
+                                                            <td id="totalNo"
+                                                                  class="px-6 py-3 text-sm font-medium text-red-600">0
+                                                            </td>
+                                                            <td id="totalPending"
+                                                                  class="px-6 py-3 text-sm text-gray-500">0</td>
+                                                            <td id="totalRate"
+                                                                  class="px-6 py-3 text-sm font-medium text-blue-600">0%
+                                                            </td>
+                                                      </tr>
+                                                </tfoot>
+                                          </table>
+                                    </div>
+                              </div>
+
+                              <!-- Chart -->
+                              <div class="mb-8">
+                                    <div class="flex justify-between items-center mb-4">
+                                          <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                                                <i class="fas fa-chart-bar mr-2"></i>
+                                                Biểu đồ tiến độ
+                                          </h3>
+                                          <div class="flex space-x-2">
+                                                <button id="lineChartBtn"
+                                                      class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-medium">
+                                                      <i class="fas fa-chart-line"></i> Đường
+                                                </button>
+                                                <button id="barChartBtn"
+                                                      class="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-medium">
+                                                      <i class="fas fa-chart-bar"></i> Cột
+                                                </button>
+                                          </div>
+                                    </div>
+                                    <div id="chartContainer"
+                                          class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                          <canvas id="progressChart"></canvas>
+                                    </div>
+                                    
+                              </div>
+
+                              <!-- Export Button -->
+                              <div class="flex justify-center mt-8">
+                                    <button id="exportBtn"
+                                          class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition duration-300 flex items-center pulse">
+                                          <i class="fas fa-file-export mr-2"></i>
+                                          Xuất File Excel
+                                    </button>
+                              </div>
+                        </div>
+
+                        
+                  </div>
+            </div>
+      </div>
+
+      <script>
+            // Global variables
+            let allFiles = [];
+            let employeeData = {};
+            let progressChart = null;
+            let chartImage = null;
+
+            // DOM elements
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.getElementById('fileInput');
+            const fileListContainer = document.getElementById('fileListContainer');
+            const fileList = document.getElementById('fileList');
+            const fileCount = document.getElementById('fileCount');
+            const processingSection = document.getElementById('processingSection');
+            const summaryTableBody = document.getElementById('summaryTableBody');
+            const employeeName = document.getElementById('employeeName');
+            const employeeEmail = document.getElementById('employeeEmail');
+            const employeeBranch = document.getElementById('employeeBranch');
+            const exportBtn = document.getElementById('exportBtn');
+            const runBtn = document.getElementById('runBtn');
+            const errorAlert = document.getElementById('errorAlert');
+            const errorTitle = document.getElementById('errorTitle');
+            const errorMessage = document.getElementById('errorMessage');
+            const closeErrorBtn = document.getElementById('closeErrorBtn');
+            const successAlert = document.getElementById('successAlert');
+            const successTitle = document.getElementById('successTitle');
+            const successMessage = document.getElementById('successMessage');
+            const closeSuccessBtn = document.getElementById('closeSuccessBtn');
+            const lineChartBtn = document.getElementById('lineChartBtn');
+            const barChartBtn = document.getElementById('barChartBtn');
+            const totalCriteria = document.getElementById('totalCriteria');
+            const totalYes = document.getElementById('totalYes');
+            const totalNo = document.getElementById('totalNo');
+            const totalPending = document.getElementById('totalPending');
+            const totalRate = document.getElementById('totalRate');
+
+            // Event Listeners
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                  e.preventDefault();
+                  dropzone.classList.add('active');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                  dropzone.classList.remove('active');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                  e.preventDefault();
+                  dropzone.classList.remove('active');
+
+                  hideAlerts();
+
+                  const files = Array.from(e.dataTransfer.files).filter(file => file.name.endsWith('.xlsx'));
+                  if (files.length > 0) {
+                        handleFiles(files);
+                  } else {
+                        showError('Không có file Excel', 'Vui lòng chỉ chọn file có định dạng .xlsx');
+                  }
+            });
+            fileInput.addEventListener('change', () => {
+                  if (fileInput.files.length > 0) {
+                        hideAlerts();
+                        handleFiles(Array.from(fileInput.files));
+                  }
+            });
+            runBtn.addEventListener('click', processAllFiles);
+            exportBtn.addEventListener('click', exportToExcel);
+            closeErrorBtn.addEventListener('click', hideError);
+            closeSuccessBtn.addEventListener('click', hideSuccess);
+            lineChartBtn.addEventListener('click', () => changeChartType('line'));
+            barChartBtn.addEventListener('click', () => changeChartType('bar'));
+
+            // Functions
+
+            function extractSupervisorAndEmployeeEmails(filename) {
+                  const match = filename.match(/^([^-]+)-([^-]+)-/);
+                  if (match) {
+                        return {
+                              supervisor: match[1],
+                              employee: match[2]
+                        };
+                  }
+                  return null;
+            }
+
+            function handleFiles(files) {
+                  hideAlerts();
+
+                  // Read each file
+                  const promises = files.map(file => {
+                        return new Promise((resolve, reject) => {
+                              const reader = new FileReader();
+                              reader.onload = (e) => {
+                                    try {
+                                          const data = new Uint8Array(e.target.result);
+                                          const workbook = XLSX.read(data, { type: 'array' });
+
+                                          // Get the first worksheet
+                                          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                                          // Extract required data
+                                          const extractedData = extractDataFromSheet(firstSheet, file.name);
+
+                                          resolve(extractedData);
+                                    } catch (error) {
+                                          reject(error);
+                                    }
+                              };
+                              reader.onerror = () => reject(new Error('File reading error'));
+                              reader.readAsArrayBuffer(file);
+                        });
+                  });
+
+                  Promise.all(promises)
+                        // Trong phần .then(results => { ... })
+                        .then(results => {
+                              // Kiểm tra định dạng tên file phải đúng theo template: gs-nv-cn-yyyy-mm-dd.xlsx
+                              const filenameRegex = /^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
+                              const invalidFiles = results.filter(f => !filenameRegex.test(f.filename));
+
+                              if (invalidFiles.length > 0) {
+                                    showError('Tên file không hợp lệ', `Các file sau không đúng định dạng: ${invalidFiles.map(f => f.filename).join(', ')}`);
+                                    return;
+                              }
+
+                              // Kiểm tra tất cả file (cũ và mới) có cùng email
+                              const allEmails = [...allFiles.map(f => f.email), ...results.map(f => f.email)];
+                              const uniqueEmails = [...new Set(allEmails)];
+                              if (uniqueEmails.length > 1) {
+                                    showError('Không khớp thông tin', 'Các file Excel được chọn không cùng một nhân viên. Vui lòng chỉ chọn file của cùng một người.');
+                                    return;
+                              }
+
+                              // Kiểm tra trùng tên trong batch mới
+                              const newFileNames = results.map(f => f.filename);
+                              const newFileNamesSet = new Set(newFileNames);
+                              if (newFileNames.length !== newFileNamesSet.size) {
+                                    showError('Trùng tên file', 'Có file trùng tên trong các file vừa chọn.');
+                                    return;
+                              }
+
+                              // Kiểm tra trùng tên với file đã có
+                              const existingFileNames = new Set(allFiles.map(f => f.filename));
+                              const duplicateFiles = results.filter(f => existingFileNames.has(f.filename));
+                              if (duplicateFiles.length > 0) {
+                                    showError('Trùng tên file', `Các file sau đã tồn tại: ${duplicateFiles.map(f => f.filename).join(', ')}`);
+                                    return;
+                              }
+
+                              // Thêm vào allFiles
+                              allFiles = [...allFiles, ...results];
+
+                              // Cập nhật UI và thông báo
+                              updateFileList(allFiles);
+                              fileListContainer.classList.remove('hidden');
+                              fileCount.textContent = allFiles.length;
+
+                              processingSection.classList.add('hidden');
+                              processingSection.classList.remove('fade-in');
+
+                              showSuccess('Tải file thành công', `Đã thêm ${results.length} file vào danh sách xử lý.`);
+                        })
+                        .catch(error => {
+                              showError('Lỗi xử lý file', error.message || 'Có lỗi khi đọc file. Vui lòng kiểm tra lại định dạng file.');
+                              console.error(error);
+                        });
+            }
+
+            function extractDateFromFilename(filename) {
+                  // Try to extract date in format yyyy-mm-dd from filename
+                  const dateMatch = filename.match(/\d{4}-\d{2}-\d{2}/);
+                  if (dateMatch) {
+                        const dateStr = dateMatch[0];
+                        const [year, month, day] = dateStr.split('-').map(Number);
+                        return new Date(year, month - 1, day);
+                  }
+
+                  // If no date in filename, try to extract from filename (last modified date, etc.)
+                  return new Date(0); // Return oldest possible date if no date found
+            }
+
+            function sortFilesByDate(files) {
+                  return [...files].sort((a, b) => {
+                        const dateA = extractDateFromFilename(a.filename);
+                        const dateB = extractDateFromFilename(b.filename);
+                        return dateA - dateB;
+                  });
+            }
+
+            function processAllFiles() {
+                  if (allFiles.length === 0) {
+                        showError('Không có dữ liệu', 'Vui lòng chọn ít nhất một file để xử lý');
+                        return;
+                  }
+
+                  try {
+                        // Add loading state to button
+                        runBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang xử lý...';
+                        runBtn.disabled = true;
+
+                        // Sort files by date from filename first, then by date from sheet
+                        allFiles = sortFilesByDate(allFiles);
+
+                        // Set employee info
+                        employeeData = {
+                              name: allFiles[0].name,
+                              email: allFiles[0].email,
+                              branch: allFiles[0].branch
+                        };
+
+                        employeeName.textContent = employeeData.name;
+                        employeeEmail.textContent = employeeData.email;
+                        employeeBranch.textContent = employeeData.branch;
+
+                        // Update summary table and chart
+                        updateSummaryTable(allFiles);
+                        createOrUpdateChart(allFiles);
+
+                        // Show processing section
+                        processingSection.classList.remove('hidden');
+                        processingSection.classList.add('fade-in');
+
+                        // Show success message
+                        showSuccess('Xử lý thành công', `Đã xử lý ${allFiles.length} file dữ liệu.`);
+
+                  } catch (error) {
+                        showError('Lỗi xử lý dữ liệu', error.message || 'Có lỗi khi xử lý dữ liệu từ các file.');
+                        console.error(error);
+                  } finally {
+                        // Reset button state
+                        runBtn.innerHTML = '<i class="fas fa-cogs mr-2"></i> Xử lý dữ liệu';
+                        runBtn.disabled = false;
+                  }
+            }
+
+            function extractDataFromSheet(sheet, filename) {
+                  // Get specific cells
+                  const name = sheet['B3'] ? sheet['B3'].v : '';
+                  const email = sheet['B4'] ? sheet['B4'].v : '';
+                  const branch = sheet['B5'] ? sheet['B5'].v : '';
+
+                  if (!email) {
+                        throw new Error(`File ${filename} không có thông tin email nhân viên (ô B4)`);
+                  }
+
+                  // Parse date from filename
+                  const dateFromFilename = extractDateFromFilename(filename);
+                  let dateStr;
+                  let date = new Date(0);
+
+                  if (dateFromFilename.getTime() !== new Date(0).getTime()) {
+                        // Format thành dd/mm/yyyy
+                        const day = String(dateFromFilename.getDate()).padStart(2, '0');
+                        const month = String(dateFromFilename.getMonth() + 1).padStart(2, '0');
+                        const year = dateFromFilename.getFullYear();
+                        dateStr = `${day}/${month}/${year}`;
+                        date = dateFromFilename;
+                  } else {
+                        // Fallback to sheet's B6 nếu không có trong filename
+                        const sheetDateStr = sheet['B6'] ? sheet['B6'].v : '';
+                        try {
+                              const [day, month, year] = sheetDateStr.split('/').map(Number);
+                              date = new Date(year, month - 1, day);
+                              dateStr = sheetDateStr;
+                        } catch (e) {
+                              console.warn('Cannot parse date from sheet');
+                              dateStr = '';
+                        }
+                  }
+
+                  // Count results from column F (assuming data starts from row 8)
+                  let hasCount = 0;
+                  let noCount = 0;
+                  let notCheckedCount = 0;
+                  let lastRow = 0;
+
+                  for (let i = 8; ; i++) {
+                        const sttCell = sheet[`A${i}`];
+                        if (!sttCell || sttCell.v === '') break;
+
+                        lastRow = i;
+
+                        const resultCell = sheet[`F${i}`];
+                        if (resultCell) {
+                              const value = String(resultCell.v).toUpperCase();
+                              if (value === 'CÓ') hasCount++;
+                              else if (value === 'KHÔNG') noCount++;
+                              else if (value === 'CHƯA KIỂM TRA') notCheckedCount++;
+                        }
+                  }
+
+                  return {
+                        filename,
+                        name,
+                        email,
+                        branch,
+                        date,
+                        dateStr,
+                        totalCriteria: lastRow - 8,
+                        hasCount,
+                        noCount,
+                        notCheckedCount,
+                        rate: lastRow > 8 ? Math.round((hasCount / (lastRow - 8)) * 100) : 0
+                  };
+            }
+
+            function updateFileList(files) {
+                  fileList.innerHTML = '';
+
+                  files.forEach((file, index) => {
+                        const fileItem = document.createElement('div');
+                        fileItem.className = 'file-item bg-gray-50 rounded-lg p-4 flex items-center justify-between hover:shadow-sm';
+
+                        const fileInfo = document.createElement('div');
+                        fileInfo.className = 'flex items-center';
+
+                        const fileIcon = document.createElement('div');
+                        fileIcon.className = 'mr-3 text-blue-500';
+                        fileIcon.innerHTML = `
+                    <i class="fas fa-file-excel text-xl"></i>
+                `;
+
+                        const fileDetails = document.createElement('div');
+                        fileDetails.innerHTML = `
+                    <p class="text-sm font-medium text-gray-700 truncate" style="max-width: 200px;">${file.filename}</p>
+                    <div class="flex items-center mt-1 text-xs text-gray-500">
+                        <span class="mr-2"><i class="far fa-calendar-alt mr-1"></i>${file.dateStr}</span>
+                        <span class="mr-2"><i class="far fa-list-alt mr-1"></i>${file.totalCriteria} tiêu chí</span>
+                        <span class="tooltip">
+                            <i class="far fa-question-circle"></i>
+                            <span class="tooltip-text">${file.filename}</span>
+                        </span>
+                    </div>
+                `;
+
+                        fileInfo.appendChild(fileIcon);
+                        fileInfo.appendChild(fileDetails);
+
+                        const fileStats = document.createElement('div');
+                        fileStats.className = 'flex items-center space-x-2 ml-4';
+                        fileStats.innerHTML = `
+                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 flex items-center">
+                        <i class="fas fa-check-circle mr-1"></i>${file.hasCount} CÓ
+                    </span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-red-100 text-red-800 flex items-center">
+                        <i class="fas fa-times-circle mr-1"></i>${file.noCount} KHÔNG
+                    </span>
+                    <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 flex items-center">
+                        <i class="fas fa-question-circle mr-1"></i>${file.notCheckedCount}
+                    </span>
+                    <button data-index="${index}" class="remove-file-btn text-red-500 hover:text-red-700 p-1 rounded-full hover:bg-red-50 transition">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `;
+
+                        fileItem.appendChild(fileInfo);
+                        fileItem.appendChild(fileStats);
+
+                        fileList.appendChild(fileItem);
+                  });
+
+                  // Add event listeners to remove buttons
+                  document.querySelectorAll('.remove-file-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                              e.stopPropagation();
+                              const index = parseInt(btn.getAttribute('data-index'));
+                              removeFile(index);
+                        });
+                  });
+            }
+
+            function removeFile(index) {
+                  allFiles.splice(index, 1);
+                  updateFileList(allFiles);
+                  fileCount.textContent = allFiles.length;
+
+                  if (allFiles.length === 0) {
+                        fileListContainer.classList.add('hidden');
+                        processingSection.classList.add('hidden');
+                  } else {
+                        // Reset processing section
+                        processingSection.classList.add('hidden');
+                  }
+            }
+
+            function updateSummaryTable(files) {
+                  summaryTableBody.innerHTML = '';
+
+                  let totalYesCount = 0;
+                  let totalNoCount = 0;
+                  let totalPendingCount = 0;
+                  let totalCriteriaCount = 0;
+
+                  sortFilesByDate(files).forEach((file, index) => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-50';
+                        row.innerHTML = `
+                        <td class="px-6 py-4 text-sm text-gray-600 font-medium">${index + 1}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${file.dateStr}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${file.totalCriteria}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">${file.hasCount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">${file.noCount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${file.notCheckedCount}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${file.rate >= 90 ? 'text-green-600' : file.rate >= 70 ? 'text-yellow-600' : 'text-red-600'}">
+                        ${file.rate}%
+                    </td>
+                `;
+                        summaryTableBody.appendChild(row);
+
+                        totalYesCount += file.hasCount;
+                        totalNoCount += file.noCount;
+                        totalPendingCount += file.notCheckedCount;
+                        totalCriteriaCount += file.totalCriteria;
+                  });
+
+                  // Update totals
+                  totalCriteria.textContent = totalCriteriaCount;
+                  totalYes.textContent = totalYesCount;
+                  totalNo.textContent = totalNoCount;
+                  totalPending.textContent = totalPendingCount;
+
+                  const totalRateValue = totalCriteriaCount > 0
+                        ? Math.round((totalYesCount / totalCriteriaCount) * 100)
+                        : 0;
+
+                  totalRate.textContent = `${totalRateValue}%`;
+                  totalRate.className = totalRateValue >= 90
+                        ? 'px-6 py-3 text-sm font-medium text-green-600'
+                        : totalRateValue >= 70
+                              ? 'px-6 py-3 text-sm font-medium text-yellow-600'
+                              : 'px-6 py-3 text-sm font-medium text-red-600';
+            }
+
+            function changeChartType(type) {
+                  if (!progressChart) return;
+
+                  // Update active button styles
+                  if (type === 'line') {
+                        lineChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                        barChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                  } else {
+                        lineChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                        barChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                  }
+
+                  progressChart.config.type = type;
+                  progressChart.update();
+            }
+
+            function createOrUpdateChart(files) {
+                  const ctx = document.getElementById('progressChart').getContext('2d');
+
+                  // Sort files by date again to ensure correct order
+                  const sortedFiles = sortFilesByDate(files);
+
+                  const labels = sortedFiles.map(file => file.dateStr);
+                  const hasData = sortedFiles.map(file => file.hasCount);
+                  const noData = sortedFiles.map(file => file.noCount);
+
+                  if (progressChart) {
+                        progressChart.data.labels = labels;
+                        progressChart.data.datasets[0].data = hasData;
+                        progressChart.data.datasets[1].data = noData;
+                        progressChart.update();
+                        return;
+                  }
+
+                  // Set line chart as default
+                  lineChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                  barChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+
+                  progressChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                              labels: labels,
+                              datasets: [
+                                    {
+                                          label: 'CÓ',
+                                          data: hasData,
+                                          borderColor: '#10b981',
+                                          backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                                          borderWidth: 2,
+                                          pointBackgroundColor: '#10b981',
+                                          pointRadius: 5,
+                                          pointHoverRadius: 7,
+                                          tension: 0.3,
+                                          fill: true
+                                    },
+                                    {
+                                          label: 'KHÔNG',
+                                          data: noData,
+                                          borderColor: '#ef4444',
+                                          backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                                          borderWidth: 2,
+                                          pointBackgroundColor: '#ef4444',
+                                          pointRadius: 5,
+                                          pointHoverRadius: 7,
+                                          tension: 0.3,
+                                          fill: true
+                                    }
+                              ]
+                        },
+                        options: {
+                              responsive: true,
+                              maintainAspectRatio: false,
+                              plugins: {
+                                    title: {
+                                          display: true,
+                                          text: 'Tiến độ đánh giá nhân viên',
+                                          font: {
+                                                size: 16,
+                                                weight: 'bold'
+                                          },
+                                          padding: {
+                                                top: 10,
+                                                bottom: 20
+                                          }
+                                    },
+                                    legend: {
+                                          position: 'top',
+                                          labels: {
+                                                font: {
+                                                      size: 14
+                                                },
+                                                usePointStyle: true,
+                                                padding: 20
+                                          }
+                                    },
+                                    tooltip: {
+                                          backgroundColor: '#1e40af',
+                                          titleFont: {
+                                                size: 14,
+                                                weight: 'bold'
+                                          },
+                                          bodyFont: {
+                                                size: 14
+                                          },
+                                          padding: 12,
+                                          callbacks: {
+                                                label: function (context) {
+                                                      return `${context.dataset.label}: ${context.raw} tiêu chí`;
+                                                }
+                                          }
+                                    }
+                              },
+                              scales: {
+                                    x: {
+                                          title: {
+                                                display: true,
+                                                text: 'Ngày đánh giá',
+                                                font: {
+                                                      size: 14,
+                                                      weight: 'bold'
+                                                }
+                                          },
+                                          ticks: {
+                                                font: {
+                                                      size: 12
+                                                }
+                                          },
+                                          grid: {
+                                                display: false
+                                          }
+                                    },
+                                    y: {
+                                          title: {
+                                                display: true,
+                                                text: 'Số lượng tiêu chí',
+                                                font: {
+                                                      size: 14,
+                                                      weight: 'bold'
+                                                }
+                                          },
+                                          beginAtZero: true,
+                                          ticks: {
+                                                font: {
+                                                      size: 12
+                                                },
+                                                precision: 0
+                                          },
+                                          grid: {
+                                                color: '#e5e7eb'
+                                          }
+                                    }
+                              },
+                              elements: {
+                                    line: {
+                                          borderWidth: 3
+                                    }
+                              }
+                        }
+                  });
+            }
+
+            async function exportToExcel() {
+                  if (allFiles.length === 0) return;
+
+                  try {
+                        // Add loading state to button
+                        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Đang xuất...';
+                        exportBtn.disabled = true;
+
+                        // Create a new workbook
+                        const workbook = new ExcelJS.Workbook();
+                        const worksheet = workbook.addWorksheet("Thống kê");
+
+                        // Add employee info
+                        worksheet.getCell('A1').value = `Tên nhân viên: ${employeeData.name}`;
+                        worksheet.getCell('A1').font = { bold: true };
+
+                        worksheet.getCell('A2').value = `Email: ${employeeData.email}`;
+                        worksheet.getCell('A3').value = `Chi nhánh: ${employeeData.branch}`;
+
+                        // Add empty row
+                        worksheet.addRow([]);
+
+                        // Add headers
+                        worksheet.getCell('A5').value = 'STT';
+                        worksheet.getCell('B5').value = 'Ngày đánh giá';
+                        worksheet.getCell('C5').value = 'Tổng tiêu chí';
+                        worksheet.getCell('D5').value = 'Tổng CÓ';
+                        worksheet.getCell('E5').value = 'Tổng KHÔNG';
+                        worksheet.getCell('F5').value = 'Tổng Chưa Kiểm Tra';
+                        worksheet.getCell('G5').value = 'Tỉ lệ % CÓ (đạt yêu cầu)';
+
+                        // Style header row
+                        ['A5', 'B5', 'C5', 'D5', 'E5', 'F5', 'G5'].forEach(cell => {
+                              worksheet.getCell(cell).font = { bold: true };
+                              worksheet.getCell(cell).fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFD9E1F2' }
+                              };
+                              worksheet.getCell(cell).border = {
+                                    top: { style: 'thin', color: { argb: 'FF8EA9DB' } },
+                                    left: { style: 'thin', color: { argb: 'FF8EA9DB' } },
+                                    bottom: { style: 'thin', color: { argb: 'FF8EA9DB' } },
+                                    right: { style: 'thin', color: { argb: 'FF8EA9DB' } }
+                              };
+                              worksheet.getCell(cell).alignment = { vertical: 'middle', horizontal: 'center' };
+                        });
+
+                        // Add data rows (sorted by date)
+                        let totalYes = 0, totalNo = 0, totalPending = 0, totalCriteria = 0;
+                        sortFilesByDate(allFiles).forEach((file, index) => {
+                              const row = worksheet.getRow(6 + index);
+
+                              row.getCell(1).value = index + 1; // STT
+                              row.getCell(1).alignment = { vertical: 'middle', horizontal: 'center' };
+                              row.getCell(2).value = file.dateStr;
+                              row.getCell(3).value = file.totalCriteria;
+                              row.getCell(4).value = file.hasCount;
+                              row.getCell(5).value = file.noCount;
+                              row.getCell(6).value = file.notCheckedCount;
+                              row.getCell(7).value = { formula: `ROUND((${file.hasCount}/${file.totalCriteria})*100,0)&"%"` };
+                              row.getCell(7).alignment = { vertical: 'middle', horizontal: 'right' };
+
+
+
+                              // Apply different colors based on rate
+                              const rate = (file.hasCount / (file.totalCriteria)) * 100;
+                              if (rate >= 90) {
+                                    row.getCell(7).font = { color: { argb: 'FF548235' }, bold: true }; // Green
+                              } else if (rate >= 70) {
+                                    row.getCell(7).font = { color: { argb: 'FFF1C933' }, bold: true }; // Yellow
+                              } else {
+                                    row.getCell(7).font = { color: { argb: 'FFC00000' }, bold: true }; // Red
+                              }
+
+                              // Update totals
+                              totalYes += file.hasCount;
+                              totalNo += file.noCount;
+                              totalPending += file.notCheckedCount;
+                              totalCriteria += file.totalCriteria;
+                        });
+
+                        // Style data rows
+                        for (let i = 6; i < 6 + allFiles.length; i++) {
+                              ['A', 'B', 'C', 'D', 'E', 'F'].forEach(col => {
+                                    worksheet.getCell(`${col}${i}`).border = {
+                                          top: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                                          left: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                                          bottom: { style: 'thin', color: { argb: 'FFD9D9D9' } },
+                                          right: { style: 'thin', color: { argb: 'FFD9D9D9' } }
+                                    };
+                              });
+
+                              // Color CÓ and KHÔNG cells
+                              worksheet.getCell(`D${i}`).fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFE2EFDA' } // Light green
+                              };
+                              worksheet.getCell(`E${i}`).fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFFCE4D6' } // Light red
+                              };
+                        }
+
+                        // Add totals row
+                        const totalRowNum = 6 + allFiles.length + 1;
+                        worksheet.getCell(`A${totalRowNum}`).value = 'Tổng cộng';
+                        worksheet.getCell(`A${totalRowNum}`).font = { bold: true };
+                        worksheet.getCell(`B${totalRowNum}`).value = '#';
+                        worksheet.getCell(`C${totalRowNum}`).value = totalCriteria;
+                        worksheet.getCell(`D${totalRowNum}`).value = totalYes;
+                        worksheet.getCell(`D${totalRowNum}`).font = { color: { argb: 'FF548235' }, bold: true }; // Green
+
+                        worksheet.getCell(`E${totalRowNum}`).value = totalNo;
+                        worksheet.getCell(`E${totalRowNum}`).font = { color: { argb: 'FFC00000' }, bold: true }; // Red
+
+                        worksheet.getCell(`F${totalRowNum}`).value = totalPending;
+                        worksheet.getCell(`G${totalRowNum}`).value = { formula: `ROUND((${totalYes}/${totalCriteria})*100,0)&"%"` };
+
+
+                        // Style totals row
+                        ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach(col => {
+                              worksheet.getCell(`${col}${totalRowNum}`).fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFF2F2F2' } // Light gray
+                              };
+                              worksheet.getCell(`${col}${totalRowNum}`).border = {
+                                    top: { style: 'double', color: { argb: 'FF0070C0' } },
+                                    bottom: { style: 'double', color: { argb: 'FF0070C0' } }
+                              };
+                              if (col !== 'A') {
+                                    worksheet.getCell(`${col}${totalRowNum}`).alignment = { vertical: 'middle', horizontal: 'right' };
+                              }
+                        });
+
+                        // Auto column width
+                        worksheet.columns.forEach(column => {
+                              let maxLength = 0;
+                              column.eachCell({ includeEmpty: true }, cell => {
+                                    const columnLength = cell.value ? cell.value.toString().length : 0;
+                                    if (columnLength > maxLength) {
+                                          maxLength = columnLength;
+                                    }
+                              });
+                              column.width = maxLength < 12 ? 12 : maxLength + 2;
+                        });
+
+                        // Add chart image (if available)
+                        if (progressChart) {
+                              const chartImage = await getChartImage();
+                              if (chartImage) {
+                                    const imageId = workbook.addImage({
+                                          base64: chartImage,
+                                          extension: 'png',
+                                    });
+
+                                    // Add chart after the data table
+                                    worksheet.addImage(imageId, `A${totalRowNum + 3}:F${totalRowNum + 25}`);
+                              }
+                        }
+
+                        // Generate file
+                        const buffer = await workbook.xlsx.writeBuffer();
+                        const now = new Date();
+                        const yyyy = now.getFullYear();
+                        const mm = String(now.getMonth() + 1).padStart(2, '0');
+                        const dd = String(now.getDate()).padStart(2, '0');
+                        const cleanEmail = employeeData.email.split('@')[0].trim() || 'unknown';
+                        const fileName = `ThongKeNhanVien_${cleanEmail}_${yyyy}-${mm}-${dd}.xlsx`;
+                        
+
+                        saveAs(new Blob([buffer]), fileName);
+
+                        showSuccess('Xuất file thành công', `File Excel đã được tải xuống thành công.`);
+
+                  } catch (error) {
+                        showError('Lỗi xuất file', 'Không thể tạo file Excel. Vui lòng thử lại.');
+                        console.error(error);
+                  } finally {
+                        // Reset button state
+                        exportBtn.innerHTML = '<i class="fas fa-file-export mr-2"></i> Xuất File Excel';
+                        exportBtn.disabled = false;
+                  }
+            }
+
+            function getChartImage() {
+                  return new Promise((resolve) => {
+                        if (!progressChart) {
+                              resolve(null);
+                              return;
+                        }
+
+                        // Temporarily adjust chart size for better image quality
+                        const originalWidth = progressChart.width;
+                        const originalHeight = progressChart.height;
+
+                        progressChart.resize(1200, 600);
+
+                        // Get base64 image
+                        const image = progressChart.toBase64Image('image/png', 1);
+
+                        // Restore original size
+                        progressChart.resize(originalWidth, originalHeight);
+
+                        resolve(image);
+                  });
+            }
+
+            function showError(title, message) {
+                  errorTitle.textContent = title;
+                  errorMessage.innerHTML = message; // Cho phép HTML nếu cần
+                  errorAlert.classList.remove('hidden');
+                  errorAlert.classList.add('fade-in');
+                  setTimeout(() => {
+                        errorAlert.classList.add('hidden');
+                  }, 5000);
+            }
+
+            function hideError() {
+                  errorAlert.classList.add('hidden');
+                  errorAlert.classList.remove('fade-in');
+            }
+
+            function showSuccess(title, message) {
+                  successTitle.textContent = title;
+                  successMessage.textContent = message;
+                  successAlert.classList.remove('hidden');
+                  successAlert.classList.add('fade-in');
+
+                  // Auto hide after 5 seconds
+                  setTimeout(() => {
+                        hideSuccess();
+                  }, 5000);
+            }
+
+            function hideSuccess() {
+                  successAlert.classList.add('hidden');
+                  successAlert.classList.remove('fade-in');
+            }
+
+            function hideAlerts() {
+                  hideError();
+                  hideSuccess();
+            }
+      </script>
+</body>
+
+</html>
