@@ -4,7 +4,7 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Tool Thống Kê Nhân Viên</title>
+      <title>Thống Kê dữ liệu Nhân Viên</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -1270,8 +1270,9 @@
                                                 font: { weight: 'bold' },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                      const percent = total ? Math.round((value / total) * 100) : 0;
-                                                      return percent > 0 ? `${percent}%` : '';
+                                                      return value > 0
+                                                            ? `${((value / total) * 100).toFixed(2)}%`
+                                                            : '';
                                                 }
                                           }
                                     }

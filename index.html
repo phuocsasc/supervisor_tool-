@@ -4,1179 +4,172 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Hệ Thống Giám Sát Lỗi Nhân Viên</title>
+      <title>Phần mềm giám sát Nhân viên</title>
       <script src="https://cdn.tailwindcss.com"></script>
-      <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
       <style>
-            .tree-item {
-                  position: relative;
-                  padding-left: 16px;
-            }
-
-            .tree-item::before {
-                  content: "";
-                  position: absolute;
-                  left: 8px;
-                  top: 24px;
-                  height: calc(100% - 24px);
-                  width: 2px;
-                  background: #d1d5db;
-            }
-
-            .tree-item:last-child::before {
-                  height: 24px;
-            }
-
-            .tree-item::after {
-                  content: "";
-                  position: absolute;
-                  left: 8px;
-                  top: 24px;
-                  width: 8px;
-                  height: 2px;
-                  background: #d1d5db;
-            }
-
-            .tree-toggle {
-                  transition: all 0.2s ease;
-            }
-
-            .tree-toggle.collapsed {
-                  transform: rotate(-90deg);
-            }
-
-            .has-error {
-                  background-color: #fee2e2;
-            }
-
-            .no-error {
-                  background-color: #dcfce7;
-            }
-
-            .error-card {
-                  transition: all 0.2s ease;
-                  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-            }
-
-            .error-card:hover {
-                  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            }
-
-            .mobile-visible {
-                  display: none;
-            }
-
-            @media (max-width: 768px) {
-                  .mobile-visible {
-                        display: block;
-                  }
-
-                  .desktop-visible {
-                        display: none;
-                  }
-
-                  .tree-item::before,
-                  .tree-item::after {
-                        display: none;
-                  }
-
-                  .tree-item {
-                        padding-left: 0;
-                  }
-            }
-
-            .custom-scrollbar::-webkit-scrollbar {
-                  width: 6px;
-                  height: 6px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-track {
-                  background: #f1f1f1;
-                  border-radius: 10px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb {
-                  background: #c1c1c1;
-                  border-radius: 10px;
-            }
-
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                  background: #a8a8a8;
-            }
-
-            /* Container chứa tất cả biểu đồ */
-            #chartContainer {
-                  max-height: 300px;
-                  overflow-y: auto;
-            }
-
-            /* Style cho mỗi biểu đồ */
-            .chart-wrapper {
-                  background: white;
-                  padding: 1rem;
-                  border-radius: 8px;
-                  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                  margin-bottom: 1rem;
-            }
-
-            .chart-wrapper canvas {
-                  max-height: 300px;
-            }
-
-            /* Thêm vào phần style */
-            .excel-canvas {
-                  position: absolute;
-                  left: -9999px;
-                  width: 1024px !important;
-                  height: 768px !important;
-            }
-
-            /* Animation cho các thông báo */
-            @keyframes fadeIn {
-                  from {
-                        opacity: 0;
-                        transform: translateY(10px);
-                  }
-
-                  to {
-                        opacity: 1;
-                        transform: translateY(0);
-                  }
-            }
-
-            .fade-in {
-                  animation: fadeIn 0.3s ease-out;
-            }
-
-            /* Hiệu ứng hover cho nút */
-            .btn-hover {
-                  transition: all 0.2s ease;
+            .btn-hover-effect {
+                  transition: all 0.3s ease;
                   transform: translateY(0);
-            }
-
-            .btn-hover:hover {
-                  transform: translateY(-2px);
                   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             }
 
-            /* Hiệu ứng khi chọn lỗi */
-            .selected-error {
-                  box-shadow: 0 0 0 2px #3b82f6;
+            .btn-hover-effect:hover {
+                  transform: translateY(-5px);
+                  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .bg-gradient-custom {
+                  background: linear-gradient(135deg, #B0DB9C 0%, #a3cf91 50%, #94c783 100%);
+            }
+
+            .gradient-text {
+                  background: linear-gradient(90deg, #ffffff, #ffffff);
+                  -webkit-background-clip: text;
+                  background-clip: text;
+                  color: transparent;
+            }
+
+            .bg_giamsat {
+                  background-color: #587850;
+            }
+
+            .bg_quantri {
+                  background-color: #4E71FF;
+            }
+
+
+            @keyframes float {
+                  0% {
+                        transform: translateY(0px);
+                  }
+
+                  50% {
+                        transform: translateY(-10px);
+                  }
+
+                  100% {
+                        transform: translateY(0px);
+                  }
+            }
+
+            .floating {
+                  animation: float 3s ease-in-out infinite;
             }
       </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
-      <div class="container mx-auto px-2 sm:px-4 py-4 sm:py-6">
-            <header class="mb-4 sm:mb-6 text-center">
-                  <h1 class="text-xl sm:text-3xl font-bold text-blue-800">HỆ THỐNG GIÁM SÁT LỖI NHÂN VIÊN</h1>
-                  <p class="text-gray-600 text-sm sm:text-base mt-1 sm:mt-2">Công cụ hỗ trợ giám sát và đánh giá chất
-                        lượng công việc</p>
-            </header>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-                  <div class="lg:col-span-1 space-y-4 sm:space-y-6">
-                        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-                              <h2 class="text-lg sm:text-xl font-semibold text-blue-700 mb-3 flex items-center">
-                                    <i class="fas fa-file-import mr-2"></i> NHẬP DANH MỤC LỖI
-                              </h2>
-                              <div class="mb-3">
-                                    <label class="block text-gray-700 text-sm font-medium mb-1" for="errorFile">
-                                          Chọn file Excel danh mục lỗi
-                                    </label>
-                                    <div class="flex items-center">
-                                          <input type="file" id="errorFile" accept=".xlsx" class="hidden">
-                                          <button id="selectFileBtn"
-                                                class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-l-md transition text-sm sm:text-base btn-hover">
-                                                <i class="fas fa-folder-open mr-1 sm:mr-2"></i> Chọn File
-                                          </button>
-                                          <span id="fileName"
-                                                class="px-3 py-1.5 sm:px-4 sm:py-2 bg-gray-100 rounded-r-md text-gray-600 flex-grow truncate text-sm sm:text-base">Chưa
-                                                chọn file</span>
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-1">Định dạng .xlsx theo mẫu cung cấp</p>
-                              </div>
-                              <button id="importBtn"
-                                    class="w-full bg-green-600 hover:bg-green-700 text-white py-1.5 sm:py-2 px-4 rounded-md flex items-center justify-center transition disabled:opacity-50 text-sm sm:text-base btn-hover"
-                                    disabled>
-                                    <i class="fas fa-upload mr-1 sm:mr-2"></i> Nhập Danh Mục
-                              </button>
-                              <div id="importStatus" class="mt-2 text-center hidden fade-in">
-                                    <p class="text-green-600 font-medium text-sm sm:text-base"><i
-                                                class="fas fa-check-circle mr-1 sm:mr-2"></i> Đã nhập danh mục lỗi thành
-                                          công!</p>
-                              </div>
-                        </div>
-
-                        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-                              <h2 class="text-lg sm:text-xl font-semibold text-blue-700 mb-3 flex items-center">
-                                    <i class="fas fa-user-edit mr-1 sm:mr-2"></i> THÔNG TIN ĐÁNH GIÁ
-                              </h2>
-                              <div class="space-y-3">
-                                    <div>
-                                          <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="supervisorName">Tên người giám sát</label>
-                                          <input type="text" id="supervisorName"
-                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    <!-- Thêm input email người giám sát -->
-                                    <div>
-                                          <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="supervisorEmail">Email người giám sát</label>
-                                          <input type="email" id="supervisorEmail"
-                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    <div>
-                                          <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="employeeName">Tên nhân viên được giám sát</label>
-                                          <input type="text" id="employeeName"
-                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    <div>
-                                          <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="employeeEmail">Email nhân viên được giám sát</label>
-                                          <input type="email" id="employeeEmail"
-                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                                    <div>
-                                          <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="employeeBranch">Tên chi nhánh nhân viên được giám sát</label>
-                                          <input type="text" id="employeeBranch"
-                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                    </div>
-                              </div>
-                        </div>
-
-                        <div class="bg-white rounded-lg shadow p-4 sm:p-6">
-
-                              <div id="chartContainer" class="mt-4 hidden">
-                                    <div class="chart-wrapper">
-                                          <canvas id="summaryChart" width="0" height="0"></canvas>
-                                    </div>
-                              </div>
-                              <div class="mt-3 space-y-2">
-                                    <button id="saveDataBtn"
-                                          class="w-full bg-blue-600 hover:bg-blue-700 text-white py-1.5 sm:py-2 px-4 rounded-md flex items-center justify-center transition disabled:opacity-50 text-sm sm:text-base btn-hover"
-                                          disabled>
-                                          <i class="fas fa-save mr-1 sm:mr-2"></i> Lưu & Xuất Excel
-                                    </button>
-                                    <button id="resetBtn"
-                                          class="w-full bg-gray-600 hover:bg-gray-700 text-white py-1.5 sm:py-2 px-4 rounded-md flex items-center justify-center transition text-sm sm:text-base btn-hover">
-                                          <i class="fas fa-redo mr-1 sm:mr-2"></i> Làm Mới
-                                    </button>
-                              </div>
-                        </div>
+<body class="min-h-screen bg-gray-100">
+      <div class="relative min-h-screen overflow-hidden">
+            <!-- Background decorative elements -->
+            <div class="absolute top-0 left-0 w-full h-full opacity-10">
+                  <div
+                        class="absolute top-20 left-10 w-40 h-40 rounded-full bg-blue-500 mix-blend-multiply filter blur-xl">
                   </div>
+                  <div
+                        class="absolute bottom-10 right-10 w-60 h-60 rounded-full bg-indigo-500 mix-blend-multiply filter blur-xl">
+                  </div>
+            </div>
 
-                  <div class="lg:col-span-2">
-                        <div class="bg-white rounded-lg shadow p-4 sm:p-6 h-full">
-                              <h2 class="text-lg sm:text-xl font-semibold text-blue-700 mb-3 flex items-center">
-                                    <i class="fas fa-clipboard-check mr-1 sm:mr-2"></i> ĐÁNH GIÁ LỖI
-                              </h2>
-                              <div id="currentEmployee" class="mb-3 p-2 sm:p-3 bg-blue-50 rounded-md hidden fade-in">
-                                    <p class="font-medium text-blue-800 text-sm sm:text-base">Đang đánh giá: <span
-                                                id="currentEmployeeName"></span></p>
-                                    <p class="text-xs sm:text-sm text-blue-600">Email: <span
-                                                id="currentEmployeeEmail"></span></p>
-                                    <p class="text-xs sm:text-sm text-blue-600">Chi nhánh: <span
-                                                id="currentEmployeeBranch"></span></p>
+            <div class="relative z-10">
+                  <header class="container mx-auto px-4 py-3 md:py-4">
+                        <div class="flex justify-between items-center">
+                              <div class="flex items-center">
+                                    <h1 class="text-white text-xl font-bold">FPT Telecom</h1>
                               </div>
-
-                              <div class="mobile-visible mb-3 flex justify-between items-center">
-                                    <div class="relative w-full">
-                                          <input type="text" id="errorSearch" placeholder="Tìm kiếm lỗi..."
-                                                class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                                          <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                                    </div>
-                                    <button id="mobileExpandBtn"
-                                          class="ml-2 p-2 text-gray-600 hover:text-gray-800 btn-hover">
-                                          <i class="fas fa-expand"></i>
+                              <!-- <div>
+                                    <button class="text-white hover:text-gray-200 px-4 py-2 rounded-lg">
+                                          <i class="fas fa-question-circle"></i>
                                     </button>
-                              </div>
+                              </div> -->
+                        </div>
+                  </header>
 
-                              <div id="errorTreeContainer" class="hidden">
-                                    <div class="mb-3 flex justify-between items-center desktop-visible">
-                                          <h3 class="text-base sm:text-lg font-medium text-gray-800">Danh mục lỗi cần
-                                                kiểm tra</h3>
-                                          <div class="flex space-x-1 sm:space-x-2">
-                                                <button id="expandAllBtn"
-                                                      class="text-xs sm:text-sm bg-gray-200 hover:bg-gray-300 px-2 sm:px-3 py-1 rounded flex items-center btn-hover">
-                                                      <i class="fas fa-expand mr-1"></i> Mở rộng
-                                                </button>
-                                                <button id="collapseAllBtn"
-                                                      class="text-xs sm:text-sm bg-gray-200 hover:bg-gray-300 px-2 sm:px-3 py-1 rounded flex items-center btn-hover">
-                                                      <i class="fas fa-compress mr-1"></i> Thu gọn
+                  <main class="container mx-auto px-4 py-4 md:py-4">
+                        <div class="max-w-4xl mx-auto text-center">
+                              <div class="mb-2 text-amber-100 font-medium flex justify-center items-center">
+                                    <span class="h-px w-8 bg-amber-200 mr-2"></span>
+                                    <span>GIẢI PHÁP QUẢN LÝ HIỆU QUẢ</span>
+                                    <span class="h-px w-8 bg-amber-200 ml-2"></span>
+                              </div>
+                              <h1 class="text-4xl md:text-6xl font-bold text-white mb-6">
+                                    <span class="gradient-text">Phần mềm Giám sát</span>
+                                    <span class="block mt-2">Nhân viên</span>
+                              </h1>
+                              <p class="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto mb-12">
+                                    Công cụ quản lý hiệu quả giúp tối ưu hóa hiệu suất làm việc và nâng cao năng suất
+                                    của đội ngũ.
+                              </p>
+
+                              <!-- Role Selection Cards -->
+                              <div class="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-10 mt-16">
+                                    <!-- Supervisor Card -->
+                                    <div
+                                          class="bg-white rounded-xl shadow-xl overflow-hidden w-full max-w-sm transform transition-all duration-300 hover:scale-105">
+                                          <div class="bg_giamsat p-6 text-white">
+                                                <i class="fas fa-user-tie text-4xl mb-4"></i>
+                                                <h3 class="text-xl font-bold">Người Giám Sát</h3>
+                                          </div>
+                                          <div class="p-6">
+                                                <p class="text-gray-600 mb-6">
+                                                      Theo dõi hiệu suất, đánh giá tiến độ công việc của các nhân viên kỹ thuật.
+                                                </p>
+                                                <a href="Giam_sat.html" class="w-full">
+                                                      <button
+                                                            class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg btn-hover-effect">
+                                                            Truy cập
+                                                            <i class="fas fa-arrow-right ml-2"></i>
+                                                      </button>
+                                                </a>
+                                          </div>
+                                    </div>
+
+                                    <!-- Admin Card -->
+                                    <div
+                                          class="bg-white rounded-xl shadow-xl overflow-hidden w-full max-w-sm transform transition-all duration-300 hover:scale-105">
+                                          <div class="bg_quantri p-6 text-white">
+                                                <i class="fas fa-user-cog text-4xl mb-4"></i>
+                                                <h3 class="text-xl font-bold">Quản Trị Viên</h3>
+                                          </div>
+                                          <div class="p-6">
+                                                <p class="text-gray-600 mb-6">
+                                                      Quản lý dữ liệu thống kê báo cáo theo nhân viên, chi nhánh, người giám sát.
+                                                </p>
+                                                <button onclick="loginAs('admin')"
+                                                      class="w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 px-6 rounded-lg btn-hover-effect">
+                                                      Truy cập
+                                                      <i class="fas fa-arrow-right ml-2"></i>
                                                 </button>
                                           </div>
                                     </div>
-                                    <div id="errorTree"
-                                          class="border rounded-md p-2 sm:p-4 max-h-[500px] overflow-y-auto custom-scrollbar">
-                                    </div>
                               </div>
 
-                              <div id="noDataMessage" class="text-center py-6 sm:py-10">
-                                    <i
-                                          class="fas fa-clipboard-list text-3xl sm:text-4xl text-gray-300 mb-2 sm:mb-3"></i>
-                                    <h3 class="text-base sm:text-xl text-gray-500 font-medium">Chưa có dữ liệu đánh giá
-                                    </h3>
-                                    <p class="text-gray-400 text-sm sm:text-base">Vui lòng nhập danh mục lỗi và thông
-                                          tin nhân viên để bắt đầu</p>
-                              </div>
+
                         </div>
-                  </div>
+                  </main>
             </div>
+
+            <!-- Background overlay -->
+            <div class="absolute inset-0 bg-gradient-custom -z-10"></div>
       </div>
 
-      <div id="saveConfirmationModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-            <div class="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-2 fade-in">
-                  <div class="text-center">
-                        <div
-                              class="w-12 h-12 sm:w-16 sm:h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                              <i class="fas fa-question-circle text-xl sm:text-3xl text-blue-600"></i>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2">Xác nhận lưu dữ liệu</h3>
-                        <p class="text-gray-500 text-sm sm:text-base mb-3 sm:mb-4">Bạn có chắc chắn muốn lưu đánh giá
-                              cho nhân viên <span id="confirmEmployeeName" class="font-medium"></span>?</p>
-                        <div class="flex space-x-2 sm:space-x-3 justify-center">
-                              <button id="confirmSaveBtn"
-                                    class="px-3 sm:px-4 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm sm:text-base btn-hover">
-                                    <i class="fas fa-check mr-1"></i> Xác nhận
-                              </button>
-                              <button id="reviewDataBtn"
-                                    class="px-3 sm:px-4 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm sm:text-base btn-hover">
-                                    <i class="fas fa-edit mr-1"></i> Xem lại
-                              </button>
-                        </div>
-                  </div>
-            </div>
-      </div>
+      <div class="fixed bottom-0 left-0 right-0 bg-white bg-opacity-10 backdrop-blur-sm py-3">
+            <div class="container mx-auto px-4">
+                  <div class="flex flex-col md:flex-row justify-between items-center text-blue-100">
 
-      <div id="saveSuccessModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-            <div class="bg-white rounded-lg p-4 sm:p-6 max-w-md w-full mx-2 fade-in">
-                  <div class="text-center">
-                        <div
-                              class="w-12 h-12 sm:w-16 sm:h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
-                              <i class="fas fa-check-circle text-xl sm:text-3xl text-green-600"></i>
-                        </div>
-                        <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2" id="saveSuccessMessage">Đã lưu
-                              và xuất Excel thành công!</h3>
-                        <p class="text-gray-500 text-sm sm:text-base mb-3 sm:mb-4">Bạn có muốn tiếp tục đánh giá nhân
-                              viên khác?</p>
-                        <div class="flex space-x-2 sm:space-x-3 justify-center">
-                              <button id="continueBtn"
-                                    class="px-3 sm:px-4 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm sm:text-base btn-hover">
-                                    Tiếp tục
-                              </button>
-                              <!-- <button id="closeSuccessBtn"
-                                    class="px-3 sm:px-4 py-1.5 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition text-sm sm:text-base btn-hover">
-                                    
-                              </button> -->
-                        </div>
-                  </div>
-            </div>
-      </div>
 
-      <div id="errorModal"
-            class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50 p-4">
-            <div class="bg-white rounded-lg p-4 w-full max-w-sm mx-2 fade-in">
-                  <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-lg font-medium text-gray-900" id="errorModalTitle">Đánh giá lỗi</h3>
-                        <button id="closeErrorModal" class="text-gray-500 hover:text-gray-700 btn-hover">
-                              <i class="fas fa-times"></i>
-                        </button>
-                  </div>
-                  <div class="mb-4">
-                        <p class="text-gray-700" id="errorModalContent">Nội dung lỗi sẽ hiển thị ở đây</p>
-                  </div>
-                  <div class="grid grid-cols-2 gap-2">
-                        <button id="modalYesBtn"
-                              class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded flex items-center justify-center btn-hover">
-                              <i class="fas fa-check mr-2"></i> CÓ (Đạt)
-                        </button>
-                        <button id="modalNoBtn"
-                              class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-center justify-center btn-hover">
-                              <i class="fas fa-times mr-2"></i> KHÔNG (Lỗi)
-                        </button>
                   </div>
             </div>
       </div>
 
       <script>
-            let errorCategories = [];
-            let currentEvaluations = {};
-            let currentEmployee = null;
-            let currentErrorForModal = null;
-            let chartInstances = {};
-            let summaryChartInstance = null;
-
-            // DOM Elements
-            const errorFileInput = document.getElementById('errorFile');
-            const selectFileBtn = document.getElementById('selectFileBtn');
-            const fileName = document.getElementById('fileName');
-            const importBtn = document.getElementById('importBtn');
-            const importStatus = document.getElementById('importStatus');
-            const supervisorName = document.getElementById('supervisorName');
-            const supervisorEmail = document.getElementById('supervisorEmail');
-            const employeeName = document.getElementById('employeeName');
-            const employeeEmail = document.getElementById('employeeEmail');
-            const employeeBranch = document.getElementById('employeeBranch');
-            const errorTreeContainer = document.getElementById('errorTreeContainer');
-            const errorTree = document.getElementById('errorTree');
-            const noDataMessage = document.getElementById('noDataMessage');
-            const saveDataBtn = document.getElementById('saveDataBtn');
-            const resetBtn = document.getElementById('resetBtn');
-            const evaluatedCount = document.getElementById('evaluatedCount');
-            const totalErrors = document.getElementById('totalErrors');
-            const avgErrorRate = document.getElementById('avgErrorRate');
-            const avgScore = document.getElementById('avgScore');
-            const currentEmployeeDiv = document.getElementById('currentEmployee');
-            const currentEmployeeName = document.getElementById('currentEmployeeName');
-            const currentEmployeeEmail = document.getElementById('currentEmployeeEmail');
-            const currentEmployeeBranch = document.getElementById('currentEmployeeBranch');
-            const expandAllBtn = document.getElementById('expandAllBtn');
-            const collapseAllBtn = document.getElementById('collapseAllBtn');
-            const saveConfirmationModal = document.getElementById('saveConfirmationModal');
-            const confirmEmployeeName = document.getElementById('confirmEmployeeName');
-            const confirmSaveBtn = document.getElementById('confirmSaveBtn');
-            const reviewDataBtn = document.getElementById('reviewDataBtn');
-            const saveSuccessModal = document.getElementById('saveSuccessModal');
-            const saveSuccessMessage = document.getElementById('saveSuccessMessage');
-            const continueBtn = document.getElementById('continueBtn');
-            const errorSearch = document.getElementById('errorSearch');
-            const mobileExpandBtn = document.getElementById('mobileExpandBtn');
-            const errorModal = document.getElementById('errorModal');
-            const errorModalTitle = document.getElementById('errorModalTitle');
-            const errorModalContent = document.getElementById('errorModalContent');
-            const modalYesBtn = document.getElementById('modalYesBtn');
-            const modalNoBtn = document.getElementById('modalNoBtn');
-            const closeErrorModal = document.getElementById('closeErrorModal');
-
-            // Event Listeners
-            selectFileBtn.addEventListener('click', () => errorFileInput.click());
-            errorFileInput.addEventListener('change', handleFileSelect);
-            importBtn.addEventListener('click', importErrorCategories);
-            saveDataBtn.addEventListener('click', showSaveConfirmation);
-            confirmSaveBtn.addEventListener('click', saveAndExport);
-            resetBtn.addEventListener('click', resetSystem);
-            expandAllBtn.addEventListener('click', () => toggleAllCategories(true));
-            collapseAllBtn.addEventListener('click', () => toggleAllCategories(false));
-            reviewDataBtn.addEventListener('click', () => saveConfirmationModal.classList.add('hidden'));
-            continueBtn.addEventListener('click', continueEvaluation);
-            errorSearch.addEventListener('input', searchErrors);
-            mobileExpandBtn.addEventListener('click', toggleMobileView);
-            modalYesBtn.addEventListener('click', () => handleModalEvaluation('CÓ'));
-            modalNoBtn.addEventListener('click', () => handleModalEvaluation('KHÔNG'));
-            closeErrorModal.addEventListener('click', () => errorModal.classList.add('hidden'));
-
-            // Functions
-            function handleFileSelect(e) {
-                  const file = e.target.files[0];
-                  if (file) {
-                        fileName.textContent = file.name;
-                        importBtn.disabled = false;
-                  } else {
-                        fileName.textContent = 'Chưa chọn file';
-                        importBtn.disabled = true;
-                  }
-            }
-
-            function importErrorCategories() {
-                  const file = errorFileInput.files[0];
-                  if (!file) return;
-
-                  const reader = new FileReader();
-                  reader.onload = function (e) {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-
-                        errorCategories = processErrorData(jsonData);
-                        importStatus.classList.remove('hidden');
-                        errorTreeContainer.classList.remove('hidden');
-                        noDataMessage.classList.add('hidden');
-                        generateErrorTree();
-
-                        // Thêm hiệu ứng fade-in
-                        setTimeout(() => {
-                              importStatus.classList.add('fade-in');
-                        }, 10);
-                  };
-                  reader.readAsArrayBuffer(file);
-            }
-
-            function processErrorData(data) {
-                  const categories = [];
-                  const categoryMap = {};
-
-                  data.forEach(row => {
-                        const cat1 = row['Danh mục 1']?.trim();
-                        const cat2 = row['Danh mục 2']?.trim();
-                        const cat3 = row['Danh mục 3']?.trim();
-                        const cat4 = row['Danh mục 4']?.trim();
-
-                        if (cat1 && !categoryMap[cat1]) {
-                              const newCat = { name: cat1, children: [] };
-                              categories.push(newCat);
-                              categoryMap[cat1] = newCat;
-                        }
-
-                        if (cat2 && cat1) {
-                              const parent = categoryMap[cat1];
-                              const existingChild = parent.children.find(c => c.name === cat2);
-                              if (!existingChild) {
-                                    const newCat = { name: cat2, children: [] };
-                                    parent.children.push(newCat);
-                                    const key = `${cat1}|${cat2}`;
-                                    categoryMap[key] = newCat;
-                              }
-                        }
-
-                        if (cat3 && cat2 && cat1) {
-                              const key = `${cat1}|${cat2}`;
-                              const parent = categoryMap[key];
-                              const existingChild = parent.children.find(c => c.name === cat3);
-                              if (!existingChild) {
-                                    const newCat = { name: cat3, children: [] };
-                                    parent.children.push(newCat);
-                                    const newKey = `${key}|${cat3}`;
-                                    categoryMap[newKey] = newCat;
-                              }
-                        }
-
-                        if (cat4 && cat3 && cat2 && cat1) {
-                              const key = `${cat1}|${cat2}|${cat3}`;
-                              const parent = categoryMap[key];
-                              const existingChild = parent.children.find(c => c.name === cat4);
-                              if (!existingChild) {
-                                    const newCat = { name: cat4, children: [] };
-                                    parent.children.push(newCat);
-                              }
-                        }
-                  });
-
-                  return categories;
-            }
-
-            function generateErrorTree() {
-                  errorTree.innerHTML = '';
-                  errorCategories.forEach((category, index) => {
-                        const categoryElement = createCategoryElement(category, index + 1);
-                        errorTree.appendChild(categoryElement);
-                  });
-            }
-
-            function createCategoryElement(category, number, level = 1) {
-                  const hasChildren = category.children && category.children.length > 0;
-                  const isLeaf = !hasChildren;
-
-                  const categoryElement = document.createElement('div');
-                  categoryElement.className = `tree-item ${hasChildren ? 'mb-1' : ''}`;
-
-                  const header = document.createElement('div');
-                  header.className = `flex items-center justify-between p-2 hover:bg-gray-50 rounded cursor-pointer error-card ${isLeaf ? 'border border-gray-200' : ''}`;
-
-                  const titleContainer = document.createElement('div');
-                  titleContainer.className = 'flex items-center flex-grow';
-
-                  if (hasChildren) {
-                        const toggleIcon = document.createElement('i');
-                        toggleIcon.className = 'fas fa-chevron-down tree-toggle text-gray-500 mr-2 text-sm';
-                        toggleIcon.addEventListener('click', (e) => {
-                              e.stopPropagation();
-                              const content = e.target.closest('.tree-item').querySelector('div:not(:first-child)');
-                              toggleCategory(e.target, content);
-                        });
-                        titleContainer.appendChild(toggleIcon);
-                  } else {
-                        const spacer = document.createElement('span');
-                        spacer.className = 'w-5 mr-2';
-                        titleContainer.appendChild(spacer);
-                  }
-
-                  const title = document.createElement('span');
-                  title.className = 'font-medium text-gray-700 text-sm sm:text-base';
-                  title.textContent = `${number}. ${category.name}`;
-                  titleContainer.appendChild(title);
-
-                  header.appendChild(titleContainer);
-
-                  if (isLeaf) {
-                        const checkBtn = document.createElement('button');
-                        checkBtn.className = 'ml-2 bg-blue-100 hover:bg-blue-200 text-blue-800 px-2 sm:px-3 py-1 rounded text-xs sm:text-sm flex items-center btn-hover';
-                        checkBtn.innerHTML = '<i class="fas fa-check-circle mr-1"></i> <span class="desktop-visible"></span>';
-                        checkBtn.addEventListener('click', (e) => {
-                              e.stopPropagation();
-                              if (window.innerWidth <= 768) {
-                                    showMobileEvaluationModal(category);
-                              } else {
-                                    showEvaluationOptions(category);
-                              }
-                        });
-                        header.appendChild(checkBtn);
-
-                        if (currentEvaluations[category.name]) {
-                              const statusBadge = document.createElement('span');
-                              statusBadge.className = `ml-2 px-2 py-1 rounded text-xs font-medium ${currentEvaluations[category.name] === 'CÓ' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-                              statusBadge.textContent = currentEvaluations[category.name];
-                              header.appendChild(statusBadge);
-
-                              if (currentEvaluations[category.name] === 'KHÔNG') {
-                                    header.classList.add('has-error');
-                              } else {
-                                    header.classList.add('no-error');
-                              }
-                        }
-                  }
-
-                  categoryElement.appendChild(header);
-
-                  if (hasChildren) {
-                        const content = document.createElement('div');
-                        content.className = 'ml-4 mt-1 hidden';
-                        category.children.forEach((child, childIndex) => {
-                              const childElement = createCategoryElement(child, childIndex + 1, level + 1);
-                              content.appendChild(childElement);
-                        });
-                        categoryElement.appendChild(content);
-                  }
-
-                  return categoryElement;
-            }
-
-            function toggleCategory(icon, content) {
-                  icon.classList.toggle('collapsed');
-                  content.classList.toggle('hidden');
-            }
-
-            function toggleAllCategories(expand) {
-                  const toggles = document.querySelectorAll('.tree-toggle');
-                  const contents = document.querySelectorAll('.tree-item > div:not(:first-child)');
-                  toggles.forEach(toggle => {
-                        if (expand) toggle.classList.remove('collapsed');
-                        else toggle.classList.add('collapsed');
-                  });
-                  contents.forEach(content => {
-                        if (expand) content.classList.remove('hidden');
-                        else content.classList.add('hidden');
-                  });
-            }
-
-            function showEvaluationOptions(category) {
-                  const existingOptions = document.querySelectorAll('.evaluation-options');
-                  existingOptions.forEach(option => option.remove());
-
-                  const categoryElements = document.querySelectorAll('.tree-item span');
-                  let targetElement = null;
-                  for (let el of categoryElements) {
-                        if (el.textContent.includes(category.name)) {
-                              targetElement = el.closest('.tree-item > div:first-child');
-                              break;
-                        }
-                  }
-
-                  if (!targetElement) return;
-
-                  // Thêm hiệu ứng selected
-                  targetElement.classList.add('selected-error');
-                  setTimeout(() => {
-                        targetElement.classList.remove('selected-error');
-                  }, 1000);
-
-                  const optionsContainer = document.createElement('div');
-                  optionsContainer.className = 'evaluation-options grid grid-cols-2 gap-2 mt-2 ml-7 fade-in';
-                  const yesBtn = document.createElement('button');
-                  yesBtn.className = 'bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded flex items-center justify-center text-sm btn-hover';
-                  yesBtn.innerHTML = '<i class="fas fa-check mr-1"></i> CÓ (Đạt)';
-                  yesBtn.addEventListener('click', () => {
-                        recordEvaluation(category.name, 'CÓ');
-                        updateEvaluationUI(targetElement, category.name, 'CÓ');
-                        optionsContainer.remove();
-                  });
-
-                  const noBtn = document.createElement('button');
-                  noBtn.className = 'bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded flex items-center justify-center text-sm btn-hover';
-                  noBtn.innerHTML = '<i class="fas fa-times mr-1"></i> KHÔNG (Lỗi)';
-                  noBtn.addEventListener('click', () => {
-                        recordEvaluation(category.name, 'KHÔNG');
-                        updateEvaluationUI(targetElement, category.name, 'KHÔNG');
-                        optionsContainer.remove();
-                  });
-
-                  optionsContainer.appendChild(yesBtn);
-                  optionsContainer.appendChild(noBtn);
-                  targetElement.parentNode.insertBefore(optionsContainer, targetElement.nextSibling);
-            }
-
-            function showMobileEvaluationModal(category) {
-                  currentErrorForModal = category;
-                  errorModalTitle.textContent = `Đánh giá lỗi: ${category.name}`;
-                  errorModalContent.textContent = `Bạn có muốn đánh giá "${category.name}"?`;
-                  errorModal.classList.remove('hidden');
-            }
-
-            function handleModalEvaluation(result) {
-                  if (!currentErrorForModal) return;
-                  recordEvaluation(currentErrorForModal.name, result);
-                  const categoryElements = document.querySelectorAll('.tree-item span');
-                  let targetElement = null;
-                  for (let el of categoryElements) {
-                        if (el.textContent.includes(currentErrorForModal.name)) {
-                              targetElement = el.closest('.tree-item > div:first-child');
-                              break;
-                        }
-                  }
-                  if (targetElement) {
-                        updateEvaluationUI(targetElement, currentErrorForModal.name, result);
-                  }
-                  errorModal.classList.add('hidden');
-                  currentErrorForModal = null;
-            }
-
-            function recordEvaluation(categoryName, result) {
-                  currentEvaluations[categoryName] = result;
-                  if (employeeName.value && supervisorName.value) {
-                        saveDataBtn.disabled = false;
-                  }
-            }
-
-            function showSaveConfirmation() {
-                  if (!employeeName.value || !supervisorName.value) {
-                        alert('Vui lòng nhập đầy đủ thông tin người giám sát và nhân viên');
-                        return;
-                  }
-                  if (Object.keys(currentEvaluations).length === 0) {
-                        alert('Vui lòng đánh giá ít nhất một lỗi trước khi lưu');
-                        return;
-                  }
-                  confirmEmployeeName.textContent = employeeName.value;
-                  saveConfirmationModal.classList.remove('hidden');
-            }
-
-            async function saveAndExport() {
-                  // Tạo dữ liệu đánh giá
-                  const evaluation = {
-                        supervisor: supervisorName.value,
-                        supervisorEmail: supervisorEmail.value,
-                        employee: {
-                              name: employeeName.value,
-                              email: employeeEmail.value,
-                              branch: employeeBranch.value
-                        },
-                        date: new Date().toISOString(),
-                        evaluations: { ...currentEvaluations }
-                  };
-
-                  // Tạo workbook Excel
-                  const workbook = new ExcelJS.Workbook();
-                  workbook.creator = 'Hệ thống giám sát lỗi nhân viên';
-                  workbook.created = new Date();
-
-                  // Tạo sheet cho nhân viên
-                  await createEmployeeSheet(workbook, evaluation);
-
-                  // Tạo tên file theo cấu trúc
-                  const supervisorEmailPart = evaluation.supervisorEmail.split('@')[0] || 'unknown';
-                  const employeeEmailPart = evaluation.employee.email.split('@')[0] || 'unknown';
-                  const branchPart = evaluation.employee.branch.replace(/\s+/g).toLowerCase() || 'unknown';
-                  const today = new Date();
-                  const datePart = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-
-                  const fileName = `${supervisorEmailPart}-${employeeEmailPart}-${branchPart}-${datePart}.xlsx`;
-
-
-                  // Xuất file
-                  const buffer = await workbook.xlsx.writeBuffer();
-                  saveAs(new Blob([buffer]), fileName);
-
-                  // Hiển thị thông báo thành công
-                  saveConfirmationModal.classList.add('hidden');
-                  saveSuccessMessage.textContent = `Đã xuất file đánh giá cho ${evaluation.employee.name}`;
-                  saveSuccessModal.classList.remove('hidden');
-
-                  // Hiển thị thông tin nhân viên hiện tại
-                  currentEmployeeDiv.classList.remove('hidden');
-                  currentEmployeeName.textContent = `${employeeName.value}`;
-                  currentEmployeeEmail.textContent = `${employeeEmail.value}`;
-                  currentEmployeeBranch.textContent = `${employeeBranch.value}`;
-            }
-
-
-
-            async function createEmployeeSheet(workbook, evaluation) {
-                  const sheetName = evaluation.employee.name
-                  const worksheet = workbook.addWorksheet(sheetName);
-
-                  // Thông tin cơ bản
-                  const row_info1 = worksheet.addRow(['Tên người giám sát:', evaluation.supervisor]);
-                  const row_info2 = worksheet.addRow(['Email người giám sát:', evaluation.supervisorEmail]);
-                  const row_info3 = worksheet.addRow(['Tên nhân viên được giám sát:', evaluation.employee.name]);
-                  const row_info4 = worksheet.addRow(['Email nhân viên được giám sát:', evaluation.employee.email]);
-                  const row_info5 = worksheet.addRow(['Chi nhánh:', evaluation.employee.branch]);
-                  const row_info6 = worksheet.addRow(['Ngày đánh giá:', new Date(evaluation.date).toLocaleDateString('vi-VN')]);
-                  worksheet.addRow([]);
-
-                  // Định dạng các dòng thông tin
-                  [row_info1, row_info2, row_info3, row_info4, row_info5, row_info6].forEach(row => {
-                        row.getCell(1).font = { bold: true };
-                  });
-
-                  // Tiêu đề bảng
-                  const headerRow = worksheet.addRow(['STT', 'Danh mục 1', 'Danh mục 2', 'Danh mục 3', 'Danh mục 4', 'Kết quả']);
-                  headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                  headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
-
-                  // Lấy danh sách lỗi phẳng
-                  const flatErrors = flattenCategories(errorCategories);
-                  flatErrors.forEach((error, i) => {
-                        const result = evaluation.evaluations[error.name] || 'CHƯA KIỂM TRA';
-                        const row = worksheet.addRow([
-                              i + 1,
-                              error.path[0] || '',
-                              error.path[1] || '',
-                              error.path[2] || '',
-                              error.path[3] || '',
-                              result
-                        ]);
-
-                        // Định dạng ô kết quả
-                        const resultCell = row.getCell(6);
-                        if (result === 'CÓ') {
-                              resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
-                        } else if (result === 'KHÔNG') {
-                              resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC7CE' } };
-                        } else {
-                              resultCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7E6E6' } };
-                        }
-                  });
-
-                  worksheet.addRow([]);
-                  worksheet.addRow([]);
-
-                  // Thống kê theo danh mục 1 ==================================================================================================
-                  const row_title_bottom_nv = worksheet.addRow(['Tổng hợp đánh giá theo danh mục 1']);
-                  row_title_bottom_nv.font = { bold: true, color: { argb: 'FFFFFFFF' } };
-                  row_title_bottom_nv.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
-                  const mainCategories = errorCategories.map(cat => cat.name);
-                  const chartData = [];
-                  chartData.push(['Danh mục 1', 'CÓ (đạt yêu cầu)', 'KHÔNG (chưa đạt yêu cầu)', 'CHƯA KIỂM TRA']);
-                  mainCategories.forEach(cat => {
-                        const yesCount = flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'CÓ').length;
-                        const noCount = flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'KHÔNG').length;
-                        const notCheckedCount = flatErrors.filter(e => e.path[0] === cat && !evaluation.evaluations[e.name]).length;
-                        chartData.push([cat, yesCount, noCount, notCheckedCount]);
-                  });
-                  chartData.forEach(row => worksheet.addRow(row));
-
-                  // Dòng đầu của chartData chính là tiêu đề
-                  const titleRow = worksheet.getRow(worksheet.rowCount - chartData.length + 1);
-                  titleRow.font = {
-                        bold: true,
-                        color: { argb: 'FFFFFFFF' } // Màu trắng
-                  };
-
-                  titleRow.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FF4472C4' } // Màu nền xanh dương đậm (hoặc chọn mã khác)
-                  };
-
-                  // Căn giữa các cột từ CÓ → CHƯA KIỂM TRA
-                  [1, 2, 3, 4].forEach(index => {
-                        titleRow.getCell(index).alignment = { horizontal: 'center', vertical: 'middle' };
-                  });
-
-
-                  // ✅ Tô màu 3 cột dữ liệu
-                  const startRowIndex = worksheet.rowCount - chartData.length + 1;
-                  for (let i = 1; i < chartData.length; i++) {
-                        const excelRow = worksheet.getRow(startRowIndex + i);
-                        excelRow.getCell(2).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } };
-                        excelRow.getCell(2).alignment = { horizontal: 'center' };
-                        excelRow.getCell(3).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFC7CE' } };
-                        excelRow.getCell(3).alignment = { horizontal: 'center' };
-                        excelRow.getCell(4).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE7E6E6' } };
-                        excelRow.getCell(4).alignment = { horizontal: 'center' };
-                  }
-
-                  // +++ THÊM PHẦN TÍNH TỔNG +++
-                  // Tính tổng số lượng CÓ, KHÔNG, CHƯA KIỂM TRA
-                  let totalYes = 0, totalNo = 0, totalNotChecked = 0;
-                  for (let i = 1; i < chartData.length; i++) {
-                        totalYes += chartData[i][1];
-                        totalNo += chartData[i][2];
-                        totalNotChecked += chartData[i][3];
-                  }
-
-                  // Thêm dòng tổng kết
-                  const totalRow = worksheet.addRow([
-                        'Tổng cộng',
-                        totalYes,
-                        totalNo,
-                        totalNotChecked
-                  ]);
-
-                  // Định dạng dòng tổng kết
-                  totalRow.font = { bold: true };
-                  totalRow.fill = {
-                        type: 'pattern',
-                        pattern: 'solid',
-                        fgColor: { argb: 'FFD3D3D3' } // Màu xám nhạt
-                  };
-
-                  // Căn giữa các ô số
-                  [2].forEach(colIndex => {
-                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
-                        totalRow.getCell(2).font = {
-                              bold: true,
-                              color: { argb: 'FF317647' }
-                        };
-                  });
-                  [3].forEach(colIndex => {
-                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
-                        totalRow.getCell(3).font = {
-                              bold: true,
-                              color: { argb: 'FFDC1111' }
-                        };
-
-                  });
-                  [4].forEach(colIndex => {
-                        totalRow.getCell(colIndex).alignment = { horizontal: 'center' };
-                  });
-
-                  //  =================================================================================================================
-
-                  // Tạo canvas để vẽ biểu đồ
-                  const chartCanvas = document.createElement('canvas');
-                  // Chỉnh width (độ rộng) và height (độ cao) ở đây
-                  chartCanvas.width = 1200; // Tăng/giảm giá trị này để thay đổi độ RỘNG
-                  chartCanvas.height = 600; // Tăng/giảm giá trị này để thay đổi độ CAO
-                  chartCanvas.style.width = '1200px'; // Giữ tỷ lệ tương ứng với width phía trên
-                  chartCanvas.style.height = '600px'; // Giữ tỷ lệ tương ứng với height phía trên
-                  document.body.appendChild(chartCanvas); // Thêm vào DOM tạm thời
-
-                  // Vẽ biểu đồ
-                  const ctx = chartCanvas.getContext('2d');
-                  const chart = new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                              labels: mainCategories,
-                              datasets: [
-                                    {
-                                          label: 'CÓ',
-                                          data: mainCategories.map(cat => {
-                                                return flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'CÓ').length;
-                                          }),
-                                          backgroundColor: 'rgba(0, 176, 80, 0.5)',
-                                          borderColor: 'rgba(0, 176, 80, 1)',
-                                          borderWidth: 1
-                                    },
-                                    {
-                                          label: 'KHÔNG',
-                                          data: mainCategories.map(cat => {
-                                                return flatErrors.filter(e => e.path[0] === cat && evaluation.evaluations[e.name] === 'KHÔNG').length;
-                                          }),
-                                          backgroundColor: 'rgba(255, 0, 0, 0.5)',
-                                          borderColor: 'rgba(255, 0, 0, 1)',
-                                          borderWidth: 1
-                                    },
-                                    {
-                                          label: 'CHƯA KIỂM TRA',
-                                          data: mainCategories.map(cat => {
-                                                return flatErrors.filter(e => e.path[0] === cat && !evaluation.evaluations[e.name]).length;
-                                          }),
-                                          backgroundColor: 'rgba(165, 165, 165, 0.5)',
-                                          borderColor: 'rgba(165, 165, 165, 1)',
-                                          borderWidth: 1
-                                    }
-                              ]
-                        },
-                        options: {
-                              responsive: false, // Phải để FALSE
-                              maintainAspectRatio: false, // Phải để FALSE
-                              scales: {
-                                    y: { beginAtZero: true, title: { display: true, text: 'Số lượng' } },
-                                    x: { title: { display: true, text: 'Danh mục' } }
-                              },
-                              plugins: {
-                                    title: {
-                                          display: true,
-                                          text: `Biểu đồ đánh giá - ${evaluation.employee.name}`
-                                    }
-                              }
-                        }
-                  });
-
-                  // Chờ biểu đồ render xong
-                  await new Promise(resolve => setTimeout(resolve, 1000));
-
-                  // Thêm biểu đồ vào sheet
-                  try {
-                        const imageData = chartCanvas.toDataURL('image/png');
-                        const base64Data = imageData.split(',')[1];
-                        const binaryString = atob(base64Data);
-                        const bytes = new Uint8Array(binaryString.length);
-                        for (let i = 0; i < binaryString.length; i++) {
-                              bytes[i] = binaryString.charCodeAt(i);
-                        }
-
-                        const imageId = workbook.addImage({
-                              buffer: bytes,
-                              extension: 'png'
-                        });
-
-                        const imageRow = worksheet.rowCount + 2;
-                        worksheet.addImage(imageId, {
-                              tl: { col: 1, row: imageRow },
-                              br: { col: 6, row: imageRow + 20 }
-                        });
-
-                        for (let i = 0; i < 20; i++) {
-                              worksheet.addRow([]);
-                        }
-                  } catch (e) {
-                        console.error('Lỗi khi thêm ảnh biểu đồ:', e);
-                  } finally {
-                        // Xóa canvas tạm thời
-                        document.body.removeChild(chartCanvas);
-                        chart.destroy();
-                  }
-
-                  // Điều chỉnh độ rộng cột
-                  worksheet.columns.forEach(column => column.width = 15);
-                  worksheet.getColumn(1).width = 30;
-                  worksheet.getColumn(2).width = 25;
-                  worksheet.getColumn(3).width = 40;
-                  worksheet.getColumn(4).width = 45;
-                  worksheet.getColumn(5).width = 45;
-                  worksheet.getColumn(6).width = 15;
-            }
-
-            function continueEvaluation() {
-                  currentEvaluations = {};
-                  employeeName.value = '';
-                  employeeEmail.value = '';
-                  employeeBranch.value = '';
-                  currentEmployeeDiv.classList.add('hidden');
-                  generateErrorTree();
-                  saveSuccessModal.classList.add('hidden');
-                  saveDataBtn.disabled = true;
-            }
-
-            function searchErrors() {
-                  const searchTerm = errorSearch.value.toLowerCase();
-                  if (!searchTerm) {
-                        const items = errorTree.querySelectorAll('.tree-item');
-                        items.forEach(item => item.style.display = '');
-                        return;
-                  }
-                  const items = errorTree.querySelectorAll('.tree-item');
-                  items.forEach(item => {
-                        const text = item.textContent.toLowerCase();
-                        if (text.includes(searchTerm)) {
-                              item.style.display = '';
-                              let parent = item.parentElement;
-                              while (parent && parent.classList.contains('tree-item')) {
-                                    const header = parent.querySelector('div:first-child');
-                                    const toggleIcon = header.querySelector('.tree-toggle');
-                                    const content = parent.querySelector('div:not(:first-child)');
-                                    if (toggleIcon && content) {
-                                          toggleIcon.classList.remove('collapsed');
-                                          content.classList.remove('hidden');
-                                    }
-                                    parent = parent.parentElement;
-                              }
-                        } else {
-                              item.style.display = 'none';
-                        }
-                  });
-            }
-
-            function toggleMobileView() {
-                  const isExpanded = errorTree.classList.contains('mobile-expanded');
-                  if (isExpanded) {
-                        errorTree.classList.remove('mobile-expanded');
-                        mobileExpandBtn.innerHTML = '<i class="fas fa-expand"></i>';
-                  } else {
-                        errorTree.classList.add('mobile-expanded');
-                        mobileExpandBtn.innerHTML = '<i class="fas fa-compress"></i>';
-                  }
-            }
-
-            function updateEvaluationUI(targetElement, categoryName, result) {
-                  const oldBadge = targetElement.querySelector('.evaluation-badge');
-                  if (oldBadge) oldBadge.remove();
-
-                  const badge = document.createElement('span');
-                  badge.className = `evaluation-badge ml-2 px-2 py-1 rounded text-xs font-medium ${result === 'CÓ' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`;
-                  badge.textContent = result;
-                  targetElement.appendChild(badge);
-
-                  if (result === 'CÓ') {
-                        targetElement.classList.remove('has-error');
-                        targetElement.classList.add('no-error');
-                  } else {
-                        targetElement.classList.remove('no-error');
-                        targetElement.classList.add('has-error');
-                  }
-
-                  if (employeeName.value && supervisorName.value) {
-                        saveDataBtn.disabled = false;
-                  }
-            }
-
-            function flattenCategories(categories, path = [], result = []) {
-                  categories.forEach(cat => {
-                        const newPath = [...path, cat.name];
-                        if (cat.children && cat.children.length > 0) {
-                              flattenCategories(cat.children, newPath, result);
-                        } else {
-                              result.push({ name: cat.name, path: newPath });
-                        }
-                  });
-                  return result;
-            }
-
-            function resetSystem() {
-                  if (confirm('Bạn có chắc chắn muốn làm mới hệ thống? Tất cả dữ liệu sẽ bị xóa.')) {
-                        errorCategories = [];
-                        currentEvaluations = {};
-                        errorTree.innerHTML = '';
-                        errorTreeContainer.classList.add('hidden');
-                        noDataMessage.classList.remove('hidden');
-                        importStatus.classList.add('hidden');
-                        currentEmployeeDiv.classList.add('hidden');
-                        saveConfirmationModal.classList.add('hidden');
-                        saveSuccessModal.classList.add('hidden');
-                        errorFileInput.value = '';
-                        fileName.textContent = 'Chưa chọn file';
-                        supervisorName.value = '';
-                        employeeName.value = '';
-                        employeeEmail.value = '';
-                        employeeBranch.value = '';
-                        errorSearch.value = '';
-                        importBtn.disabled = true;
-                        saveDataBtn.disabled = true;
-                        // exportBtn.disabled = true;
-
-
-                        // Xóa tất cả biểu đồ
-                        Object.values(chartInstances).forEach(chart => chart.destroy());
-                        chartInstances = {};
-
-                        if (summaryChartInstance) {
-                              summaryChartInstance.destroy();
-                              summaryChartInstance = null;
-                        }
-
-                        chartContainer.innerHTML = '';
-                        chartContainer.classList.add('hidden');
+            function loginAs(role) {
+                  if (role === 'supervisor') {
+                        alert('Bạn đã chọn đăng nhập với vai trò Người Giám Sát. Hệ thống đang chuyển hướng...');
+                        // window.location.href = '/supervisor-login';
+                  } else if (role === 'admin') {
+                        alert('Bạn đã chọn đăng nhập với vai trò Quản Trị Viên. Hệ thống đang chuyển hướng...');
+                        // window.location.href = '/admin-login';
                   }
             }
       </script>

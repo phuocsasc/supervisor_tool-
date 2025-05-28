@@ -4,11 +4,14 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Tool Thống Kê Người Giám Sát</title>
+      <title>Thống Kê dữ liệu Người Giám Sát</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <style>
             .dropzone {
@@ -56,7 +59,7 @@
                   </h1>
                   <p class="mt-2 opacity-90">Tải lên các file đánh giá để thống kê kết quả</p>
             </div>
-
+            <!-- Main Content test -->
             <!-- Main Content -->
             <div class="p-6">
                   <!-- File Upload Section -->
@@ -155,6 +158,9 @@
                               </table>
                         </div>
                   </div>
+                  <!-- Biểu đồ tròn từng danh mục -->
+                  <div id="pieChartContainer" class="mt-10 hidden"></div>
+
             </div>
       </div>
 
@@ -271,6 +277,78 @@
 
                   fileList.classList.toggle('hidden', filesMetadata.length === 0);
             }
+            //draw circle chart
+            function renderPieCharts() {
+                  const container = document.getElementById('pieChartContainer');
+                  container.innerHTML = ''; // Xóa biểu đồ cũ nếu có
+                  container.classList.remove('hidden');
+
+                  const grid = document.createElement('div');
+                  grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+                  container.appendChild(grid);
+
+                  Object.entries(processedData.categoryStats).forEach(([cat, vals], i) => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'text-center';
+
+                        const canvas = document.createElement('canvas');
+                        canvas.id = `chart${i + 1}`;
+                        canvas.className = 'w-full max-w-[260px] h-auto mx-auto';
+                        wrapper.appendChild(canvas);
+
+                        const title = document.createElement('div');
+                        title.className = 'font-semibold text-sm text-gray-800 mt-2';
+                        title.textContent = cat;
+                        wrapper.appendChild(title);
+
+                        grid.appendChild(wrapper);
+
+                        new Chart(canvas, {
+                              type: 'pie',
+                              data: {
+                                    labels: ['CÓ', 'KHÔNG', 'CHƯA KIỂM TRA'],
+                                    datasets: [{
+                                          data: [vals["CÓ"], vals["KHÔNG"], vals["CHƯA KIỂM TRA"]],
+                                          backgroundColor: ['#00B050', '#FF0000', '#A5A5A5']
+                                    }]
+                              },
+                              options: {
+                                    responsive: true,
+                                    plugins: {
+                                          legend: { display: false },
+                                          datalabels: {
+                                                color: '#fff',
+                                                font: { weight: 'bold' },
+                                                formatter: (value, ctx) => {
+                                                      const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                                      return value > 0 ? `${((value / total) * 100).toFixed(2)}%` : '';
+                                                }
+                                          }
+                                    }
+                              },
+                              plugins: [ChartDataLabels]
+                        });
+                  });
+
+                  // ✅ Chú thích màu dưới cùng
+                  const legend = document.createElement('div');
+                  legend.className = 'flex justify-center gap-6 mt-6 flex-wrap text-sm text-gray-800 font-medium';
+                  const colors = [
+                        { label: "CÓ", color: "#00B050" },
+                        { label: "KHÔNG", color: "#FF0000" },
+                        { label: "CHƯA KIỂM TRA", color: "#A5A5A5" }
+                  ];
+
+                  colors.forEach(({ label, color }) => {
+                        const item = document.createElement('div');
+                        item.className = 'flex items-center gap-2';
+                        item.innerHTML = `<div class="w-4 h-4 rounded" style="background-color:${color}"></div><span>${label}</span>`;
+                        legend.appendChild(item);
+                  });
+
+                  container.appendChild(legend);
+            }
+
 
             // Function to remove a file
             function removeFile(index) {
@@ -300,12 +378,12 @@
 
             // Function to show email error
             function showEmailError(message) {
-                        emailErrorMessage.textContent = message;
-                        emailError.classList.remove('hidden');
-                        setTimeout(() => {
-                              emailError.classList.add('hidden');
-                        }, 5000);
-                  }
+                  emailErrorMessage.textContent = message;
+                  emailError.classList.remove('hidden');
+                  setTimeout(() => {
+                        emailError.classList.add('hidden');
+                  }, 5000);
+            }
 
 
             // Function to hide email error
@@ -382,6 +460,25 @@
                                           khong: khong,
                                           chua: chua
                                     });
+                                    if (!processedData.categoryStats) processedData.categoryStats = {};
+
+                                    for (let row = 9; ; row++) {
+                                          const sttCell = sheet[`A${row}`];
+                                          if (!sttCell || sttCell.v === undefined) break;
+
+                                          const cat = sheet[`B${row}`]?.v?.trim();
+                                          const result = (sheet[`F${row}`]?.v || '').toUpperCase();
+                                          if (!cat) continue;
+
+                                          if (!processedData.categoryStats[cat]) {
+                                                processedData.categoryStats[cat] = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
+                                          }
+
+                                          if (result === 'CÓ') processedData.categoryStats[cat]["CÓ"]++;
+                                          else if (result === 'KHÔNG') processedData.categoryStats[cat]["KHÔNG"]++;
+                                          else processedData.categoryStats[cat]["CHƯA KIỂM TRA"]++;
+                                    }
+
 
                                     // Update totals
                                     processedData.totalCo += co;
@@ -396,6 +493,7 @@
 
                         if (processedData.dataRows.length > 0) {
                               renderResults();
+                              renderPieCharts();
                               exportBtn.disabled = false;
                               resultsSection.classList.remove('hidden');
                         }
@@ -574,9 +672,9 @@
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
-                                                // fgColor: { argb: 'FFDAEEF3' }  // xanh nhạt
+                                                fgColor: { argb: 'FFDAEEF3' }  // xanh nhạt
                                           };
-                                          // cell.font = { color: { argb: 'FF00688B' }, bold: true }; // xanh đậm
+                                          cell.font = { color: { argb: 'FF00688B' }, bold: true }; // xanh đậm
                                     }
 
                                     // Tổng tiêu chí
@@ -584,9 +682,9 @@
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
-                                                // fgColor: { argb: 'FFFFF2CC' }  // vàng nhạt
+                                                fgColor: { argb: 'FFFFF2CC' }  // vàng nhạt
                                           };
-                                          // cell.font = { color: { argb: 'FF7F6000' }, bold: true }; // nâu đậm
+                                          cell.font = { color: { argb: 'FF7F6000' }, bold: true }; // nâu đậm
                                     }
 
                                     // Tổng CÓ
@@ -614,9 +712,9 @@
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
-                                                // fgColor: { argb: 'FFFFFCEB' }  // vàng kem
+                                                fgColor: { argb: 'FFFFFCEB' }  // vàng kem
                                           };
-                                          // cell.font = { color: { argb: 'FFFFC000' }, bold: true }; // vàng đậm
+                                          cell.font = { color: { argb: 'FFFFC000' }, bold: true }; // vàng đậm
                                     }
                               });
 
@@ -676,6 +774,85 @@
                         const dd = String(now.getDate()).padStart(2, '0');
                         const cleanEmail = processedData.supervisorEmail.split('@')[0].trim() || 'unknown';
                         const fileName = `ThongKeNguoiGiamSat_${cleanEmail}_${yyyy}-${mm}-${dd}.xlsx`;
+
+                        // === CHÈN 5 BIỂU ĐỒ TRÒN NẾU CÓ
+                        let colOffset = 1;
+                        let rowOffset = ws.rowCount + 2;
+                        let maxRowOffset = rowOffset;   // sau phần bảng
+                        const chartCanvases = document.querySelectorAll("#pieChartContainer canvas");
+
+                        // ✅ Đợi tất cả biểu đồ render xong
+                        await new Promise(resolve => setTimeout(resolve, 500));
+
+                        chartCanvases.forEach((canvas, i) => {
+                              const dataUrl = canvas.toDataURL("image/png");
+                              const base64 = dataUrl.split(',')[1];
+                              const binary = atob(base64);
+                              const bytes = new Uint8Array(binary.length);
+                              for (let j = 0; j < binary.length; j++) {
+                                    bytes[j] = binary.charCodeAt(j);
+                              }
+
+                              const imageId = wb.addImage({
+                                    buffer: bytes,
+                                    extension: 'png'
+                              });
+
+                              ws.addImage(imageId, {
+                                    tl: { col: colOffset, row: rowOffset },
+                                    ext: { width: 250, height: 250 }
+                              });
+
+                              // Thêm tiêu đề biểu đồ
+                              // Thêm tiêu đề biểu đồ dưới ảnh
+                              const title = canvas.parentElement.querySelector('div').textContent || `Biểu đồ ${i + 1}`;
+                              const titleRow = rowOffset + 16; // hoặc +17 nếu ảnh cao hơn
+
+                              // Gộp 3 cột bên dưới ảnh để căn giữa
+                              ws.mergeCells(titleRow, colOffset, titleRow, colOffset + 2);
+                              const titleCell = ws.getCell(titleRow, colOffset);
+                              titleCell.value = title;
+                              titleCell.font = { bold: true };
+                              titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+                              colOffset += 3;
+                              if ((i + 1) % 3 === 0) {
+                                    colOffset = 1;
+                                    rowOffset += 18;
+                              }
+                        });
+
+                        // ✅ THÊM CHÚ THÍCH MÀU 1 LẦN SAU BIỂU ĐỒ
+                        const legendStartRow = rowOffset + 18;
+                        const legendRow = ws.getRow(legendStartRow);
+                        legendRow.getCell(1).value = 'CÓ';
+                        legendRow.getCell(1).fill = {
+                              type: 'pattern',
+                              pattern: 'solid',
+                              fgColor: { argb: 'FF00B050' }  // xanh lá
+                        };
+
+                        legendRow.getCell(2).value = 'KHÔNG';
+                        legendRow.getCell(2).fill = {
+                              type: 'pattern',
+                              pattern: 'solid',
+                              fgColor: { argb: 'FFFF0000' }  // đỏ
+                        };
+
+                        legendRow.getCell(3).value = 'CHƯA KT';
+                        legendRow.getCell(3).fill = {
+                              type: 'pattern',
+                              pattern: 'solid',
+                              fgColor: { argb: 'FFA5A5A5' }  // xám
+                        };
+
+                        legendRow.eachCell(cell => {
+                              cell.font = { bold: true };
+                              cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                        });
+                        legendRow.height = 20;
+                        legendRow.commit();
+
 
                         // Save file
                         const buf = await wb.xlsx.writeBuffer();
