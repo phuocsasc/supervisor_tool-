@@ -4,7 +4,7 @@
 <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Thống Kê dữ liệu Người Giám Sát</title>
+      <title>Tool Thống Kê Người Giám Sát</title>
       <script src="https://cdn.tailwindcss.com"></script>
       <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -46,123 +46,247 @@
             .custom-scroll::-webkit-scrollbar-thumb:hover {
                   background: #a0aec0;
             }
+            .active-menu {
+                  background-color: #3b82f6;
+                  color: white;
+            }
+
+            .active-menu:hover {
+                  background-color: #2563eb !important;
+            }
+
+            .sidebar {
+                  transition: all 0.3s;
+            }
+
+            @media (max-width: 768px) {
+                  .sidebar {
+                        transform: translateX(-100%);
+                        position: absolute;
+                        z-index: 50;
+                        height: 100vh;
+                  }
+
+                  .sidebar.open {
+                        transform: translateX(0);
+                  }
+
+                  .overlay {
+                        display: none;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        z-index: 40;
+                  }
+
+                  .overlay.open {
+                        display: block;
+                  }
+            }
       </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen py-10">
-      <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
-                  <h1 class="text-3xl font-bold flex items-center">
-                        <i class="fas fa-chart-bar mr-3"></i>
-                        Thống Kê Theo Người Giám Sát
-                  </h1>
-                  <p class="mt-2 opacity-90">Tải lên các file đánh giá để thống kê kết quả</p>
-            </div>
-            <!-- Main Content test -->
-            <!-- Main Content -->
-            <div class="p-6">
-                  <!-- File Upload Section -->
-                  <div class="mb-8">
-                        <div id="dropzone"
-                              class="dropzone rounded-lg p-6 text-center cursor-pointer transition-all duration-300 hover:shadow-md">
-                              <div class="flex flex-col items-center justify-center py-8">
-                                    <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
-                                    <p class="text-lg font-medium text-gray-700">Kéo thả file Excel vào đây hoặc</p>
-                                    <label for="fileInput"
-                                          class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg cursor-pointer transition duration-300 transform hover:scale-105">
-                                          <i class="fas fa-folder-open mr-2"></i>Chọn file
-                                    </label>
-                                    <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx,.xls">
-                              </div>
-                        </div>
+<body class="bg-gray-50 min-h-screen">
 
-                        <!-- File List -->
-                        <div id="fileList"
-                              class="mt-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto custom-scroll hidden">
-                              <div class="p-3 border-b border-gray-200 bg-gray-100 text-gray-600 font-medium">
-                                    <div class="grid grid-cols-12 gap-2">
-                                          <div class="col-span-5">Tên file</div>
-                                          <div class="col-span-3">Người giám sát</div>
-                                          <div class="col-span-3">Ngày đánh giá</div>
-                                          <div class="col-span-1 text-center">Xóa</div>
+      <div class="flex h-screen overflow-hidden">
+            <!-- Mobile menu button -->
+            <div class="md:hidden fixed top-4 left-4 z-50">
+                  <button id="menuToggle" class="p-2 rounded-md bg-blue-500 text-white">
+                        <i class="fas fa-bars"></i>
+                  </button>
+            </div>
+      
+            <!-- Overlay for mobile -->
+            <div id="overlay" class="overlay"></div>
+      
+            <!-- Sidebar -->
+            <div id="sidebar"
+                  class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
+                  <!-- Logo -->
+                  <div class="flex items-center space-x-2 px-4">
+                        <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
+                        <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
+                  </div>
+      
+                  <!-- Navigation -->
+                  <nav>
+                        <div class="space-y-2">
+                              <a href="admin.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    Trang chủ
+                              </a>
+                              <a href="Truy_xuat_data.html"
+                                    class=" menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-layer-group mr-3"></i>
+                                    Gom nhóm dữ liệu
+                              </a>
+                              <a href="Tieu_Chi_1.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-users mr-3"></i>
+                                    Thống kê Nhân Viên
+                              </a>
+                              <a href="Tieu_Chi_2.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-building mr-4"></i>
+                                    Thống kê Chi Nhánh
+                              </a>
+                              <a href="Tieu_Chi_3.html"
+                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-user-tie mr-3"></i>
+                                    Thống kê Người Giám Sát
+                              </a>
+                        </div>
+                  </nav>
+      
+                  <!-- Logout button at bottom -->
+                  <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <a href="index.html"
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                              <i class="fas fa-sign-out-alt mr-3"></i>
+                              Thoát
+                        </a>
+                  </div>
+            </div>
+      
+      
+            <!-- Main content -->
+            <main class="flex-1 overflow-y-auto p-2">
+                  <div id="mainContent" class="bg-white rounded-lg shadow p-2">
+                        <!-- Nội dung của từng tool -->
+
+                        <div class="max-w-6xl bg-white rounded-xl shadow-md overflow-hidden px-8 py-4">
+                              <!-- Header -->
+                              <div class="">
+                                    <div class="flex items-center justify-between">
+                                          <div>
+                                                <h1 class="text-3xl font-bold text-blue-600 flex items-center">
+                                                      <i class="fas fa-user-tie mr-3"></i>
+                                                      THỐNG KÊ THEO NGƯỜI GIÁM SÁT
+                                                </h1>
+                                                <p class="text-gray-600 mt-1 flex items-center ">
+                                                      Tải lên các file Excel dữ liệu cho 1 NGƯỜI GIÁM SÁT để hệ thống thống kê tình hình làm việc
+                                                </p>
+                                          </div>
                                     </div>
                               </div>
-                              <div id="fileItemsContainer" class="divide-y divide-gray-200"></div>
-                        </div>
-
-                        <div id="emailError" class="text-red-500 mt-2 hidden">
-                              <i class="fas fa-exclamation-circle mr-1"></i>
-                              <span id="emailErrorMessage"></span>
-                        </div>
-                  </div>
-
-                  <!-- Action Buttons -->
-                  <div class="flex flex-wrap gap-4 mb-8">
-                        <button id="processBtn"
-                              class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center transition duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
-                              disabled>
-                              <i class="fas fa-cogs mr-2"></i>Xử lý dữ liệu
-                        </button>
-                        <button id="exportBtn"
-                              class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg flex items-center transition duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
-                              disabled>
-                              <i class="fas fa-file-excel mr-2"></i>Xuất File Excel
-                        </button>
-                  </div>
-
-                  <!-- Results Section -->
-                  <div id="resultsSection" class="hidden">
-                        <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2 flex items-center">
-                              <i class="fas fa-table mr-2"></i>Kết quả thống kê
-                        </h2>
-
-                        <div class="mb-4">
-                              <div class="flex items-center">
-                                    <span class="font-medium text-gray-700 mr-2">Người giám sát:</span>
-                                    <span id="supervisorNameDisplay" class="text-blue-600 font-medium"></span>
+                              <!-- Main Content test -->
+                              <!-- Main Content -->
+                              <div class="p-6">
+                                    <!-- File Upload Section -->
+                                    <div class="mb-8">
+                                          <div id="dropzone"
+                                                class="dropzone rounded-lg p-6 text-center cursor-pointer transition-all duration-300 hover:shadow-md">
+                                                <div class="flex flex-col items-center justify-center py-8">
+                                                      <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
+                                                      <p class="text-lg font-medium text-gray-700">Kéo thả file Excel vào đây hoặc</p>
+                                                      <label for="fileInput"
+                                                            class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg cursor-pointer transition duration-300 transform hover:scale-105">
+                                                            <i class="fas fa-folder-open mr-2"></i>Chọn file
+                                                      </label>
+                                                      <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx,.xls">
+                                                </div>
+                                          </div>
+                        
+                                          <!-- File List -->
+                                          <div id="fileList"
+                                                class="mt-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto custom-scroll hidden">
+                                                <div class="p-3 border-b border-gray-200 bg-gray-100 text-gray-600 font-medium">
+                                                      <div class="grid grid-cols-12 gap-2">
+                                                            <div class="col-span-5">Tên file</div>
+                                                            <div class="col-span-3">Người giám sát</div>
+                                                            <div class="col-span-3">Ngày đánh giá</div>
+                                                            <div class="col-span-1 text-center">Xóa</div>
+                                                      </div>
+                                                </div>
+                                                <div id="fileItemsContainer" class="divide-y divide-gray-200"></div>
+                                          </div>
+                        
+                                          <div id="emailError" class="text-red-500 mt-2 hidden">
+                                                <i class="fas fa-exclamation-circle mr-1"></i>
+                                                <span id="emailErrorMessage"></span>
+                                          </div>
+                                    </div>
+                        
+                                    <!-- Action Buttons -->
+                                    <div class="flex flex-wrap gap-4 mb-8">
+                                          <button id="processBtn"
+                                                class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-6 rounded-lg flex items-center transition duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                                                disabled>
+                                                <i class="fas fa-cogs mr-2"></i>Xử lý dữ liệu
+                                          </button>
+                                          <button id="exportBtn"
+                                                class="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-6 rounded-lg flex items-center transition duration-300 transform hover:scale-105 disabled:opacity-50 disabled:transform-none"
+                                                disabled>
+                                                <i class="fas fa-file-excel mr-2"></i>Xuất File Excel
+                                          </button>
+                                    </div>
+                        
+                                    <!-- Results Section -->
+                                    <div id="resultsSection" class="hidden">
+                                          <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2 flex items-center">
+                                                <i class="fas fa-table mr-2"></i>Kết quả thống kê
+                                          </h2>
+                        
+                                          <div class="mb-4">
+                                                <div class="flex items-center">
+                                                      <span class="font-medium text-gray-700 mr-2">Người giám sát:</span>
+                                                      <span id="supervisorNameDisplay" class="text-blue-600 font-medium"></span>
+                                                </div>
+                                                <div class="flex items-center">
+                                                      <span class="font-medium text-gray-700 mr-2">Email:</span>
+                                                      <span id="supervisorEmailDisplay" class="text-blue-600"></span>
+                                                </div>
+                                          </div>
+                        
+                                          <div class="overflow-x-auto custom-scroll">
+                                                <table id="resultsTable" class="min-w-full bg-white rounded-lg overflow-hidden shadow">
+                                                      <thead class="bg-gray-800 text-white">
+                                                            <tr>
+                                                                  <th class="py-3 px-4 text-left">STT</th>
+                                                                  <th class="py-3 px-4 text-left">Ngày đánh giá</th>
+                                                                  <th class="py-3 px-4 text-left">Tên nhân viên</th>
+                                                                  <th class="py-3 px-4 text-left">Email nhân viên</th>
+                                                                  <th class="py-3 px-4 text-left">Chi nhánh</th>
+                                                                  <th class="py-3 px-4 text-center">Tổng TC</th>
+                                                                  <th class="py-3 px-4 text-center">CÓ</th>
+                                                                  <th class="py-3 px-4 text-center">KHÔNG</th>
+                                                                  <th class="py-3 px-4 text-center">Chưa KT</th>
+                                                            </tr>
+                                                      </thead>
+                                                      <tbody id="resultsBody" class="divide-y divide-gray-200">
+                                                            <!-- Results will be populated here -->
+                                                      </tbody>
+                                                      <tfoot class="bg-gray-100 font-semibold">
+                                                            <tr>
+                                                                  <td class="py-3 px-4" colspan="5">TỔNG CỘNG</td>
+                                                                  <td id="totalCount" class="py-3 px-4 text-center">0</td>
+                                                                  <td id="totalCo" class="py-3 px-4 text-center text-green-600">0</td>
+                                                                  <td id="totalKhong" class="py-3 px-4 text-center text-red-600">0</td>
+                                                                  <td id="totalChua" class="py-3 px-4 text-center text-yellow-600">0</td>
+                                                            </tr>
+                                                      </tfoot>
+                                                </table>
+                                          </div>
+                                    </div>
+                                    <!-- Biểu đồ tròn từng danh mục -->
+                                    <div id="pieChartContainer" class="mt-10 hidden"></div>
+                        
                               </div>
-                              <div class="flex items-center">
-                                    <span class="font-medium text-gray-700 mr-2">Email:</span>
-                                    <span id="supervisorEmailDisplay" class="text-blue-600"></span>
-                              </div>
                         </div>
-
-                        <div class="overflow-x-auto custom-scroll">
-                              <table id="resultsTable" class="min-w-full bg-white rounded-lg overflow-hidden shadow">
-                                    <thead class="bg-gray-800 text-white">
-                                          <tr>
-                                                <th class="py-3 px-4 text-left">STT</th>
-                                                <th class="py-3 px-4 text-left">Ngày đánh giá</th>
-                                                <th class="py-3 px-4 text-left">Tên nhân viên</th>
-                                                <th class="py-3 px-4 text-left">Email nhân viên</th>
-                                                <th class="py-3 px-4 text-left">Chi nhánh</th>
-                                                <th class="py-3 px-4 text-center">Tổng TC</th>
-                                                <th class="py-3 px-4 text-center">CÓ</th>
-                                                <th class="py-3 px-4 text-center">KHÔNG</th>
-                                                <th class="py-3 px-4 text-center">Chưa KT</th>
-                                          </tr>
-                                    </thead>
-                                    <tbody id="resultsBody" class="divide-y divide-gray-200">
-                                          <!-- Results will be populated here -->
-                                    </tbody>
-                                    <tfoot class="bg-gray-100 font-semibold">
-                                          <tr>
-                                                <td class="py-3 px-4" colspan="5">TỔNG CỘNG</td>
-                                                <td id="totalCount" class="py-3 px-4 text-center">0</td>
-                                                <td id="totalCo" class="py-3 px-4 text-center text-green-600">0</td>
-                                                <td id="totalKhong" class="py-3 px-4 text-center text-red-600">0</td>
-                                                <td id="totalChua" class="py-3 px-4 text-center text-yellow-600">0</td>
-                                          </tr>
-                                    </tfoot>
-                              </table>
-                        </div>
+      
+      
                   </div>
-                  <!-- Biểu đồ tròn từng danh mục -->
-                  <div id="pieChartContainer" class="mt-10 hidden"></div>
-
-            </div>
+      
+            </main>
+      
       </div>
+
+
+      
 
       <script>
             // Global variables to store processed data
@@ -284,25 +408,96 @@
                   container.classList.remove('hidden');
 
                   const grid = document.createElement('div');
-                  grid.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6';
+                  grid.className = 'flex flex-col items-center gap-6';
+
                   container.appendChild(grid);
 
                   Object.entries(processedData.categoryStats).forEach(([cat, vals], i) => {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'text-center';
+                        wrapper.className = 'flex flex-col md:flex-row items-start gap-2 w-full';
+
+                        // === Biểu đồ tròn (giữ nguyên như cũ)
+                        const chartContainer = document.createElement('div');
+                        chartContainer.className = 'w-full md:w-1/2 text-center';
 
                         const canvas = document.createElement('canvas');
                         canvas.id = `chart${i + 1}`;
                         canvas.className = 'w-full max-w-[260px] h-auto mx-auto';
-                        wrapper.appendChild(canvas);
+                        chartContainer.appendChild(canvas);
 
                         const title = document.createElement('div');
                         title.className = 'font-semibold text-sm text-gray-800 mt-2';
                         title.textContent = cat;
-                        wrapper.appendChild(title);
+                        chartContainer.appendChild(title);
+                        wrapper.appendChild(chartContainer);
 
+                        // === Bảng lỗi
+                        const tableWrapper = document.createElement('div');
+                        tableWrapper.className = 'w-full md:w-1/2 overflow-x-auto max-h-[12rem] overflow-y-auto custom-scroll';
+
+
+                        const table = document.createElement('table');
+                        table.className = 'min-w-full bg-white border border-gray-300 rounded-lg shadow text-sm';
+
+                        table.className = 'min-w-full table-fixed bg-white border border-gray-300 rounded-lg shadow text-sm';
+
+                        table.innerHTML = `
+<thead class="bg-blue-700 text-white">
+  <tr>
+    <th class="px-3 py-2 border border-gray-300" style="width:7%">STT</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:25%">Email nhân viên</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:68%">Chi tiết lỗi</th>
+  </tr>
+</thead>
+<tbody id="errorTableBody${i}"></tbody>
+`;
+
+                        tableWrapper.appendChild(table);
+                        wrapper.appendChild(tableWrapper);
                         grid.appendChild(wrapper);
 
+                        // === Dữ liệu lỗi KHÔNG
+                        const tbody = table.querySelector(`#errorTableBody${i}`);
+                        let stt = 1;
+                        processedData.dataRows.forEach(row => {
+                              const sheet = row.sheet;
+                              if (!sheet) return;
+
+                              for (let r = 9; ; r++) {
+                                    const catCell = sheet[`B${r}`];
+                                    const resultCell = sheet[`F${r}`];
+                                    const detailCell = sheet[`D${r}`];
+                                    if (!catCell || !resultCell) break;
+
+                                    const catVal = (catCell?.v || '').toString().trim();
+                                    const resultVal = (resultCell?.v || '').toUpperCase();
+                                    if (catVal === cat && resultVal === 'KHÔNG') {
+                                          const d2 = (sheet[`C${r}`]?.v || '').toString().trim();
+                                          const d3 = (sheet[`D${r}`]?.v || '').toString().trim();
+                                          const d4 = (sheet[`E${r}`]?.v || '').toString().trim();
+                                          const parts = [d2, d3, d4].filter(s => s);
+                                          const mainText = parts.slice(0, -1).join(' => ');
+                                          const lastPart = parts.slice(-1)[0] || '';
+
+                                          const detailHTML = `
+    ${mainText ? `${mainText} => ` : ''}
+    <span class="text-red-600 font-medium">${lastPart}</span>
+`;
+
+
+                                          const tr = document.createElement('tr');
+                                          tr.innerHTML = `
+                    <td class="px-3 py-2 border border-gray-300 text-center">${stt++}</td>
+                    <td class="px-3 py-2 border border-gray-300">${row.email}</td>
+                    <td class="px-3 py-2 border border-gray-300 break-words">${detailHTML}</td>
+
+                `;
+                                          tbody.appendChild(tr);
+                                    }
+                              }
+                        });
+
+                        // === Vẽ biểu đồ
                         new Chart(canvas, {
                               type: 'pie',
                               data: {
@@ -321,7 +516,7 @@
                                                 font: { weight: 'bold' },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                      return value > 0 ? `${((value / total) * 100).toFixed(2)}%` : '';
+                                                      return value > 0 ? `${((value / total) * 100).toFixed(0)}%` : '';
                                                 }
                                           }
                                     }
@@ -329,6 +524,7 @@
                               plugins: [ChartDataLabels]
                         });
                   });
+
 
                   // ✅ Chú thích màu dưới cùng
                   const legend = document.createElement('div');
@@ -458,7 +654,8 @@
                                           total: total,
                                           co: co,
                                           khong: khong,
-                                          chua: chua
+                                          chua: chua,
+                                          sheet: sheet
                                     });
                                     if (!processedData.categoryStats) processedData.categoryStats = {};
 
@@ -600,7 +797,7 @@
                               { width: 25 }, // Tên nhân viên
                               { width: 25 }, // Email nhân viên
                               { width: 20 }, // Chi nhánh
-                              { width: 20 }, // Tổng TC
+                              { width: 25 }, // Tổng TC
                               { width: 13 }, // CÓ
                               { width: 13 }, // KHÔNG
                               { width: 20 }  // Chưa KT
@@ -777,81 +974,134 @@
 
                         // === CHÈN 5 BIỂU ĐỒ TRÒN NẾU CÓ
                         let colOffset = 1;
-                        let rowOffset = ws.rowCount + 2;
-                        let maxRowOffset = rowOffset;   // sau phần bảng
-                        const chartCanvases = document.querySelectorAll("#pieChartContainer canvas");
+                        let rowOffset = ws.rowCount + 3;
+                        let maxRowOffset = rowOffset;
+                        const chartPairs = document.querySelectorAll('#pieChartContainer .flex');
+                        for (const pair of chartPairs) {
+                              const canvas = pair.querySelector('canvas');
+                              const table = pair.querySelector('table');
 
-                        // ✅ Đợi tất cả biểu đồ render xong
-                        await new Promise(resolve => setTimeout(resolve, 500));
+                              // Nếu không có canvas thì bỏ qua vòng lặp
+                              if (!canvas) continue;
+                              const title = pair.querySelector('div.font-semibold')?.textContent || 'Tiêu chí';
 
-                        chartCanvases.forEach((canvas, i) => {
+                              // 1. Tiêu đề tiêu chí
+                              ws.mergeCells(`A${rowOffset}:K${rowOffset}`);
+                              ws.getCell(`A${rowOffset}`).value = `Tiêu chí: ${title}`;
+                              ws.getCell(`A${rowOffset}`).font = { bold: true };
+                              rowOffset++;
+
+                              // 2. Vẽ biểu đồ từ canvas
                               const dataUrl = canvas.toDataURL("image/png");
                               const base64 = dataUrl.split(',')[1];
                               const binary = atob(base64);
                               const bytes = new Uint8Array(binary.length);
-                              for (let j = 0; j < binary.length; j++) {
-                                    bytes[j] = binary.charCodeAt(j);
-                              }
-
-                              const imageId = wb.addImage({
-                                    buffer: bytes,
-                                    extension: 'png'
-                              });
+                              for (let j = 0; j < binary.length; j++) bytes[j] = binary.charCodeAt(j);
+                              const imageId = wb.addImage({ buffer: bytes, extension: 'png' });
 
                               ws.addImage(imageId, {
-                                    tl: { col: colOffset, row: rowOffset },
-                                    ext: { width: 250, height: 250 }
+                                    tl: { col: 1, row: rowOffset },
+                                    ext: { width: 220, height: 220 }
                               });
+                              const tableStartRow = rowOffset + 1;
+                              const tableStartCol = 5;
 
-                              // Thêm tiêu đề biểu đồ
-                              // Thêm tiêu đề biểu đồ dưới ảnh
-                              const title = canvas.parentElement.querySelector('div').textContent || `Biểu đồ ${i + 1}`;
-                              const titleRow = rowOffset + 16; // hoặc +17 nếu ảnh cao hơn
+                              // === Bảng lỗi chi tiết ===
+                              if (table) {
+                                    const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                                    const rows = Array.from(table.querySelectorAll('tbody tr')).map(tr =>
+                                          Array.from(tr.querySelectorAll('td')).map(td =>
+                                                td.innerText?.replace(/\s+/g, ' ').replace(/=>/g, '→').replace(/<[^>]+>/g, '').trim()
+                                          )
+                                    );
 
-                              // Gộp 3 cột bên dưới ảnh để căn giữa
-                              ws.mergeCells(titleRow, colOffset, titleRow, colOffset + 2);
-                              const titleCell = ws.getCell(titleRow, colOffset);
-                              titleCell.value = title;
-                              titleCell.font = { bold: true };
-                              titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+                                    if (headers.length > 0) {
+                                          ws.getCell(tableStartRow, tableStartCol).value = `Bảng lỗi chi tiết - ${title}`;
+                                          ws.mergeCells(tableStartRow, tableStartCol, tableStartRow, tableStartCol + headers.length - 1);
+                                          ws.getCell(tableStartRow, tableStartCol).font = { bold: true };
 
-                              colOffset += 3;
-                              if ((i + 1) % 3 === 0) {
-                                    colOffset = 1;
-                                    rowOffset += 18;
+                                          // Header dòng 1
+                                          headers.forEach((text, idx) => {
+                                                const cell = ws.getCell(tableStartRow + 1, tableStartCol + idx);
+                                                cell.value = text;
+                                                cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+                                                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } };
+                                                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+                                          });
+
+                                          // Dữ liệu chi tiết
+                                          rows.forEach((row, rowIndex) => {
+                                                row.forEach((text, colIndex) => {
+                                                      const excelRow = ws.getRow(tableStartRow + 2 + rowIndex);
+                                                      const cell = excelRow.getCell(tableStartCol + colIndex);
+
+                                                      // Format lỗi dạng richText an toàn
+                                                      if (colIndex === 2) {
+                                                            const parts = text.split('→').map(s => s.trim()).filter(Boolean);
+                                                            const last = parts.pop();
+                                                            const before = parts.join(' → ');
+                                                            const richParts = [];
+                                                            if (before) richParts.push({ text: before + ' → ', font: { color: { argb: 'FF000000' } } });
+                                                            if (last) richParts.push({ text: last, font: { color: { argb: 'FFFF0000' }, bold: true } });
+
+                                                            if (richParts.length > 0) {
+                                                                  cell.value = { richText: richParts };
+                                                            } else {
+                                                                  cell.value = text;
+                                                            }
+                                                            cell.alignment = { wrapText: false, vertical: 'top', horizontal: 'left' };
+                                                      } else {
+                                                            cell.value = text;
+                                                            cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                                                      }
+
+                                                      cell.border = {
+                                                            top: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                                                            left: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                                                            bottom: { style: 'thin', color: { argb: 'FFCCCCCC' } },
+                                                            right: { style: 'thin', color: { argb: 'FFCCCCCC' } }
+                                                      };
+
+                                                      excelRow.height = 40; // Cho phép wrapText hoạt động rõ hơn
+                                                });
+                                          });
+
+                                          rowOffset += Math.max(rows.length + 4, 20);
+                                    }
                               }
-                        });
 
-                        // ✅ THÊM CHÚ THÍCH MÀU 1 LẦN SAU BIỂU ĐỒ
-                        const legendStartRow = rowOffset + 18;
-                        const legendRow = ws.getRow(legendStartRow);
-                        legendRow.getCell(1).value = 'CÓ';
-                        legendRow.getCell(1).fill = {
-                              type: 'pattern',
-                              pattern: 'solid',
-                              fgColor: { argb: 'FF00B050' }  // xanh lá
-                        };
 
-                        legendRow.getCell(2).value = 'KHÔNG';
+                        }
+
+
+
+                        // 4. Thêm chú thích màu sau tất cả biểu đồ
+                        const legendRow = ws.getRow(rowOffset + 2);
+                        legendRow.getCell(1).value = 'Chú thích:';
+                        legendRow.getCell(2).value = 'CÓ';
                         legendRow.getCell(2).fill = {
                               type: 'pattern',
                               pattern: 'solid',
-                              fgColor: { argb: 'FFFF0000' }  // đỏ
+                              fgColor: { argb: 'FF00B050' } // xanh lá
                         };
-
-                        legendRow.getCell(3).value = 'CHƯA KT';
+                        legendRow.getCell(3).value = 'KHÔNG';
                         legendRow.getCell(3).fill = {
                               type: 'pattern',
                               pattern: 'solid',
-                              fgColor: { argb: 'FFA5A5A5' }  // xám
+                              fgColor: { argb: 'FFFF0000' } // đỏ
                         };
-
+                        legendRow.getCell(4).value = 'CHƯA KT';
+                        legendRow.getCell(4).fill = {
+                              type: 'pattern',
+                              pattern: 'solid',
+                              fgColor: { argb: 'FFA5A5A5' } // xám
+                        };
                         legendRow.eachCell(cell => {
                               cell.font = { bold: true };
                               cell.alignment = { vertical: 'middle', horizontal: 'center' };
                         });
-                        legendRow.height = 20;
                         legendRow.commit();
+
 
 
                         // Save file
