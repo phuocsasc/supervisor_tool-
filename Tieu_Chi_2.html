@@ -13,90 +13,209 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+      <style>
+            .active-menu {
+                  background-color: #3b82f6;
+                  color: white;
+            }
+
+            .active-menu:hover {
+                  background-color: #2563eb !important;
+            }
+
+            .sidebar {
+                  transition: all 0.3s;
+            }
+
+            @media (max-width: 768px) {
+                  .sidebar {
+                        transform: translateX(-100%);
+                        position: absolute;
+                        z-index: 50;
+                        height: 100vh;
+                  }
+
+                  .sidebar.open {
+                        transform: translateX(0);
+                  }
+
+                  .overlay {
+                        display: none;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background-color: rgba(0, 0, 0, 0.5);
+                        z-index: 40;
+                  }
+
+                  .overlay.open {
+                        display: block;
+                  }
+            }
+      </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen py-10">
-      <div class="max-w-5xl mx-auto px-4">
-            <div class="bg-white rounded-lg shadow p-6">
-                  <h2 class="text-xl sm:text-2xl font-semibold text-blue-700 mb-4 flex items-center">
-                        <i class="fas fa-chart-column mr-2"></i> TỔNG HỢP ĐÁNH GIÁ THEO CHI NHÁNH
-                  </h2>
-                  <div class="mb-3">
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Chọn các file đánh giá nhân viên
-                              trong chi nhánh</label>
-                        <input type="file" id="summaryFiles" accept=".xlsx" multiple class="hidden">
-                        <button id="chooseSummaryFilesBtn"
-                              class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded btn-hover">
-                              <i class="fas fa-folder-open mr-1"></i> Chọn File
-                        </button>
-                        <div id="fileListDisplay"
-                              class="mt-2 space-y-1 text-sm text-gray-700 max-h-[160px] overflow-y-auto pr-1"></div>
-
-                        <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx</p>
+<body class="bg-gray-50 min-h-screen">
+      <div class="flex h-screen overflow-hidden">
+            <!-- Mobile menu button -->
+            <div class="md:hidden fixed top-4 left-4 z-50">
+                  <button id="menuToggle" class="p-2 rounded-md bg-blue-500 text-white">
+                        <i class="fas fa-bars"></i>
+                  </button>
+            </div>
+      
+            <!-- Overlay for mobile -->
+            <div id="overlay" class="overlay"></div>
+      
+            <!-- Sidebar -->
+            <div id="sidebar"
+                  class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
+                  <!-- Logo -->
+                  <div class="flex items-center space-x-2 px-4">
+                        <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
+                        <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
                   </div>
-                  <button id="generateSummaryBtn"
-                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
-                        <i class="fas fa-chart-pie mr-1"></i> Xử lý dữ liệu
-                  </button>
-                  <button id="exportExcelBtn"
-                        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 mt-3 rounded btn-hover">
-                        <i class="fas fa-file-export mr-1"></i> Xuất File Excel
-                  </button>
-                  <button id="resetPageBtn"
-                        class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 mt-3 rounded btn-hover">
-                        <i class="fas fa-rotate-left mr-1"></i> Làm mới
-                  </button>
-
-
-            </div>
-            <div id="branchReportContainer" class="mt-8 hidden">formatter
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh</h3>
-                  <div class="overflow-x-auto max-h-[320px] overflow-y-auto rounded border border-gray-300">
-                        <table class="min-w-full bg-white rounded shadow text-sm">
-                              <thead class="bg-blue-600 text-white sticky top-0 z-10">
-                                    <tr>
-                                          <th class="py-2 px-4 bg-blue-600">STT</th>
-                                          <th class="py-2 px-4 bg-blue-600">Email người giám sát</th>
-                                          <th class="py-2 px-4 bg-blue-600">Tên nhân viên</th>
-                                          <th class="py-2 px-4 bg-blue-600">Email</th>
-                                          <th class="py-2 px-4 bg-blue-600">Chi nhánh</th>
-                                          <th class="py-2 px-4 bg-blue-600">Ngày đánh giá</th>
-                                          <th class="py-2 px-4 bg-blue-600">Tổng tiêu chí</th>
-                                          <th class="py-2 px-4 bg-blue-600">CÓ</th>
-                                          <th class="py-2 px-4 bg-blue-600">KHÔNG</th>
-                                          <th class="py-2 px-4 bg-blue-600">CHƯA KIỂM TRA</th>
-                                    </tr>
-                              </thead>
-                              <tbody id="branchReportBody"></tbody>
-                        </table>
-                  </div>
-            </div>
-
-            <div id="chartContainer" class="mt-8 hidden">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Biểu đồ đánh giá theo nhân viên</h3>
-                  <canvas id="branchBarChart" class="bg-white p-4 rounded shadow"></canvas>
-            </div>
-
-            <div id="summaryTableContainer" class="mt-8 hidden">
-                  <h3 class="text-lg font-semibold text-gray-800 mb-3">Tổng hợp đánh giá theo danh mục 1</h3>
-                  <div class="overflow-x-auto">
-                        <table class="min-w-full bg-white rounded shadow text-sm">
-                              <thead>
-                                    <tr class="bg-blue-700 text-white">
-                                          <th class="py-2 px-4 text-left">Danh mục 1</th>
-                                          <th class="py-2 px-4 text-center">CÓ (đạt yêu cầu)</th>
-                                          <th class="py-2 px-4 text-center">KHÔNG (chưa đạt yêu cầu)</th>
-                                          <th class="py-2 px-4 text-center">CHƯA KIỂM TRA</th>
-                                    </tr>
-                              </thead>
-                              <tbody id="summaryTableBody"></tbody>
-                        </table>
+      
+                  <!-- Navigation -->
+                  <nav>
+                        <div class="space-y-2">
+                              <a href="admin.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-tachometer-alt mr-3"></i>
+                                    Trang chủ
+                              </a>
+                              <a href="Truy_xuat_data.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-layer-group mr-3"></i>
+                                    Gom nhóm dữ liệu
+                              </a>
+                              <a href="Tieu_Chi_1.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-users mr-3"></i>
+                                    Thống kê Nhân Viên
+                              </a>
+                              <a href="Tieu_Chi_2.html"
+                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-building mr-4"></i>
+                                    Thống kê Chi Nhánh
+                              </a>
+                              <a href="#"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-user-tie mr-3"></i>
+                                    Thống kê Người Giám Sát
+                              </a>
+                        </div>
+                  </nav>
+      
+                  <!-- Logout button at bottom -->
+                  <div class="absolute bottom-0 left-0 right-0 p-4">
+                        <a href="index.html"
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                              <i class="fas fa-sign-out-alt mr-3"></i>
+                              Thoát
+                        </a>
                   </div>
             </div>
-
-            <!-- Biểu đồ tròn theo từng danh mục -->
-            <div id="pieChartContainer" class="mt-8 hidden"></div>
+      
+      
+            <!-- Main content -->
+            <main class="flex-1 overflow-y-auto p-2">
+                  <div class="bg-white rounded-lg shadow p-2">
+                        <!-- Nội dung của từng tool -->
+                        <div class="max-w-7xl mx-auto px-4">
+                              <div class="bg-white rounded-lg shadow p-4 px-6">
+                                    <h1 class="text-3xl font-bold text-blue-600 mb-2">
+                                          <i class="fas fa-building mr-3"></i>
+                                          THỐNG KÊ DỮ LIỆU THEO CHI NHÁNH
+                                    </h1>
+                                    <div class="mb-3">
+                                          <label class="block text-gray-600 text-sm mb-5">
+                                                Tải lên các file Excel dữ liệu cho 1 Chi Nhánh</label>
+                                          <input type="file" id="summaryFiles" accept=".xlsx" multiple class="hidden">
+                                          <button id="chooseSummaryFilesBtn"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded btn-hover">
+                                                <i class="fas fa-folder-open mr-1"></i> Chọn File
+                                          </button>
+                                          <div id="fileListDisplay"
+                                                class="mt-2 space-y-1 text-sm text-gray-700 max-h-[160px] overflow-y-auto pr-1"></div>
+                        
+                                          <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx đúng định dạng mà người giám sát cung cấp</p>
+                                    </div>
+                                    <button id="generateSummaryBtn"
+                                          class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
+                                          <i class="fas fa-chart-pie mr-1"></i> Xử lý dữ liệu
+                                    </button>
+                                    <button id="exportExcelBtn"
+                                          class="w-full bg-green-600 hover:bg-green-700 text-white py-2 mt-3 rounded btn-hover">
+                                          <i class="fas fa-file-export mr-1"></i> Xuất File Excel
+                                    </button>
+                                    <button id="resetPageBtn"
+                                          class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 mt-3 rounded btn-hover">
+                                          <i class="fas fa-rotate-left mr-1"></i> Làm mới
+                                    </button>
+                        
+                        
+                              </div>
+                              <div id="branchReportContainer" class="mt-8 hidden">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh</h3>
+                                    <div class="overflow-x-auto max-h-[520px] overflow-y-auto rounded border border-gray-300">
+                                          <table class="min-w-full bg-white rounded shadow text-sm">
+                                                <thead class="bg-blue-600 text-white sticky top-0 z-10">
+                                                      <tr>
+                                                            <th class="py-2 px-4 bg-blue-600">STT</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Email người giám sát</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Tên nhân viên</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Email</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Chi nhánh</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Ngày đánh giá</th>
+                                                            <th class="py-2 px-4 bg-blue-600">Tổng tiêu chí</th>
+                                                            <th class="py-2 px-4 bg-blue-600">CÓ</th>
+                                                            <th class="py-2 px-4 bg-blue-600">KHÔNG</th>
+                                                            <th class="py-2 px-4 bg-blue-600">CHƯA KIỂM TRA</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="branchReportBody"></tbody>
+                                          </table>
+                                    </div>
+                              </div>
+                        
+                              <div id="chartContainer" class="mt-8 hidden">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Biểu đồ đánh giá theo nhân viên</h3>
+                                    <canvas id="branchBarChart" class="bg-white p-4 rounded shadow"></canvas>
+                              </div>
+                        
+                              <div id="summaryTableContainer" class="mt-8 hidden">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Tổng hợp đánh giá theo danh mục 1</h3>
+                                    <div class="overflow-x-auto">
+                                          <table class="min-w-full bg-white rounded shadow text-sm">
+                                                <thead>
+                                                      <tr class="bg-blue-700 text-white">
+                                                            <th class="py-2 px-4 text-left">Danh mục 1</th>
+                                                            <th class="py-2 px-4 text-center">CÓ (đạt yêu cầu)</th>
+                                                            <th class="py-2 px-4 text-center">KHÔNG (chưa đạt yêu cầu)</th>
+                                                            <th class="py-2 px-4 text-center">CHƯA KIỂM TRA</th>
+                                                      </tr>
+                                                </thead>
+                                                <tbody id="summaryTableBody"></tbody>
+                                          </table>
+                                    </div>
+                              </div>
+                        
+                              <!-- Biểu đồ tròn theo từng danh mục -->
+                              <div id="pieChartContainer" class="mt-8 hidden"></div>
+                        </div>
+      
+      
+                  </div>
+      
+            </main>
+      
       </div>
+
+      
 
       <script>
             const chooseSummaryFilesBtn = document.getElementById('chooseSummaryFilesBtn');
