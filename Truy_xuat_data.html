@@ -53,6 +53,7 @@
                   background-color: #ef4444;
                   margin-right: 6px;
             }
+
             .active-menu {
                   background-color: #3b82f6;
                   color: white;
@@ -104,10 +105,10 @@
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
-      
+
             <!-- Overlay for mobile -->
             <div id="overlay" class="overlay"></div>
-      
+
             <!-- Sidebar -->
             <div id="sidebar"
                   class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
@@ -116,48 +117,60 @@
                         <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
                         <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
                   </div>
-      
+
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
                               <a href="admin.html"
                                     class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
-                                    Trang chủ
+                                    Trang Chủ
                               </a>
                               <a href="Truy_xuat_data.html"
                                     class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-layer-group mr-3"></i>
-                                    Gom nhóm dữ liệu
+                                    Gom Nhóm Dữ Liệu
                               </a>
                               <a href="Tieu_Chi_1.html"
                                     class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-users mr-3"></i>
-                                    Thống kê Nhân Viên
-                              </a>
-                              <a href="Tieu_Chi_2.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
-                                    <i class="fas fa-building mr-4"></i>
-                                    Thống kê Chi Nhánh
+                                    Thống Kê Nhân Viên
                               </a>
                               <a href="Tieu_Chi_3.html"
                                     class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-user-tie mr-3"></i>
-                                    Thống kê Người Giám Sát
+                                    Thống Kê Người Giám Sát
                               </a>
+                              <a href="Tieu_Chi_2.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-code-branch mr-4"></i>
+                                    Thống Kê Chi Nhánh
+                              </a>
+                              <a href="Tieu_Chi_KhuVuc.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-map-marked-alt mr-4"></i>
+                                    Thống Kê Khu Vực
+                              </a>
+                              <a href="Tieu_Chi_ToanQuoc.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-globe-americas mr-4"></i>
+                                    Thống Kê Toàn Quốc
+                              </a>
+                        
                         </div>
                   </nav>
-      
+
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
-                        <a href="index.html" class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                        <a href="index.html"
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
                               <i class="fas fa-sign-out-alt mr-3"></i>
                               Thoát
                         </a>
                   </div>
             </div>
-            
-      
+
+
             <!-- Main content -->
             <main class="flex-1 overflow-y-auto p-2">
                   <div class="bg-white rounded-lg shadow p-6">
@@ -167,33 +180,41 @@
                                     <header class="mb-8">
                                           <h1 class="text-3xl font-bold text-blue-600 mb-2">
                                                 <i class="fas fa-layer-group mr-3"></i>
-                                                GOM NHÓM DỮ LIỆU</h1>
-                                          <p class="text-gray-600">Tải lên các file Excel dữ liệu để hệ thống tự động phân chia file theo từng Folder Người giám sát, Nhân viên và
+                                                GOM NHÓM DỮ LIỆU
+                                          </h1>
+                                          <p class="text-gray-600">Tải lên các file Excel dữ liệu để hệ thống tự động
+                                                phân chia file theo từng Folder Người giám sát, Nhân viên và
                                                 Chi nhánh</p>
                                     </header>
-                              
+
                                     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
                                           <div id="drop-zone"
                                                 class="drop-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 hover:border-blue-400">
                                                 <div class="flex flex-col items-center justify-center">
-                                                      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500 mb-4" fill="none"
+                                                      <svg xmlns="http://www.w3.org/2000/svg"
+                                                            class="h-12 w-12 text-blue-500 mb-4" fill="none"
                                                             viewBox="0 0 24 24" stroke="currentColor">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                  stroke-width="2"
                                                                   d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                                                       </svg>
-                                                      <h3 class="text-lg font-medium text-gray-700 mb-2">Kéo thả file Excel vào đây</h3>
+                                                      <h3 class="text-lg font-medium text-gray-700 mb-2">Kéo thả file
+                                                            Excel vào đây</h3>
                                                       <button id="file-input-btn"
                                                             class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Chọn
                                                             File</button>
-                                                      <p class="text-gray-400 mt-4">Chỉ hỗ trợ file Excel .xlsx đúng định dạng mà người giám sát cung cấp</p>
+                                                      <p class="text-gray-400 mt-4">Chỉ hỗ trợ file Excel .xlsx đúng
+                                                            định dạng mà người giám sát cung cấp</p>
 
-                                                      <input type="file" id="file-input" class="hidden" accept=".xlsx" multiple>
+                                                      <input type="file" id="file-input" class="hidden" accept=".xlsx"
+                                                            multiple>
                                                 </div>
                                           </div>
-                              
+
                                           <div class="mt-6">
                                                 <div class="flex items-center justify-between mb-2">
-                                                      <span class="text-gray-700">Dữ liệu sẽ được sắp xếp theo đúng 3 đối tượng sau:</span>
+                                                      <span class="text-gray-700">Dữ liệu sẽ được sắp xếp theo đúng 3
+                                                            đối tượng sau:</span>
                                                       <div class="flex space-x-4">
                                                             <label class="inline-flex items-center">
                                                                   <input type="checkbox" checked disabled
@@ -214,18 +235,19 @@
                                                                   <span class="ml-2 text-gray-700">Chi nhánh</span>
                                                             </label>
                                                       </div>
-                              
+
                                                 </div>
                                           </div>
                                     </div>
-                              
+
                                     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
                                           <div class="flex justify-between items-center mb-4">
                                                 <h2 class="text-xl font-semibold text-gray-800">Xử lý</h2>
                                                 <div class="flex space-x-2">
-                                                      <button id="refresh-btn" class="flex items-center text-gray-600 hover:text-blue-600">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
-                                                                  fill="currentColor">
+                                                      <button id="refresh-btn"
+                                                            class="flex items-center text-gray-600 hover:text-blue-600">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1"
+                                                                  viewBox="0 0 20 20" fill="currentColor">
                                                                   <path fill-rule="evenodd"
                                                                         d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
                                                                         clip-rule="evenodd" />
@@ -234,8 +256,8 @@
                                                       </button>
                                                       <button id="export-btn"
                                                             class="flex items-center bg-green-500 hover:bg-green-600 text-white font-medium py-1.5 px-3 rounded-lg transition duration-200 ml-2">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20"
-                                                                  fill="currentColor">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1"
+                                                                  viewBox="0 0 20 20" fill="currentColor">
                                                                   <path fill-rule="evenodd"
                                                                         d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                                                                         clip-rule="evenodd" />
@@ -246,11 +268,14 @@
                                           </div>
                                           <div class="mb-4">
                                                 <div class="flex justify-between mb-1">
-                                                      <span class="text-sm font-medium text-blue-600" id="progress-status">Sẵn sàng</span>
-                                                      <span class="text-sm font-medium text-gray-600" id="progress-percent">0%</span>
+                                                      <span class="text-sm font-medium text-blue-600"
+                                                            id="progress-status">Sẵn sàng</span>
+                                                      <span class="text-sm font-medium text-gray-600"
+                                                            id="progress-percent">0%</span>
                                                 </div>
                                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                      <div class="bg-blue-600 h-2.5 rounded-full progress-bar" id="progress-bar" style="width: 0%">
+                                                      <div class="bg-blue-600 h-2.5 rounded-full progress-bar"
+                                                            id="progress-bar" style="width: 0%">
                                                       </div>
                                                 </div>
                                           </div>
@@ -261,7 +286,8 @@
                                                 <span id="error-indicator" class="hidden ml-3">
                                                       <span class="error-dot"></span>
                                                       <span class="text-sm text-gray-600">
-                                                            Lỗi: <span id="error-preview-count" class="font-medium text-red-500">0</span>
+                                                            Lỗi: <span id="error-preview-count"
+                                                                  class="font-medium text-red-500">0</span>
                                                       </span>
                                                 </span>
                                           </div>
@@ -269,13 +295,15 @@
                                                 <!-- Files will be listed here -->
                                           </div>
                                     </div>
-                              
-                                    <div class="bg-white rounded-xl shadow-md p-6" id="results-section" style="display: none;">
+
+                                    <div class="bg-white rounded-xl shadow-md p-6" id="results-section"
+                                          style="display: none;">
                                           <h2 class="text-xl font-semibold text-gray-800 mb-4">Kết quả</h2>
                                           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div class="bg-green-50 p-4 rounded-lg">
                                                       <div class="flex items-center justify-between">
-                                                            <span class="text-green-600 font-medium">File thành công</span>
+                                                            <span class="text-green-600 font-medium">File thành
+                                                                  công</span>
                                                             <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
                                                                   id="success-count">0</span>
                                                       </div>
@@ -302,15 +330,15 @@
                               </div>
                         </div>
                   </div>
-                  
+
             </main>
 
-            
+
 
 
 
       </div>
-      
+
 
       <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -591,6 +619,7 @@
                         const supervisorsFolder = zip.folder("Người Giám Sát");
                         const employeesFolder = zip.folder("Nhân Viên Được Đánh Giá");
                         const branchesFolder = zip.folder("Chi Nhánh");
+                        const areasFolder = zip.folder("Khu Vực");
 
                         let zipProgress = 0;
 
@@ -602,7 +631,11 @@
                               const parts = fileName.split('-');
                               const supervisorEmail = parts[0];
                               const employeeEmail = parts[1];
-                              const branchName = parts[2];
+                              const branchName = parts[3];
+                              const areaName = parts[2];
+                              //khu vực
+                              const areaSubfolderOnly = areasFolder.folder(areaName);
+                              areaSubfolderOnly.file(fileName, file);
 
                               // Add to Supervisor folder
                               const supervisorSubfolder = supervisorsFolder.folder(supervisorEmail);

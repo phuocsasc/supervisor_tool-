@@ -46,6 +46,7 @@
             .custom-scroll::-webkit-scrollbar-thumb:hover {
                   background: #a0aec0;
             }
+
             .active-menu {
                   background-color: #3b82f6;
                   color: white;
@@ -98,10 +99,10 @@
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
-      
+
             <!-- Overlay for mobile -->
             <div id="overlay" class="overlay"></div>
-      
+
             <!-- Sidebar -->
             <div id="sidebar"
                   class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
@@ -110,38 +111,49 @@
                         <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
                         <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
                   </div>
-      
+
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
                               <a href="admin.html"
                                     class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
-                                    Trang chủ
+                                    Trang Chủ
                               </a>
                               <a href="Truy_xuat_data.html"
-                                    class=" menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-layer-group mr-3"></i>
-                                    Gom nhóm dữ liệu
+                                    Gom Nhóm Dữ Liệu
                               </a>
                               <a href="Tieu_Chi_1.html"
                                     class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-users mr-3"></i>
-                                    Thống kê Nhân Viên
-                              </a>
-                              <a href="Tieu_Chi_2.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
-                                    <i class="fas fa-building mr-4"></i>
-                                    Thống kê Chi Nhánh
+                                    Thống Kê Nhân Viên
                               </a>
                               <a href="Tieu_Chi_3.html"
                                     class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
                                     <i class="fas fa-user-tie mr-3"></i>
-                                    Thống kê Người Giám Sát
+                                    Thống Kê Người Giám Sát
                               </a>
+                              <a href="Tieu_Chi_2.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-code-branch mr-4"></i>
+                                    Thống Kê Chi Nhánh
+                              </a>
+                              <a href="Tieu_Chi_KhuVuc.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-map-marked-alt mr-4"></i>
+                                    Thống Kê Khu Vực
+                              </a>
+                              <a href="Tieu_Chi_ToanQuoc.html"
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    <i class="fas fa-globe-americas mr-4"></i>
+                                    Thống Kê Toàn Quốc
+                              </a>
+                        
                         </div>
                   </nav>
-      
+
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
@@ -151,8 +163,8 @@
                         </a>
                   </div>
             </div>
-      
-      
+
+
             <!-- Main content -->
             <main class="flex-1 overflow-y-auto p-2">
                   <div id="mainContent" class="bg-white rounded-lg shadow p-6">
@@ -168,7 +180,8 @@
                                                       THỐNG KÊ THEO NGƯỜI GIÁM SÁT
                                                 </h1>
                                                 <p class="text-gray-600 mt-1 flex items-center ">
-                                                      Tải lên các file Excel dữ liệu cho 1 NGƯỜI GIÁM SÁT để hệ thống thống kê tình hình làm việc
+                                                      Tải lên các file Excel dữ liệu cho 1 NGƯỜI GIÁM SÁT để hệ thống
+                                                      thống kê tình hình làm việc
                                                 </p>
                                           </div>
                                     </div>
@@ -181,20 +194,24 @@
                                           <div id="dropzone"
                                                 class="dropzone rounded-lg p-6 text-center cursor-pointer transition-all duration-300 hover:shadow-md">
                                                 <div class="flex flex-col items-center justify-center py-8">
-                                                      <i class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
-                                                      <p class="text-lg font-medium text-gray-700">Kéo thả file Excel vào đây hoặc</p>
+                                                      <i
+                                                            class="fas fa-cloud-upload-alt text-4xl text-blue-500 mb-3"></i>
+                                                      <p class="text-lg font-medium text-gray-700">Kéo thả file Excel
+                                                            vào đây hoặc</p>
                                                       <label for="fileInput"
                                                             class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg cursor-pointer transition duration-300 transform hover:scale-105">
                                                             <i class="fas fa-folder-open mr-2"></i>Chọn file
                                                       </label>
-                                                      <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx,.xls">
+                                                      <input type="file" id="fileInput" class="hidden" multiple
+                                                            accept=".xlsx,.xls">
                                                 </div>
                                           </div>
-                        
+
                                           <!-- File List -->
                                           <div id="fileList"
                                                 class="mt-4 bg-gray-50 rounded-lg border border-gray-200 max-h-48 overflow-y-auto custom-scroll hidden">
-                                                <div class="p-3 border-b border-gray-200 bg-gray-100 text-gray-600 font-medium">
+                                                <div
+                                                      class="p-3 border-b border-gray-200 bg-gray-100 text-gray-600 font-medium">
                                                       <div class="grid grid-cols-12 gap-2">
                                                             <div class="col-span-5">Tên file</div>
                                                             <div class="col-span-3">Người giám sát</div>
@@ -204,13 +221,13 @@
                                                 </div>
                                                 <div id="fileItemsContainer" class="divide-y divide-gray-200"></div>
                                           </div>
-                        
+
                                           <div id="emailError" class="text-red-500 mt-2 hidden">
                                                 <i class="fas fa-exclamation-circle mr-1"></i>
                                                 <span id="emailErrorMessage"></span>
                                           </div>
                                     </div>
-                        
+
                                     <!-- Action Buttons -->
                                     <div class="flex flex-wrap gap-4 mb-8">
                                           <button id="processBtn"
@@ -224,32 +241,37 @@
                                                 <i class="fas fa-file-excel mr-2"></i>Xuất File Excel
                                           </button>
                                     </div>
-                        
+
                                     <!-- Results Section -->
                                     <div id="resultsSection" class="hidden">
-                                          <h2 class="text-xl font-bold mb-4 text-gray-700 border-b pb-2 flex items-center">
+                                          <h2
+                                                class="text-xl font-bold mb-4 text-gray-700 border-b pb-2 flex items-center">
                                                 <i class="fas fa-table mr-2"></i>Kết quả thống kê
                                           </h2>
-                        
+
                                           <div class="mb-4">
                                                 <div class="flex items-center">
-                                                      <span class="font-medium text-gray-700 mr-2">Người giám sát:</span>
-                                                      <span id="supervisorNameDisplay" class="text-blue-600 font-medium"></span>
+                                                      <span class="font-medium text-gray-700 mr-2">Người giám
+                                                            sát:</span>
+                                                      <span id="supervisorNameDisplay"
+                                                            class="text-blue-600 font-medium"></span>
                                                 </div>
                                                 <div class="flex items-center">
                                                       <span class="font-medium text-gray-700 mr-2">Email:</span>
                                                       <span id="supervisorEmailDisplay" class="text-blue-600"></span>
                                                 </div>
                                           </div>
-                        
+
                                           <div class="overflow-x-auto custom-scroll">
-                                                <table id="resultsTable" class="min-w-full bg-white rounded-lg overflow-hidden shadow">
+                                                <table id="resultsTable"
+                                                      class="min-w-full bg-white rounded-lg overflow-hidden shadow">
                                                       <thead class="bg-gray-800 text-white">
                                                             <tr>
                                                                   <th class="py-3 px-4 text-left">STT</th>
                                                                   <th class="py-3 px-4 text-left">Ngày đánh giá</th>
                                                                   <th class="py-3 px-4 text-left">Tên nhân viên</th>
                                                                   <th class="py-3 px-4 text-left">Email nhân viên</th>
+                                                                  <th class="py-3 px-4 text-left">Khu vực</th>
                                                                   <th class="py-3 px-4 text-left">Chi nhánh</th>
                                                                   <th class="py-3 px-4 text-center">Tổng TC</th>
                                                                   <th class="py-3 px-4 text-center">CÓ</th>
@@ -262,11 +284,18 @@
                                                       </tbody>
                                                       <tfoot class="bg-gray-100 font-semibold">
                                                             <tr>
-                                                                  <td class="py-3 px-4" colspan="5">TỔNG CỘNG</td>
-                                                                  <td id="totalCount" class="py-3 px-4 text-center">0</td>
-                                                                  <td id="totalCo" class="py-3 px-4 text-center text-green-600">0</td>
-                                                                  <td id="totalKhong" class="py-3 px-4 text-center text-red-600">0</td>
-                                                                  <td id="totalChua" class="py-3 px-4 text-center text-yellow-600">0</td>
+                                                                  <td class="py-3 px-4" colspan="6">TỔNG CỘNG</td>
+                                                                  <td id="totalCount" class="py-3 px-4 text-center">0
+                                                                  </td>
+                                                                  <td id="totalCo"
+                                                                        class="py-3 px-4 text-center text-green-600">0
+                                                                  </td>
+                                                                  <td id="totalKhong"
+                                                                        class="py-3 px-4 text-center text-red-600">0
+                                                                  </td>
+                                                                  <td id="totalChua"
+                                                                        class="py-3 px-4 text-center text-yellow-600">0
+                                                                  </td>
                                                             </tr>
                                                       </tfoot>
                                                 </table>
@@ -274,19 +303,19 @@
                                     </div>
                                     <!-- Biểu đồ tròn từng danh mục -->
                                     <div id="pieChartContainer" class="mt-10 hidden"></div>
-                        
+
                               </div>
                         </div>
-      
-      
+
+
                   </div>
-      
+
             </main>
-      
+
       </div>
 
 
-      
+
 
       <script>
             // Global variables to store processed data
@@ -319,6 +348,7 @@
 
             // Store files and their metadata
             const filesMetadata = [];
+            let currentEmail = null;
 
             // Event Listeners
             fileInput.addEventListener('change', handleFiles);
@@ -344,38 +374,50 @@
 
             // Function to handle file selection
             function handleFiles() {
-                  const files = Array.from(fileInput.files);
-                  if (files.length === 0) return;
+                        const files = Array.from(fileInput.files);
+                        if (files.length === 0) return;
 
-                  // Clear previous files and errors
-                  fileItemsContainer.innerHTML = '';
-                  hideEmailError();
-
-                  // Process each file and add to the file list
-                  files.forEach((file, index) => {
-                        // Check if file is already added
-                        if (filesMetadata.some(f => f.file.name === file.name)) {
-                              return;
+                        // Clear UI chỉ nếu chưa có file nào trước đó
+                        if (filesMetadata.length === 0) {
+                              fileItemsContainer.innerHTML = '';
+                              currentEmail = null; // Reset email nếu là đợt chọn file đầu tiên
                         }
 
-                        const fileName = file.name;
-                        const dateStr = extractDateStr(fileName);
+                        hideEmailError();
 
-                        // Add metadata to array
-                        filesMetadata.push({
-                              file,
-                              index,
-                              fileName,
-                              dateStr
+                        files.forEach((file, index) => {
+                              if (filesMetadata.some(f => f.file.name === file.name)) return;
+
+                              const fileName = file.name;
+                              const parts = fileName.replace('.xlsx', '').split('-');
+
+                              if (parts.length !== 7) {
+                                    showEmailError(`File <strong>${file.name}</strong> không đúng định dạng <code>emailGT-emailNV-KhuV-ChiN-yyyy-mm-dd.xlsx</code>.`);
+                                    return;
+                              }
+
+                              const fileEmail = parts[0].trim();
+
+                              if (currentEmail === null) {
+                                    currentEmail = fileEmail; // Gán email từ file đầu tiên
+                              } else if (fileEmail !== currentEmail) {
+                                    showEmailError(`File <strong>${file.name}</strong> có email người giám sát khác với file đầu tiên (<strong>${currentEmail}</strong>).`);
+                                    return;
+                              }
+
+                              const dateStr = extractDateStr(fileName);
+
+                              filesMetadata.push({
+                                    file,
+                                    index: filesMetadata.length, // cập nhật chỉ số chính xác
+                                    fileName,
+                                    dateStr
+                              });
                         });
-                  });
 
-                  // Update file list UI
-                  renderFileList();
-
-                  // Enable process button if we have files
-                  toggleProcessButton();
-            }
+                        renderFileList();
+                        toggleProcessButton();
+                  }
 
             // Function to render the file list
             function renderFileList() {
@@ -444,13 +486,15 @@
                         table.innerHTML = `
 <thead class="bg-blue-700 text-white">
   <tr>
-    <th class="px-3 py-2 border border-gray-300" style="width:7%">STT</th>
-    <th class="px-3 py-2 border border-gray-300" style="width:25%">Email nhân viên</th>
-    <th class="px-3 py-2 border border-gray-300" style="width:68%">Chi tiết lỗi</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:6%">STT</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:23%">Email nhân viên</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:15%">Ngày vi phạm</th>
+    <th class="px-3 py-2 border border-gray-300" style="width:56%">Chi tiết lỗi</th>
   </tr>
 </thead>
 <tbody id="errorTableBody${i}"></tbody>
 `;
+
 
                         tableWrapper.appendChild(table);
                         wrapper.appendChild(tableWrapper);
@@ -487,11 +531,12 @@
 
                                           const tr = document.createElement('tr');
                                           tr.innerHTML = `
-                    <td class="px-3 py-2 border border-gray-300 text-center">${stt++}</td>
-                    <td class="px-3 py-2 border border-gray-300">${row.email}</td>
-                    <td class="px-3 py-2 border border-gray-300 break-words">${detailHTML}</td>
+  <td class="px-3 py-2 border border-gray-300 text-center">${stt++}</td>
+  <td class="px-3 py-2 border border-gray-300">${row.email}</td>
+  <td class="px-3 py-2 border border-gray-300 text-center">${row.date}</td>
+  <td class="px-3 py-2 border border-gray-300 break-words">${detailHTML}</td>
+`;
 
-                `;
                                           tbody.appendChild(tr);
                                     }
                               }
@@ -631,6 +676,8 @@
                                     const employeeName = sheet['B3']?.v || '';
                                     const employeeEmail = sheet['B4']?.v || '';
                                     const branch = sheet['B5']?.v || '';
+                                    const area = sheet['B7']?.v || ''; // giả sử ô B6 là khu vực
+
 
                                     // Count results
                                     let total = 0, co = 0, khong = 0, chua = 0;
@@ -655,7 +702,8 @@
                                           co: co,
                                           khong: khong,
                                           chua: chua,
-                                          sheet: sheet
+                                          sheet: sheet,
+                                          area: area,
                                     });
                                     if (!processedData.categoryStats) processedData.categoryStats = {};
 
@@ -721,6 +769,7 @@
                     <td class="py-3 px-4">${row.date}</td>
                     <td class="py-3 px-4 font-medium">${row.name}</td>
                     <td class="py-3 px-4 text-blue-600">${row.email}</td>
+                   <td class="py-3 px-4">${row.area || ''}</td>
                     <td class="py-3 px-4">${row.branch}</td>
                     <td class="py-3 px-4 text-center">${row.total}</td>
                     <td class="py-3 px-4 text-center text-green-600">${row.co}</td>
@@ -796,6 +845,7 @@
                               { width: 15 }, // Ngày đánh giá
                               { width: 25 }, // Tên nhân viên
                               { width: 25 }, // Email nhân viên
+                              { width: 20 },//khu vực
                               { width: 20 }, // Chi nhánh
                               { width: 25 }, // Tổng TC
                               { width: 13 }, // CÓ
@@ -825,6 +875,7 @@
                               'Ngày đánh giá',
                               'Tên nhân viên',
                               'Email nhân viên',
+                              'Khu vực',
                               'Chi nhánh',
                               'Tổng tiêu chí đánh giá',
                               'Tổng CÓ',
@@ -844,6 +895,7 @@
                                     row.date,  // Ngày đánh giá
                                     row.name,
                                     row.email,
+                                    row.area,
                                     row.branch,
                                     row.total, // Tổng tiêu chí đánh giá
                                     row.co, // Tổng CÓ
@@ -875,7 +927,7 @@
                                     }
 
                                     // Tổng tiêu chí
-                                    if (colNumber === 6) {
+                                    if (colNumber === 7) {
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
@@ -885,7 +937,7 @@
                                     }
 
                                     // Tổng CÓ
-                                    if (colNumber === 7) {
+                                    if (colNumber === 8) {
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
@@ -895,7 +947,7 @@
                                     }
 
                                     // Tổng KHÔNG
-                                    if (colNumber === 8) {
+                                    if (colNumber === 9) {
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
@@ -905,7 +957,7 @@
                                     }
 
                                     // Tổng Chưa KT
-                                    if (colNumber === 9) {
+                                    if (colNumber === 10) {
                                           cell.fill = {
                                                 type: 'pattern',
                                                 pattern: 'solid',
@@ -926,11 +978,13 @@
                               '',
                               '',
                               '',
+                              '',
                               processedData.dataRows.reduce((sum, row) => sum + row.total, 0),
                               processedData.totalCo,
                               processedData.totalKhong,
                               processedData.totalChua
                         ]);
+
 
                         totalRow.eachCell((cell, colNumber) => {
                               cell.style = {
@@ -943,10 +997,10 @@
                                     }
                               };
 
-                              if (colNumber >= 6) {
+                              if (colNumber >= 7) {
                                     cell.style.alignment = { vertical: 'middle', horizontal: 'center' };
                               }
-                              if (colNumber == 7) {
+                              if (colNumber == 8) {
                                     cell.fill = {
                                           type: 'pattern',
                                           pattern: 'solid',
@@ -954,7 +1008,7 @@
                                     };
                                     cell.font = { color: { argb: 'FF00B050' }, bold: true }; // xanh lá đậm
                               }
-                              if (colNumber == 8) {
+                              if (colNumber == 9) {
                                     cell.fill = {
                                           type: 'pattern',
                                           pattern: 'solid',
@@ -1049,7 +1103,7 @@
                                                             } else {
                                                                   cell.value = text;
                                                             }
-                                                            cell.alignment = { wrapText: false, vertical: 'top', horizontal: 'left' };
+                                                            cell.alignment = { wrapText: true, vertical: 'top', horizontal: 'left' };
                                                       } else {
                                                             cell.value = text;
                                                             cell.alignment = { vertical: 'middle', horizontal: 'center' };

@@ -782,6 +782,9 @@
 
             function recordEvaluation(categoryName, result) {
                   currentEvaluations[categoryName] = result;
+                  if (result !== 'không' && currentEvaluationsNote.hasOwnProperty(categoryName)) {
+                        delete currentEvaluationsNote[categoryName];
+                  }
                   if (employeeName.value && supervisorName.value) {
                         saveDataBtn.disabled = false;
                   }
@@ -841,7 +844,7 @@
                   saveConfirmationModal.classList.add('hidden');
                   saveSuccessMessage.textContent = `Đã xuất file đánh giá cho ${evaluation.employee.name}`;
                   saveSuccessModal.classList.remove('hidden');
-
+                  currentEvaluationsNote = {}; // reset toàn bộ ghi chú sau khi xuất
                   // Hiển thị thông tin nhân viên hiện tại
                   currentEmployeeDiv.classList.remove('hidden');
                   currentEmployeeName.textContent = `${employeeName.value}`;
@@ -1107,6 +1110,7 @@
 
             function continueEvaluation() {
                   currentEvaluations = {};
+                  currentEvaluationsNote = {};
                   employeeName.value = '';
                   employeeEmail.value = '';
                   employeeBranch.value = '';
