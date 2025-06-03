@@ -66,10 +66,10 @@
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
-      
+
             <!-- Overlay for mobile -->
             <div id="overlay" class="overlay"></div>
-      
+
             <!-- Sidebar -->
             <div id="sidebar"
                   class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
@@ -78,7 +78,7 @@
                         <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
                         <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
                   </div>
-      
+
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
@@ -109,7 +109,7 @@
                               </a>
                         </div>
                   </nav>
-      
+
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
@@ -119,8 +119,8 @@
                         </a>
                   </div>
             </div>
-      
-      
+
+
             <!-- Main content -->
             <main class="flex-1 overflow-y-auto p-2">
                   <div class="bg-white rounded-lg shadow p-6">
@@ -140,10 +140,14 @@
                                                 <i class="fas fa-folder-open mr-1"></i> Chọn File
                                           </button>
                                           <div id="fileListDisplay"
-                                                class="mt-2 space-y-1 text-sm text-gray-700 max-h-[160px] overflow-y-auto pr-1"></div>
-                        
-                                          <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx đúng định dạng mà người giám sát cung cấp</p>
+                                                class="mt-2 space-y-1 text-sm text-gray-700 max-h-[160px] overflow-y-auto pr-1">
+                                          </div>
+
+                                          <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx đúng định
+                                                dạng mà người giám sát cung cấp</p>
                                     </div>
+                                    
+
                                     <button id="generateSummaryBtn"
                                           class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
                                           <i class="fas fa-chart-pie mr-1"></i> Xử lý dữ liệu
@@ -156,12 +160,14 @@
                                           class="w-full bg-gray-500 hover:bg-gray-600 text-white py-2 mt-3 rounded btn-hover">
                                           <i class="fas fa-rotate-left mr-1"></i> Làm mới
                                     </button>
-                        
-                        
+
+
                               </div>
                               <div id="branchReportContainer" class="mt-8 hidden">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh</h3>
-                                    <div class="overflow-x-auto max-h-[520px] overflow-y-auto rounded border border-gray-300">
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Báo cáo tình hình chi nhánh
+                                    </h3>
+                                    <div
+                                          class="overflow-x-auto max-h-[520px] overflow-y-auto rounded border border-gray-300">
                                           <table class="min-w-full bg-white rounded shadow text-sm">
                                                 <thead class="bg-blue-600 text-white sticky top-0 z-10">
                                                       <tr>
@@ -181,21 +187,24 @@
                                           </table>
                                     </div>
                               </div>
-                        
+
                               <div id="chartContainer" class="mt-8 hidden">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Biểu đồ đánh giá theo nhân viên</h3>
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Biểu đồ đánh giá theo nhân viên
+                                    </h3>
                                     <canvas id="branchBarChart" class="bg-white p-4 rounded shadow"></canvas>
                               </div>
-                        
+
                               <div id="summaryTableContainer" class="mt-8 hidden">
-                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Tổng hợp đánh giá theo danh mục 1</h3>
+                                    <h3 class="text-lg font-semibold text-gray-800 mb-3">Tổng hợp đánh giá theo danh mục
+                                          1</h3>
                                     <div class="overflow-x-auto">
                                           <table class="min-w-full bg-white rounded shadow text-sm">
                                                 <thead>
                                                       <tr class="bg-blue-700 text-white">
                                                             <th class="py-2 px-4 text-left">Danh mục 1</th>
                                                             <th class="py-2 px-4 text-center">CÓ (đạt yêu cầu)</th>
-                                                            <th class="py-2 px-4 text-center">KHÔNG (chưa đạt yêu cầu)</th>
+                                                            <th class="py-2 px-4 text-center">KHÔNG (chưa đạt yêu cầu)
+                                                            </th>
                                                             <th class="py-2 px-4 text-center">CHƯA KIỂM TRA</th>
                                                       </tr>
                                                 </thead>
@@ -203,19 +212,19 @@
                                           </table>
                                     </div>
                               </div>
-                        
+
                               <!-- Biểu đồ tròn theo từng danh mục -->
                               <div id="pieChartContainer" class="mt-8 hidden"></div>
                         </div>
-      
-      
+
+
                   </div>
-      
+
             </main>
-      
+
       </div>
 
-      
+
 
       <script>
             const chooseSummaryFilesBtn = document.getElementById('chooseSummaryFilesBtn');
@@ -227,6 +236,8 @@
 
             let selectedFiles = new Map();
             let selectedBranch = null;
+            let errorSummary = {}; // 🟦 Khai báo toàn cục
+
             chooseSummaryFilesBtn.addEventListener('click', () => summaryFilesInput.click());
             document.getElementById("resetPageBtn").addEventListener("click", () => {
                   if (confirm("Bạn có chắc chắn muốn làm mới toàn bộ trang?")) {
@@ -373,6 +384,7 @@
                         const canvas = pieCanvases[i];
                         const chartName = canvas.parentElement.querySelector('div')?.textContent || `Danh mục ${i + 1}`;
 
+                        // 📌 Convert canvas to image buffer
                         const dataUrl = canvas.toDataURL("image/png");
                         const base64 = dataUrl.split(',')[1];
                         const binary = atob(base64);
@@ -384,25 +396,74 @@
                               extension: 'png'
                         });
 
-                        // Vẽ hình vào vị trí cụ thể
+                        // 🖼️ Chèn biểu đồ tròn
                         sheet.addImage(imageId, {
                               tl: { col: colOffset, row: rowOffset },
-                              ext: { width: 240, height: 240 }  // ✅ giữ đúng hình tròn
+                              ext: { width: 240, height: 240 }
                         });
 
-                        // Thêm tên bên dưới ảnh
-                        const titleRow = sheet.getRow(rowOffset + 13);
-                        titleRow.getCell(colOffset + 1).value = chartName;
-                        titleRow.getCell(colOffset + 1).font = { bold: true };
-                        titleRow.commit();
+                        // 📋 Tạo bảng lỗi chi tiết bên phải biểu đồ
+                        const tableStartCol = colOffset + 5;
+                        const tableStartRow = rowOffset;
+                        const headers = ["STT", "Lỗi chi tiết", "Số lần lỗi"];
 
-                        // Di chuyển vị trí hình tiếp theo
-                        colOffset += 4;
-                        if ((i + 1) % chartPerRow === 0) {
-                              colOffset = 1;
-                              rowOffset += 15;
+                        const headerRow = sheet.getRow(tableStartRow);
+                        headers.forEach((text, idx) => {
+                              const cell = headerRow.getCell(tableStartCol + idx);
+                              cell.value = text;
+                              cell.font = { bold: true };
+                              cell.fill = {
+                                    type: 'pattern',
+                                    pattern: 'solid',
+                                    fgColor: { argb: 'FFD9E1F2' }
+                              };
+                              cell.border = {
+                                    top: { style: 'thin' },
+                                    left: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    right: { style: 'thin' }
+                              };
+                        });
+
+                        headerRow.commit();
+
+                        const cat = chartName;
+                        const errors = errorSummary[cat] || {};
+                        const sortedErrors = Object.entries(errors).sort((a, b) => b[1] - a[1]);
+
+                        for (let j = 0; j < sortedErrors.length; j++) {
+                              const [desc, count] = sortedErrors[j];
+                              const row = sheet.getRow(tableStartRow + 1 + j);
+
+                              row.getCell(tableStartCol).value = j + 1;
+                              row.getCell(tableStartCol + 1).value = desc;
+                              row.getCell(tableStartCol + 2).value = count;
+
+                              for (let k = 0; k < 3; k++) {
+                                    row.getCell(tableStartCol + k).border = {
+                                          top: { style: 'thin' },
+                                          left: { style: 'thin' },
+                                          bottom: { style: 'thin' },
+                                          right: { style: 'thin' }
+                                    };
+                              }
+
+                              row.commit();
                         }
+
+                        // 🧾 Ghi tên danh mục bên dưới ảnh
+                        const labelRow = sheet.getRow(rowOffset + 13);
+                        labelRow.getCell(colOffset + 1).value = chartName;
+                        sheet.mergeCells(labelRow.number, colOffset + 1, labelRow.number, colOffset + 3);
+                        labelRow.font = { bold: true };
+                        labelRow.alignment = { horizontal: "center" };
+                        labelRow.commit();
+
+                        // 📏 Tính hàng tiếp theo
+                        rowOffset += Math.max(15, sortedErrors.length + 2);
+                        colOffset = 1;
                   }
+
                   // ✅ Chèn chú thích dưới cùng bảng Excel
                   let legendStartRow = sheet.rowCount + 2;
                   const legendItems = [
@@ -489,22 +550,32 @@
 
                   // Tách dữ liệu từ tên file
                   const parts = fileName.replace(".xlsx", "").split("-");
-                  const supervisor = parts[0] || "N/A";      // Tên nhân viên giám sát
-                  const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";       // Tên nhân viên chi nhánh
-                  const branch = parts[2] || "N/A";          // Chi nhánh
-                  const date = parts.slice(3).join("-");          // Ngày đánh giá
-                  const fullName = rows[2]?.[1] || "N/A"; // ✅ đúng ô B3
+                  const supervisor = parts[0] || "N/A";
+                  const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";
+                  const branch = parts[2] || "N/A";
+                  const date = parts.slice(3).join("-");
+                  const fullName = rows[2]?.[1] || "N/A";
+
                   const resultCounts = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
                   const categoryStats = {};
+                  const errorDetails = {}; // 🟦 Thêm dòng này để lưu lỗi chi tiết
 
                   for (let i = 7; i < rows.length; i++) {
                         const cat = rows[i]?.[1];
+                        const detail = rows[i]?.[2]?.toString().trim() || "";
                         const result = rows[i]?.[5]?.toString().trim();
+
                         if (!cat || !resultCounts.hasOwnProperty(result)) continue;
 
                         resultCounts[result]++;
                         if (!categoryStats[cat]) categoryStats[cat] = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
                         categoryStats[cat][result]++;
+
+                        if (result === "KHÔNG") {
+                              if (!errorDetails[cat]) errorDetails[cat] = {};
+                              if (!errorDetails[cat][detail]) errorDetails[cat][detail] = 0;
+                              errorDetails[cat][detail]++;
+                        }
                   }
 
                   return {
@@ -514,9 +585,11 @@
                         branch,
                         date,
                         ...resultCounts,
-                        categoryStats
+                        categoryStats,
+                        errorDetails // 🟦 Trả ra chi tiết lỗi
                   };
             }
+
 
 
             document.getElementById('generateSummaryBtn').addEventListener('click', async () => {
@@ -525,6 +598,7 @@
 
                   const summaryMap = new Map(); // key = email|branch
                   const categoryTotals = {};
+
                   const TOTAL_CRITERIA = 115;
 
                   for (const file of files) {
@@ -532,7 +606,7 @@
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, categoryStats } = getSummaryFromSheet(sheet, file.name);
+                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, categoryStats, errorDetails } = getSummaryFromSheet(sheet, file.name);
 
                         const key = `${fullName}|${branch}`;
 
@@ -554,6 +628,15 @@
                               categoryTotals[cat]["KHÔNG"] += values["KHÔNG"];
                               categoryTotals[cat]["CHƯA KIỂM TRA"] += values["CHƯA KIỂM TRA"];
                         }
+                        // 🟦 Gộp lỗi chi tiết
+                        for (const [cat, details] of Object.entries(errorDetails)) {
+                              if (!errorSummary[cat]) errorSummary[cat] = {};
+                              for (const [desc, count] of Object.entries(details)) {
+                                    if (!errorSummary[cat][desc]) errorSummary[cat][desc] = 0;
+                                    errorSummary[cat][desc] += count;
+                              }
+                        }
+
                   }
 
                   // Chuẩn bị dữ liệu biểu đồ phần trăm
@@ -608,16 +691,22 @@
 
                   // Tạo container grid chứa các biểu đồ tròn
                   const pieContainer = document.createElement('div');
-                  pieContainer.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6';
+                  pieContainer.className = 'flex flex-col gap-6 mt-6 items-center';
+
                   pieChartContainer.appendChild(pieContainer);
 
                   // Tạo biểu đồ tròn từng danh mục
+
                   for (const [cat, vals] of Object.entries(categoryTotals)) {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'flex flex-col lg:flex-row gap-4 items-start bg-white p-4 rounded shadow';
+
+                        // Biểu đồ tròn
                         const chartWrapper = document.createElement('div');
                         chartWrapper.className = 'text-center';
 
                         const canvas = document.createElement('canvas');
-                        canvas.className = 'w-full max-w-[280px] h-auto mx-auto';
+                        canvas.className = 'w-[240px] h-[240px]';
                         chartWrapper.appendChild(canvas);
 
                         const title = document.createElement('div');
@@ -625,8 +714,48 @@
                         title.textContent = cat;
                         chartWrapper.appendChild(title);
 
-                        pieContainer.appendChild(chartWrapper);
+                        wrapper.appendChild(chartWrapper);
 
+                        // Bảng chi tiết lỗi
+                        const tableWrapper = document.createElement('div');
+                        tableWrapper.className = 'overflow-auto min-w-[420px] max-w-[420px] h-[190px]';
+
+
+                        const table = document.createElement('table');
+                        table.className = 'min-w-[300px] text-xs text-left text-gray-700 border rounded';
+                        table.innerHTML = `
+<thead class="bg-gray-200 text-gray-900 sticky top-0 z-10">
+
+    <tr>
+        <th class="px-2 py-1 border w-[10%] text-center">STT</th>
+        <th class="px-2 py-1 border w-[70%]">Lỗi chi tiết</th>
+        <th class="px-2 py-1 border w-[20%] text-center">Số lần lỗi</th>
+    </tr>
+</thead>
+<tbody></tbody>
+`;
+
+
+                        const tbody = table.querySelector('tbody');
+                        const errorList = errorSummary[cat] || {};
+                        const sortedErrors = Object.entries(errorList).sort((a, b) => b[1] - a[1]);
+
+                        sortedErrors.forEach(([desc, count], index) => {
+                              const row = document.createElement('tr');
+                              row.innerHTML = `
+            <td class="px-2 py-1 border text-center">${index + 1}</td>
+            <td class="px-2 py-1 border">${desc}</td>
+            <td class="px-2 py-1 border text-center">${count}</td>
+        `;
+                              tbody.appendChild(row);
+                        });
+
+                        tableWrapper.appendChild(table);
+                        wrapper.appendChild(tableWrapper);
+
+                        pieContainer.appendChild(wrapper);
+
+                        // Vẽ biểu đồ tròn
                         new Chart(canvas, {
                               type: 'pie',
                               data: {
@@ -639,14 +768,10 @@
                               options: {
                                     responsive: true,
                                     plugins: {
-                                          legend: {
-                                                display: false
-                                          },
+                                          legend: { display: false },
                                           datalabels: {
                                                 color: '#fff',
-                                                font: {
-                                                      weight: 'bold'
-                                                },
+                                                font: { weight: 'bold' },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                                       return value > 0
@@ -656,10 +781,8 @@
                                           }
                                     }
                               },
-                              plugins: [ChartDataLabels]  // ✅ Bật plugin
+                              plugins: [ChartDataLabels]
                         });
-
-
                   }
 
                   // ✅ Tạo chú thích chung bên dưới

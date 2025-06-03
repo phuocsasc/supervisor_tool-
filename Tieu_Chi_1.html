@@ -263,10 +263,10 @@
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
-      
+
             <!-- Overlay for mobile -->
             <div id="overlay" class="overlay"></div>
-      
+
             <!-- Sidebar -->
             <div id="sidebar"
                   class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
@@ -275,7 +275,7 @@
                         <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
                         <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
                   </div>
-      
+
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
@@ -306,7 +306,7 @@
                               </a>
                         </div>
                   </nav>
-      
+
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
@@ -316,8 +316,8 @@
                         </a>
                   </div>
             </div>
-      
-      
+
+
             <!-- Main content -->
             <main class="flex-1 overflow-y-auto p-2">
                   <div id="mainContent" class="bg-white rounded-lg shadow p-6">
@@ -333,12 +333,13 @@
                                                             THỐNG KÊ DỮ LIỆU THEO TỪNG NHÂN VIÊN
                                                       </h1>
                                                       <p class="text-gray-600 mt-1 flex items-center ">
-                                                            Tải lên các file Excel dữ liệu cho 1 NHÂN VIÊN để hệ thống thống kê tình hình làm việc
+                                                            Tải lên các file Excel dữ liệu cho 1 NHÂN VIÊN để hệ thống
+                                                            thống kê tình hình làm việc
                                                       </p>
                                                 </div>
                                           </div>
                                     </div>
-                        
+
                                     <!-- Main Content -->
                                     <div class="p-6">
                                           <!-- Dropzone -->
@@ -346,25 +347,31 @@
                                                 class="dropzone rounded-xl p-8 mb-6 text-center cursor-pointer transition-all duration-300">
                                                 <div class="flex flex-col items-center justify-center">
                                                       <div class="bg-blue-100 p-4 rounded-full mb-4">
-                                                            <i class="fas fa-cloud-upload-alt text-blue-500 text-3xl"></i>
+                                                            <i
+                                                                  class="fas fa-cloud-upload-alt text-blue-500 text-3xl"></i>
                                                       </div>
-                                                      <h3 class="mt-2 text-lg font-medium text-gray-800">Kéo & thả file Excel vào đây</h3>
+                                                      <h3 class="mt-2 text-lg font-medium text-gray-800">Kéo & thả file
+                                                            Excel vào đây</h3>
                                                       <p class="mt-1 text-sm text-gray-500">hoặc click để chọn file</p>
                                                       <p class="mt-2 text-xs text-gray-400 flex items-center">
                                                             <i class="fas fa-info-circle mr-1"></i>
-                                                            Chỉ hỗ trợ file Excel .xlsx đúng định dạng mà người giám sát cung cấp
+                                                            Chỉ hỗ trợ file Excel .xlsx đúng định dạng mà người giám sát
+                                                            cung cấp
                                                       </p>
                                                 </div>
                                           </div>
                                           <input type="file" id="fileInput" class="hidden" multiple accept=".xlsx">
                                           <!-- Error Alert -->
-                                          <div id="errorAlert" class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
+                                          <div id="errorAlert"
+                                                class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg">
                                                 <div class="flex">
                                                       <div class="flex-shrink-0 pt-0.5">
-                                                            <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                                                            <i
+                                                                  class="fas fa-exclamation-circle text-red-500 text-xl"></i>
                                                       </div>
                                                       <div class="ml-3">
-                                                            <h3 class="text-sm font-medium text-red-800" id="errorTitle">Có lỗi xảy ra
+                                                            <h3 class="text-sm font-medium text-red-800"
+                                                                  id="errorTitle">Có lỗi xảy ra
                                                             </h3>
                                                             <div class="mt-2 text-sm text-red-700" id="errorMessage">
                                                                   <!-- Error details will be inserted here -->
@@ -376,7 +383,7 @@
                                                       </button>
                                                 </div>
                                           </div>
-                        
+
                                           <!-- Success Alert -->
                                           <div id="successAlert"
                                                 class="hidden fade-in bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded-r-lg">
@@ -385,9 +392,11 @@
                                                             <i class="fas fa-check-circle text-green-500 text-xl"></i>
                                                       </div>
                                                       <div class="ml-3">
-                                                            <h3 class="text-sm font-medium text-green-800" id="successTitle">Thành công
+                                                            <h3 class="text-sm font-medium text-green-800"
+                                                                  id="successTitle">Thành công
                                                             </h3>
-                                                            <div class="mt-2 text-sm text-green-700" id="successMessage">
+                                                            <div class="mt-2 text-sm text-green-700"
+                                                                  id="successMessage">
                                                                   <!-- Success message will be inserted here -->
                                                             </div>
                                                       </div>
@@ -399,14 +408,16 @@
                                           </div>
                                           <!-- Selected Files -->
                                           <div id="fileListContainer" class="mb-6 hidden fade-in">
-                                                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+                                                <div
+                                                      class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
                                                       <h3 class="text-lg font-semibold text-gray-700 flex items-center">
                                                             <i class="fas fa-file-excel text-green-600 mr-2"></i>
                                                             File đã chọn (<span id="fileCount">0</span>)
                                                       </h3>
                                                       <!-- Nút nằm cạnh nhau bên phải -->
                                                       <div class="flex gap-3 justify-end">
-                                                            <button id="resetPageBtn" class="px-6 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded btn-hover">
+                                                            <button id="resetPageBtn"
+                                                                  class="px-6 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded btn-hover">
                                                                   <i class="fas fa-rotate-left mr-1"></i> Làm mới
                                                             </button>
                                                             <button id="runBtn"
@@ -417,47 +428,61 @@
                                                       </div>
                                                 </div>
                                                 <div id="fileList"
-                                                      class="space-y-3 divide-y divide-gray-100 max-h-[300px] overflow-y-auto pr-2"></div>
+                                                      class="space-y-3 divide-y divide-gray-100 max-h-[300px] overflow-y-auto pr-2">
+                                                </div>
                                           </div>
-                        
+
                                           <!-- Processing Area -->
                                           <div id="processingSection" class="hidden fade-in">
                                                 <!-- Employee Info -->
                                                 <div id="employeeInfo"
                                                       class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl mb-8 border border-blue-100">
-                                                      <h3 class="text-lg font-semibold mb-3 text-blue-800 flex items-center">
+                                                      <h3
+                                                            class="text-lg font-semibold mb-3 text-blue-800 flex items-center">
                                                             <i class="fas fa-user-circle mr-2"></i>
                                                             Thông tin nhân viên
                                                       </h3>
                                                       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                             <div class="bg-white p-3 rounded-lg shadow-sm">
-                                                                  <p class="text-sm text-gray-500"><i class="fas fa-user mr-2"></i>Tên
+                                                                  <p class="text-sm text-gray-500"><i
+                                                                              class="fas fa-user mr-2"></i>Tên
                                                                         nhân viên</p>
-                                                                  <p id="employeeName" class="font-medium text-gray-800 mt-1 truncate">-
+                                                                  <p id="employeeName"
+                                                                        class="font-medium text-gray-800 mt-1 truncate">
+                                                                        -
                                                                   </p>
                                                             </div>
                                                             <div class="bg-white p-3 rounded-lg shadow-sm">
-                                                                  <p class="text-sm text-gray-500"><i class="fas fa-envelope mr-2"></i>Email</p>
-                                                                  <p id="employeeEmail" class="font-medium text-gray-800 mt-1 truncate">-
+                                                                  <p class="text-sm text-gray-500"><i
+                                                                              class="fas fa-envelope mr-2"></i>Email</p>
+                                                                  <p id="employeeEmail"
+                                                                        class="font-medium text-gray-800 mt-1 truncate">
+                                                                        -
                                                                   </p>
                                                             </div>
                                                             <div class="bg-white p-3 rounded-lg shadow-sm">
-                                                                  <p class="text-sm text-gray-500"><i class="fas fa-building mr-2"></i>Chi
+                                                                  <p class="text-sm text-gray-500"><i
+                                                                              class="fas fa-building mr-2"></i>Chi
                                                                         nhánh</p>
-                                                                  <p id="employeeBranch" class="font-medium text-gray-800 mt-1 truncate">-
+                                                                  <p id="employeeBranch"
+                                                                        class="font-medium text-gray-800 mt-1 truncate">
+                                                                        -
                                                                   </p>
                                                             </div>
                                                       </div>
                                                 </div>
-                        
+
                                                 <!-- Summary Table -->
                                                 <div class="mb-8">
-                                                      <h3 class="text-lg font-semibold mb-4 text-gray-700 flex items-center">
+                                                      <h3
+                                                            class="text-lg font-semibold mb-4 text-gray-700 flex items-center">
                                                             <i class="fas fa-table mr-2"></i>
                                                             Bảng tổng hợp dữ liệu
                                                       </h3>
-                                                      <div class="scrollable-table-container border border-gray-200 rounded-lg shadow-sm">
-                                                            <table id="summaryTable" class="min-w-full divide-y divide-gray-200">
+                                                      <div
+                                                            class="scrollable-table-container border border-gray-200 rounded-lg shadow-sm">
+                                                            <table id="summaryTable"
+                                                                  class="min-w-full divide-y divide-gray-200">
                                                                   <thead class="bg-gray-100">
                                                                         <tr>
                                                                               <th scope="col"
@@ -490,38 +515,50 @@
                                                                               </th>
                                                                         </tr>
                                                                   </thead>
-                                                                  <tbody id="summaryTableBody" class="bg-white divide-y divide-gray-200">
+                                                                  <tbody id="summaryTableBody"
+                                                                        class="bg-white divide-y divide-gray-200">
                                                                         <!-- Data will be inserted here -->
                                                                   </tbody>
                                                                   <tfoot class="bg-gray-300 ">
                                                                         <tr>
-                                                                              <td class="px-6 py-3 text-sm font-semibold text-gray-900">
+                                                                              <td
+                                                                                    class="px-6 py-3 text-sm font-semibold text-gray-900">
                                                                                     Tổng cộng</td>
-                                                                              <td class="px-6 py-3 text-sm font-semibold text-gray-900">#
+                                                                              <td
+                                                                                    class="px-6 py-3 text-sm font-semibold text-gray-900">
+                                                                                    #
                                                                               </td>
-                                                                              <td id="totalCriteria" class="px-6 py-3 text-sm text-gray-500">0
+                                                                              <td id="totalCriteria"
+                                                                                    class="px-6 py-3 text-sm text-gray-500">
+                                                                                    0
                                                                               </td>
                                                                               <td id="totalYes"
-                                                                                    class="px-6 py-3 text-sm font-medium text-green-600">0
+                                                                                    class="px-6 py-3 text-sm font-medium text-green-600">
+                                                                                    0
                                                                               </td>
                                                                               <td id="totalNo"
-                                                                                    class="px-6 py-3 text-sm font-medium text-red-600">0
+                                                                                    class="px-6 py-3 text-sm font-medium text-red-600">
+                                                                                    0
                                                                               </td>
-                                                                              <td id="totalPending" class="px-6 py-3 text-sm text-gray-500">0
+                                                                              <td id="totalPending"
+                                                                                    class="px-6 py-3 text-sm text-gray-500">
+                                                                                    0
                                                                               </td>
                                                                               <td id="totalRate"
-                                                                                    class="px-6 py-3 text-sm font-medium text-blue-600">0%
+                                                                                    class="px-6 py-3 text-sm font-medium text-blue-600">
+                                                                                    0%
                                                                               </td>
                                                                         </tr>
                                                                   </tfoot>
                                                             </table>
                                                       </div>
                                                 </div>
-                        
+
                                                 <!-- Chart -->
                                                 <div class="mb-8">
                                                       <div class="flex justify-between items-center mb-4">
-                                                            <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                                                            <h3
+                                                                  class="text-lg font-semibold text-gray-700 flex items-center">
                                                                   <i class="fas fa-chart-bar mr-2"></i>
                                                                   Biểu đồ tiến độ
                                                             </h3>
@@ -536,24 +573,26 @@
                                                                   </button>
                                                             </div>
                                                       </div>
-                                                      <div id="chartContainer" class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                                      <div id="chartContainer"
+                                                            class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                                                             <canvas id="progressChart"></canvas>
                                                       </div>
                                                       <!-- Biểu đồ tròn tiêu chí -->
                                                       <div id="pieChartContainer" class="mt-8 hidden">
-                                                            <h3 class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
+                                                            <h3
+                                                                  class="text-lg font-semibold text-gray-700 mb-4 flex items-center">
                                                                   <i class="fas fa-chart-pie mr-2"></i>
                                                                   Biểu đồ đánh giá theo các tiêu chí sau:
                                                             </h3>
                                                             <div id="pieChartGrid" class="flex flex-col gap-8">
                                                                   <!-- Biểu đồ và bảng lỗi sẽ được chèn bằng JavaScript -->
                                                             </div>
-                        
-                        
+
+
                                                       </div>
-                        
+
                                                 </div>
-                        
+
                                                 <!-- Export Button -->
                                                 <div class="flex justify-center mt-8">
                                                       <button id="exportBtn"
@@ -563,20 +602,20 @@
                                                       </button>
                                                 </div>
                                           </div>
-                        
-                        
+
+
                                     </div>
                               </div>
                         </div>
-      
-      
+
+
                   </div>
-      
+
             </main>
-      
+
       </div>
 
-      
+
 
       <script>
             // Global variables
@@ -651,10 +690,10 @@
 
 
             document.getElementById("resetPageBtn").addEventListener("click", () => {
-                        if (confirm("Bạn có chắc chắn muốn làm mới toàn bộ trang?")) {
-                              location.reload();
-                        }
-                  });
+                  if (confirm("Bạn có chắc chắn muốn làm mới toàn bộ trang?")) {
+                        location.reload();
+                  }
+            });
             // Functions
 
             function extractSupervisorAndEmployeeEmails(filename) {
@@ -1496,9 +1535,10 @@
 
                               if (!category || !['CÓ', 'KHÔNG', 'CHƯA KIỂM TRA'].includes(result)) continue;
 
-                              if (categoryList.length < 5 && !categoryList.includes(category)) {
+                              if (!categoryList.includes(category)) {
                                     categoryList.push(category);
                               }
+
 
                               if (categoryList.includes(category)) {
                                     if (!categoryStats[category]) {
@@ -1509,7 +1549,7 @@
                                     if (result === 'KHÔNG') {
                                           if (!categoryErrors[category]) categoryErrors[category] = [];
                                           categoryErrors[category].push({
-                                                email: employeeEmail,
+                                                date: file.dateStr,
                                                 detail: detail || '(Không rõ lỗi)'
                                           });
                                     }
@@ -1539,18 +1579,18 @@
                         table.className = 'error-table';
                         table.innerHTML = `
       <thead>
-        <tr>
-          <th>STT</th>
-          <th>Email nhân viên</th>
-          <th>Chi tiết lỗi</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${(categoryErrors[cat] || [])
-                                    .map((err, i) => `<tr><td>${i + 1}</td><td>${err.email}</td><td>${err.detail}</td></tr>`)
-                                    .join('')
-                              }
-      </tbody>
+  <tr>
+    <th>STT</th>
+    <th>Ngày vi phạm</th>
+    <th>Chi tiết lỗi</th>
+  </tr>
+</thead>
+<tbody>
+  ${(categoryErrors[cat] || [])
+                                    .map((err, i) => `<tr><td>${i + 1}</td><td>${err.date}</td><td>${err.detail}</td></tr>`)
+                                    .join('')}
+</tbody>
+
     `;//note
                         const scrollWrapper = document.createElement('div');
                         scrollWrapper.className = 'scrollable-error-table';
