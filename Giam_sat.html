@@ -175,13 +175,14 @@
             <header class="mb-4 sm:mb-6 flex justify-between items-center">
                   <div class="text-center w-full sm:w-auto">
                         <h1 class="text-xl sm:text-3xl font-bold text-blue-800">HỆ THỐNG GIÁM SÁT LỖI NHÂN VIÊN</h1>
-                        <p class="text-gray-600 text-sm sm:text-base mt-1 sm:mt-2">Công cụ hỗ trợ giám sát và đánh giá chất lượng
+                        <p class="text-gray-600 text-sm sm:text-base mt-1 sm:mt-2">Công cụ hỗ trợ giám sát và đánh giá
+                              chất lượng
                               công việc</p>
                   </div>
-            
+
                   <button onclick="logout()"
                         class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-medium text-sm sm:text-base btn-hover ml-4">
-                        <i class="fas fa-sign-out-alt mr-2"></i> 
+                        <i class="fas fa-sign-out-alt mr-2"></i>
                   </button>
             </header>
 
@@ -252,10 +253,31 @@
                                     </div>
                                     <div>
                                           <label class="block text-gray-700 text-sm font-medium mb-1"
-                                                for="employeeBranch">Tên chi nhánh nhân viên được giám sát</label>
-                                          <input type="text" id="employeeBranch"
+                                                for="employeeArea">Khu vực</label>
+                                          <select id="employeeArea"
                                                 class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">-- Chọn khu vực --</option>
+                                                <option value="PNCDNB">PNCDNB</option>
+                                                <option value="PNCHCM">PNCHCM</option>
+                                                <option value="PNCTDDT">PNCTDDT</option>
+                                                <option value="PNCTNB">PNCTNB</option>
+                                                <option value="TINPNCTNMT">TINPNCTNMT</option>
+                                                <option value="TINDBB">TINDBB</option>
+                                                <option value="TINHNI">TINHNI</option>
+                                                <option value="TINTBB">TINTBB</option>
+                                                <option value="TINTDDT">TINTDDT</option>
+                                          </select>
                                     </div>
+                                    <div>
+                                          <label class="block text-gray-700 text-sm font-medium mb-1"
+                                                for="employeeBranch">Tên chi nhánh nhân viên được giám sát</label>
+                                          <select id="employeeBranch"
+                                                class="w-full px-3 py-1.5 sm:py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                                <option value="">-- Chọn chi nhánh --</option>
+                                          </select>
+
+                                    </div>
+
                               </div>
                         </div>
 
@@ -412,12 +434,22 @@
                               <i class="fas fa-times mr-2"></i> KHÔNG (Lỗi)
                         </button>
                   </div>
+                  <div id="noteContainer" class="hidden mt-3">
+                        <textarea id="noteInput" class="w-full p-2 border border-gray-300 rounded text-sm"
+                              placeholder="Nhập ghi chú nếu có..."></textarea>
+                        <button id="confirmNoBtn"
+                              class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2 text-base font-semibold rounded-md">
+                              <i class="fas fa-paper-plane mr-2"></i> Xác nhận KHÔNG
+                        </button>
+                  </div>
+
             </div>
       </div>
 
       <script>
             let errorCategories = [];
             let currentEvaluations = {};
+            let currentEvaluationsNote = {};
             let currentEmployee = null;
             let currentErrorForModal = null;
             let chartInstances = {};
@@ -479,7 +511,19 @@
             errorSearch.addEventListener('input', searchErrors);
             mobileExpandBtn.addEventListener('click', toggleMobileView);
             modalYesBtn.addEventListener('click', () => handleModalEvaluation('CÓ'));
-            modalNoBtn.addEventListener('click', () => handleModalEvaluation('KHÔNG'));
+            modalNoBtn.addEventListener('click', () => {
+                  // Ẩn 2 nút CÓ / KHÔNG
+                  modalYesBtn.classList.add('hidden');
+                  modalNoBtn.classList.add('hidden');
+
+                  // Hiện vùng nhập ghi chú và nút xác nhận KHÔNG
+                  document.getElementById('noteContainer').classList.remove('hidden');
+
+                  // Reset ghi chú cũ nếu có
+                  document.getElementById('noteInput').value = '';
+            });
+
+
             closeErrorModal.addEventListener('click', () => errorModal.classList.add('hidden'));
 
             // Functions
@@ -675,11 +719,13 @@
                         else content.classList.add('hidden');
                   });
             }
-
+            function resetErrorModal() {
+                  document.getElementById('noteInput').value = '';
+                  document.getElementById('noteContainer').classList.add('hidden');
+                  modalYesBtn.classList.remove('hidden');
+                  modalNoBtn.classList.remove('hidden');
+            }
             function showEvaluationOptions(category) {
-                  const existingOptions = document.querySelectorAll('.evaluation-options');
-                  existingOptions.forEach(option => option.remove());
-
                   const categoryElements = document.querySelectorAll('.tree-item span');
                   let targetElement = null;
                   for (let el of categoryElements) {
@@ -691,42 +737,29 @@
 
                   if (!targetElement) return;
 
-                  // Thêm hiệu ứng selected
+                  // Hiệu ứng nhấn
                   targetElement.classList.add('selected-error');
                   setTimeout(() => {
                         targetElement.classList.remove('selected-error');
                   }, 1000);
 
-                  const optionsContainer = document.createElement('div');
-                  optionsContainer.className = 'evaluation-options grid grid-cols-2 gap-2 mt-2 ml-7 fade-in';
-                  const yesBtn = document.createElement('button');
-                  yesBtn.className = 'bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded flex items-center justify-center text-sm btn-hover';
-                  yesBtn.innerHTML = '<i class="fas fa-check mr-1"></i> CÓ (Đạt)';
-                  yesBtn.addEventListener('click', () => {
-                        recordEvaluation(category.name, 'CÓ');
-                        updateEvaluationUI(targetElement, category.name, 'CÓ');
-                        optionsContainer.remove();
-                  });
+                  // ✅ Mở thẳng popup
+                  currentErrorForModal = category;
+                  errorModalTitle.textContent = `Đánh giá lỗi: ${category.name}`;
+                  errorModalContent.textContent = `Bạn có muốn đánh giá "${category.name}"?`;
 
-                  const noBtn = document.createElement('button');
-                  noBtn.className = 'bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded flex items-center justify-center text-sm btn-hover';
-                  noBtn.innerHTML = '<i class="fas fa-times mr-1"></i> KHÔNG (Lỗi)';
-                  noBtn.addEventListener('click', () => {
-                        recordEvaluation(category.name, 'KHÔNG');
-                        updateEvaluationUI(targetElement, category.name, 'KHÔNG');
-                        optionsContainer.remove();
-                  });
-
-                  optionsContainer.appendChild(yesBtn);
-                  optionsContainer.appendChild(noBtn);
-                  targetElement.parentNode.insertBefore(optionsContainer, targetElement.nextSibling);
+                  resetErrorModal();
+                  errorModal.classList.remove('hidden');
             }
+
 
             function showMobileEvaluationModal(category) {
                   currentErrorForModal = category;
                   errorModalTitle.textContent = `Đánh giá lỗi: ${category.name}`;
                   errorModalContent.textContent = `Bạn có muốn đánh giá "${category.name}"?`;
+                  resetErrorModal();
                   errorModal.classList.remove('hidden');
+
             }
 
             function handleModalEvaluation(result) {
@@ -792,11 +825,12 @@
                   // Tạo tên file theo cấu trúc
                   const supervisorEmailPart = evaluation.supervisorEmail.split('@')[0] || 'unknown';
                   const employeeEmailPart = evaluation.employee.email.split('@')[0] || 'unknown';
-                  const branchPart = evaluation.employee.branch.replace(/\s+/g).toLowerCase() || 'unknown';
+                  const areaPart = document.getElementById('employeeArea').value.replace(/\s+/g, '').toUpperCase() || 'unknown';
+                  const branchPart = evaluation.employee.branch.replace(/\s+/g, '').toUpperCase() || 'unknown';
                   const today = new Date();
                   const datePart = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
-                  const fileName = `${supervisorEmailPart}-${employeeEmailPart}-${branchPart}-${datePart}.xlsx`;
+                  const fileName = `${supervisorEmailPart}-${employeeEmailPart}-${areaPart}-${branchPart}-${datePart}.xlsx`;
 
 
                   // Xuất file
@@ -828,15 +862,16 @@
                   const row_info4 = worksheet.addRow(['Email nhân viên được giám sát:', evaluation.employee.email]);
                   const row_info5 = worksheet.addRow(['Chi nhánh:', evaluation.employee.branch]);
                   const row_info6 = worksheet.addRow(['Ngày đánh giá:', new Date(evaluation.date).toLocaleDateString('vi-VN')]);
-                  worksheet.addRow([]);
+                  const row_info5b = worksheet.addRow(['Khu vực:', document.getElementById('employeeArea').value]);
+
 
                   // Định dạng các dòng thông tin
-                  [row_info1, row_info2, row_info3, row_info4, row_info5, row_info6].forEach(row => {
+                  [row_info1, row_info2, row_info3, row_info4, row_info5, row_info5b, row_info6].forEach(row => {
                         row.getCell(1).font = { bold: true };
                   });
 
                   // Tiêu đề bảng
-                  const headerRow = worksheet.addRow(['STT', 'Danh mục 1', 'Danh mục 2', 'Danh mục 3', 'Danh mục 4', 'Kết quả']);
+                  const headerRow = worksheet.addRow(['STT', 'Danh mục 1', 'Danh mục 2', 'Danh mục 3', 'Danh mục 4', 'Kết quả', 'Ghi chú']);
                   headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                   headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0070C0' } };
 
@@ -844,13 +879,15 @@
                   const flatErrors = flattenCategories(errorCategories);
                   flatErrors.forEach((error, i) => {
                         const result = evaluation.evaluations[error.name] || 'CHƯA KIỂM TRA';
+                        const note = currentEvaluationsNote[error.name] || '';
                         const row = worksheet.addRow([
                               i + 1,
                               error.path[0] || '',
                               error.path[1] || '',
                               error.path[2] || '',
                               error.path[3] || '',
-                              result
+                              result,
+                              note
                         ]);
 
                         // Định dạng ô kết quả
@@ -1064,6 +1101,8 @@
                   worksheet.getColumn(4).width = 45;
                   worksheet.getColumn(5).width = 45;
                   worksheet.getColumn(6).width = 15;
+                  worksheet.getColumn(7).width = 45;
+
             }
 
             function continueEvaluation() {
@@ -1188,8 +1227,61 @@
                   }
             }
             function logout() {
-                        window.location.href = 'index.html';
+                  window.location.href = 'index.html';
+            }
+            const areaToBranches = {
+                  'PNCDNB': ['PBPCUSR', 'PBTNUSR', 'PLANUSR', 'PLDGUSR', 'PNTNUSR', 'PTNHUSR'],
+                  'PNCHCM': ['PSG01USR1', 'PSG01USR2', 'PSG02USR1', 'PSG02USR2', 'PSG03USR', 'PSG04USR1', 'PSG04USR2', 'PSG06USR', 'PSG07USR', 'PSG09USR', 'PSG10USR', 'PSG11USR', 'PSG12USR', 'PSG13USR', 'PSG16USR'],
+                  'PNCTDDT': ['PBDG1USR', 'PBDG2USR', 'PDNI1USR', 'PDNI2USR', 'PDNI3USR', 'PDNI4USR', 'PKHAUSR1', 'PKHAUSR2', 'PVTUUSR'],
+                  'PNCTNB': ['PAGGUSR', 'PBLUUSR', 'PBTEUSR', 'PCMUUSR', 'PCTOUSR', 'PDTPUSR', 'PHGGUSR', 'PKGGUSR', 'PSTGUSR', 'PTGGUSR', 'PTVHUSR', 'PVLGUSR'],
+                  'TINPNCTNMT': ['PBDHUSR', 'PDLKUSR', 'PGLIUSR', 'PKTMUSR', 'PPYNUSR', 'PQNIUSR', 'PQNMUSR', 'THUEUSR', 'TQBHUSR', 'TQTIUSR'],
+                  'TINDBB': ['TDBNUSR', 'THBHUSR', 'THNMUSR', 'THTHUSR', 'THYNUSR1', 'THYNUSR2', 'TNANUSR', 'TNBHUSR', 'TNDHUSR', 'TSLAUSR', 'TTBHUSR', 'TTHAINF', 'TTHAUSR'],
+                  'TINHNI': ['THN01USR1', 'THN01USR2', 'THN02USR1', 'THN02USR2', 'THN03USR1', 'THN03USR2', 'THN04USR1', 'THN04USR2', 'THN05USR1', 'THN05USR2', 'THN06USR1', 'THN06USR2', 'THN07USR1', 'THN07USR2', 'THN08USR1', 'THN08USR2', 'THN09USR1', 'THN09USR2'],
+                  'TINTBB': ['TBGGUSR', 'TBNHUSR', 'TCBGUSR', 'TLCIUSR', 'TLSNUSR', 'TPTOUSR', 'TTNNUSR', 'TTQGUSR', 'TVPCUSR', 'TYBIUSR'],
+                  'TINTDDT': ['TDNGUSR1', 'TDNGUSR2', 'THDGUSR1', 'THDGUSR2', 'THPGUSR1', 'THPGUSR2', 'TQNH1USR', 'TQNH2USR', 'TQNH3USR']
+            };
+
+            document.getElementById('employeeArea').addEventListener('change', function () {
+                  const area = this.value;
+                  const branchSelect = document.getElementById('employeeBranch');
+                  branchSelect.innerHTML = '<option value=\"\">-- Chọn chi nhánh --</option>';
+                  if (areaToBranches[area]) {
+                        areaToBranches[area].forEach(branch => {
+                              const opt = document.createElement('option');
+                              opt.value = branch;
+                              opt.textContent = branch;
+                              branchSelect.appendChild(opt);
+                        });
                   }
+            });
+            document.getElementById('confirmNoBtn').addEventListener('click', () => {
+                  const note = document.getElementById('noteInput').value.trim();
+                  if (!currentErrorForModal) return;
+
+                  recordEvaluation(currentErrorForModal.name, 'KHÔNG');
+                  currentEvaluationsNote[currentErrorForModal.name] = note;
+
+                  // Cập nhật UI
+                  const categoryElements = document.querySelectorAll('.tree-item span');
+                  let targetElement = null;
+                  for (let el of categoryElements) {
+                        if (el.textContent.includes(currentErrorForModal.name)) {
+                              targetElement = el.closest('.tree-item > div:first-child');
+                              break;
+                        }
+                  }
+
+                  if (targetElement) {
+                        updateEvaluationUI(targetElement, currentErrorForModal.name, 'KHÔNG');
+                  }
+
+                  // Reset modal
+                  document.getElementById('noteInput').value = '';
+                  document.getElementById('noteContainer').classList.add('hidden');
+                  modalYesBtn.classList.remove('hidden');
+                  modalNoBtn.classList.remove('hidden');
+                  errorModal.classList.add('hidden');
+            });
 
       </script>
 </body>

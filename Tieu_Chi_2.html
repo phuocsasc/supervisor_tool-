@@ -146,7 +146,28 @@
                                           <p class="text-xs text-gray-500 mt-1">Chỉ hỗ trợ file Excel .xlsx đúng định
                                                 dạng mà người giám sát cung cấp</p>
                                     </div>
-                                    
+                                    <!-- Alert lỗi -->
+                                    <div id="errorAlert"
+                                          class="hidden fade-in bg-red-50 border-l-4 border-red-500 p-4 my-4 rounded-r-lg">
+                                          <div class="flex">
+                                                <div class="flex-shrink-0 pt-0.5">
+                                                      <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+                                                </div>
+                                                <div class="ml-3">
+                                                      <h3 class="text-sm font-medium text-red-800" id="errorTitle">Có
+                                                            lỗi xảy ra</h3>
+                                                      <div class="mt-2 text-sm text-red-700" id="errorMessage">
+                                                            <!-- Nội dung lỗi -->
+                                                      </div>
+                                                </div>
+                                                <button id="closeErrorBtn"
+                                                      class="ml-auto -mx-1.5 -my-1.5 bg-red-50 rounded-lg p-1.5 inline-flex h-8 w-8 text-red-500 hover:text-red-700">
+                                                      <i class="fas fa-times"></i>
+                                                </button>
+                                          </div>
+                                    </div>
+
+
 
                                     <button id="generateSummaryBtn"
                                           class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 mt-3 rounded btn-hover">
@@ -234,6 +255,26 @@
             const summaryTableContainer = document.getElementById('summaryTableContainer');
             const summaryTableBody = document.getElementById('summaryTableBody');
 
+            const errorAlert = document.getElementById('errorAlert');
+            const errorTitle = document.getElementById('errorTitle');
+            const errorMessage = document.getElementById('errorMessage');
+            const closeErrorBtn = document.getElementById('closeErrorBtn');
+
+            function showError(title, message) {
+                  errorTitle.textContent = title;
+                  errorMessage.innerHTML = message;
+                  errorAlert.classList.remove('hidden');
+                  errorAlert.classList.add('fade-in');
+
+                  setTimeout(() => {
+                        errorAlert.classList.add('hidden');
+                  }, 5000);
+            }
+
+            closeErrorBtn?.addEventListener('click', () => {
+                  errorAlert.classList.add('hidden');
+            });
+
             let selectedFiles = new Map();
             let selectedBranch = null;
             let errorSummary = {}; // 🟦 Khai báo toàn cục
@@ -246,6 +287,8 @@
             });
 
             document.getElementById("exportExcelBtn").addEventListener("click", async () => {
+                  const files = Array.from(selectedFiles.values());
+                  if (!files.length) return showError('Chưa chọn file.');
                   const workbook = new ExcelJS.Workbook();
                   const sheet = workbook.addWorksheet("Thong Ke Chi Nhan");
 
@@ -509,7 +552,7 @@
                         }
 
                         if (branch !== selectedBranch) {
-                              alert("Tất cả các file Excel nhân viên phải thuộc cùng 1 CHI NHÁNH.");
+                              showError("Không đúng chi nhánh", "Tất cả các file phải thuộc cùng 1 chi nhánh.");
                               return;
                         }
 
@@ -594,7 +637,7 @@
 
             document.getElementById('generateSummaryBtn').addEventListener('click', async () => {
                   const files = Array.from(selectedFiles.values());
-                  if (!files.length) return alert('Chưa chọn file.');
+                  if (!files.length) return showError('Chưa chọn file.');
 
                   const summaryMap = new Map(); // key = email|branch
                   const categoryTotals = {};
