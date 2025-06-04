@@ -1,5 +1,10 @@
 <!DOCTYPE html>
 <html lang="vi">
+<!-- 
+@fpt.com
+@fpt.net
+@vienthongtin.com 
+-->
 
 <head>
       <meta charset="UTF-8">
@@ -547,19 +552,50 @@
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        const jsonDataRaw = XLSX.utils.sheet_to_json(firstSheet, { raw: true, defval: "" });
 
-                        errorCategories = processErrorData(jsonData);
+                        // ✅ Chuẩn hóa tên cột: bỏ khoảng trắng dư
+                        const jsonData = jsonDataRaw.map(row => {
+                              const cleanRow = {};
+                              Object.keys(row).forEach(key => {
+                                    const trimmedKey = key.trim();
+                                    cleanRow[trimmedKey] = row[key];
+                              });
+                              return cleanRow;
+                        });
+
+                        // ✅ Chỉ kiểm tra dòng đầu tiên có đủ 4 cột
+                        const requiredFields = ["Danh mục 1", "Danh mục 2", "Danh mục 3", "Danh mục 4"];
+                        const isValidFormat = jsonData.length > 0 &&
+                              requiredFields.every(field => jsonData[0].hasOwnProperty(field));
+
                         importStatus.classList.remove('hidden');
+                        importStatus.classList.add('fade-in');
+
+                        if (!isValidFormat) {
+                              const actualFields = Object.keys(jsonData[0] || {}).join('", "');
+
+                              importStatus.innerHTML = `
+        <p class="text-red-600 font-medium text-sm sm:text-base">
+            <i class="fas fa-exclamation-circle mr-1 sm:mr-2"></i>
+            File danh mục lỗi không đạt yêu cầu.
+        </p>`;
+                              errorTreeContainer.classList.add('hidden');
+                              noDataMessage.classList.remove('hidden');
+                              return;
+                        }
+
+                        // ✅ Nếu hợp lệ
+                        errorCategories = processErrorData(jsonData);
+                        importStatus.innerHTML = `
+            <p class="text-green-600 font-medium text-sm sm:text-base">
+                <i class="fas fa-check-circle mr-1 sm:mr-2"></i> Đã nhập danh mục lỗi thành công!
+            </p>`;
                         errorTreeContainer.classList.remove('hidden');
                         noDataMessage.classList.add('hidden');
                         generateErrorTree();
-
-                        // Thêm hiệu ứng fade-in
-                        setTimeout(() => {
-                              importStatus.classList.add('fade-in');
-                        }, 10);
                   };
+
                   reader.readAsArrayBuffer(file);
             }
 
