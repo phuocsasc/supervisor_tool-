@@ -314,7 +314,7 @@
                                     <i class="fas fa-globe-americas mr-4"></i>
                                     Thống Kê Toàn Quốc
                               </a>
-                        
+
                         </div>
                   </nav>
 
@@ -481,8 +481,11 @@
                                                                   </p>
                                                             </div>
                                                             <div class="bg-white p-3 rounded-lg shadow-sm">
-                                                                  <p class="text-sm text-gray-500"><i class="fas fa-building mr-2"></i>Khu vực</p>
-                                                                  <p id="employeeArea" class="font-medium text-gray-800 mt-1 truncate">
+                                                                  <p class="text-sm text-gray-500"><i
+                                                                              class="fas fa-building mr-2"></i>Khu vực
+                                                                  </p>
+                                                                  <p id="employeeArea"
+                                                                        class="font-medium text-gray-800 mt-1 truncate">
                                                                         -
                                                                   </p>
                                                             </div>
@@ -758,8 +761,7 @@
                         // Trong phần .then(results => { ... })
                         .then(results => {
                               // Kiểm tra định dạng tên file phải đúng theo template: gs-nv-kv-cn-yyyy-mm-dd.xlsx
-                              const filenameRegex = /^[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
-
+                              const filenameRegex = /^[a-z0-9._]+-[a-z0-9._]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
                               const invalidFiles = results.filter(f => !filenameRegex.test(f.filename));
 
                               if (invalidFiles.length > 0) {
@@ -1022,18 +1024,27 @@
             }
 
             function removeFile(index) {
-                  allFiles.splice(index, 1);
-                  updateFileList(allFiles);
+                  allFiles.splice(index, 1);  // Xoá file khỏi mảng
+                  updateFileList(allFiles);  // Cập nhật giao diện danh sách file
                   fileCount.textContent = allFiles.length;
 
                   if (allFiles.length === 0) {
                         fileListContainer.classList.add('hidden');
                         processingSection.classList.add('hidden');
+
+                        // 👉 Reset thông tin nhân viên
+                        employeeName.textContent = '-';
+                        employeeEmail.textContent = '-';
+                        employeeBranch.textContent = '-';
+                        employeeArea.textContent = '-';
+
+                        // 👉 Reset biến lưu thông tin
+                        employeeData = {};
                   } else {
-                        // Reset processing section
                         processingSection.classList.add('hidden');
                   }
             }
+
 
             function updateSummaryTable(files) {
                   summaryTableBody.innerHTML = '';
