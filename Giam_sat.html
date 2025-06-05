@@ -831,13 +831,30 @@
                         alert('Vui lòng nhập đầy đủ thông tin người giám sát và nhân viên');
                         return;
                   }
+
+                  // ✅ Kiểm tra định dạng email
+                  const emailRegex = /^[a-zA-Z0-9._%+-]+@(fpt\.com|fpt\.net|vienthongtin\.com)$/;
+
+                  if (!emailRegex.test(supervisorEmail.value)) {
+                        alert('Email người giám sát phải có đuôi @fpt.com, @fpt.net hoặc @vienthongtin.com');
+                        return;
+                  }
+
+                  if (!emailRegex.test(employeeEmail.value)) {
+                        alert('Email nhân viên phải có đuôi @fpt.com, @fpt.net hoặc @vienthongtin.com');
+                        return;
+                  }
+
                   if (Object.keys(currentEvaluations).length === 0) {
                         alert('Vui lòng đánh giá ít nhất một lỗi trước khi lưu');
                         return;
                   }
+
                   confirmEmployeeName.textContent = employeeName.value;
                   saveConfirmationModal.classList.remove('hidden');
             }
+
+
 
             async function saveAndExport() {
                   // Tạo dữ liệu đánh giá
