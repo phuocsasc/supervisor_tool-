@@ -1670,7 +1670,7 @@
                                                 font: { weight: 'bold' },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                      const percent = total ? Math.round((value / total) * 100) : 0;
+                                                      const percent = total ? ((value / total) * 100).toFixed(1) : 0;
                                                       return percent > 0 ? `${percent}%` : '';
                                                 }
                                           }

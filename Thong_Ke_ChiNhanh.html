@@ -615,6 +615,7 @@
             function getSummaryFromSheet(sheet, fileName) {
                   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
+                  let totalCriteria = 0;
                   const parts = fileName.replace(".xlsx", "").split("-");
                   const supervisor = parts[0] || "N/A";
                   const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";
@@ -630,6 +631,7 @@
                   const errorDetails = {};
 
                   for (let i = 7; i < rows.length; i++) {
+
                         const cat = rows[i]?.[1];
                         const detail = rows[i]?.[2]?.toString().trim() || "";
                         const result = rows[i]?.[5]?.toString().trim();
@@ -645,6 +647,8 @@
                               if (!errorDetails[cat][detail]) errorDetails[cat][detail] = new Set();
                               errorDetails[cat][detail].add(emailNhanVien);
                         }
+                        totalCriteria++; // <- PHẢI có dòng này để đếm số tiêu chí
+
                   }
 
                   return {
@@ -656,7 +660,8 @@
                         date,
                         ...resultCounts,
                         categoryStats,
-                        errorDetails
+                        errorDetails,
+                        totalCriteria
                   };
             }
 
@@ -681,19 +686,19 @@
                   const summaryMap = new Map(); // key = email|branch
                   const categoryTotals = {};
 
-                  const TOTAL_CRITERIA = 115;
+
 
                   for (const file of files) {
                         const data = await file.arrayBuffer();
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, categoryStats, errorDetails } = getSummaryFromSheet(sheet, file.name);
+                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, categoryStats, errorDetails, totalCriteria } = getSummaryFromSheet(sheet, file.name);
 
                         const key = `${fullName}|${branch}`;
 
                         if (!summaryMap.has(key)) {
-                              summaryMap.set(key, { fullName, email, branch, CÓ: 0, KHÔNG: 0, CHUA: 0, count: 0 });
+                              summaryMap.set(key, { fullName, email, branch, CÓ: 0, KHÔNG: 0, CHUA: 0, totalCriteria: 0, count: 0 });
                         }
 
                         const r = summaryMap.get(key);
@@ -703,6 +708,7 @@
                         r.KHÔNG += KHÔNG;
                         r.CHUA += CHUA;
                         r.count++;
+                        r.totalCriteria += totalCriteria;
 
                         for (const [cat, values] of Object.entries(categoryStats)) {
                               if (!categoryTotals[cat]) categoryTotals[cat] = { "CÓ": 0, "KHÔNG": 0, "CHƯA KIỂM TRA": 0 };
@@ -730,11 +736,13 @@
                   const dataNo = [];
                   const dataNA = [];
 
-                  for (const { fullName, branch, CÓ, KHÔNG, CHUA, count } of summaryMap.values()) {
+                  for (const { fullName, branch, CÓ, KHÔNG, CHUA, count, totalCriteria } of summaryMap.values()) {
                         labels.push(`${fullName} (${branch})`);
-                        dataYes.push(Math.round(((CÓ / count) / TOTAL_CRITERIA) * 10000) / 100);
-                        dataNo.push(Math.round(((KHÔNG / count) / TOTAL_CRITERIA) * 10000) / 100);
-                        dataNA.push(Math.round(((CHUA / count) / TOTAL_CRITERIA) * 10000) / 100);
+
+                        const tc = totalCriteria || 1; // đề phòng chia 0
+                        dataYes.push(Math.round((CÓ / tc) * 10000) / 100);
+                        dataNo.push(Math.round((KHÔNG / tc) * 10000) / 100);
+                        dataNA.push(Math.round((CHUA / tc) * 10000) / 100);
                   }
 
                   const ctx = document.getElementById('branchBarChart').getContext('2d');
@@ -869,7 +877,7 @@
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                                       return value > 0
-                                                            ? `${((value / total) * 100).toFixed(2)}%`
+                                                            ? `${((value / total) * 100).toFixed(1)}%`
                                                             : '';
                                                 }
                                           }
@@ -919,7 +927,7 @@
                         const workbook = XLSX.read(data, { type: 'array' });
                         const sheetName = workbook.SheetNames[0];
                         const sheet = workbook.Sheets[sheetName];
-                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA } = getSummaryFromSheet(sheet, file.name);
+                        const { supervisor, fullName, email, branch, date, CÓ, KHÔNG, "CHƯA KIỂM TRA": CHUA, totalCriteria } = getSummaryFromSheet(sheet, file.name);
 
                         const row = document.createElement('tr');
                         row.className = 'border-b';
@@ -931,7 +939,7 @@
         <td class="py-2 px-4">${email}</td>
         <td class="py-2 px-4">${branch}</td>
         <td class="py-2 px-4">${date}</td>
-        <td class="py-2 px-4 text-center">${TOTAL_CRITERIA}</td>
+       <td class="py-2 px-4 text-center">${totalCriteria}</td>
         <td class="py-2 px-4 text-center">${CÓ}</td>
         <td class="py-2 px-4 text-center">${KHÔNG}</td>
         <td class="py-2 px-4 text-center">${CHUA}</td>
