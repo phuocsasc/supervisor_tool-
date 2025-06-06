@@ -762,6 +762,7 @@
                         .then(results => {
                               // Kiểm tra định dạng tên file phải đúng theo template: gs-nv-kv-cn-yyyy-mm-dd.xlsx
                               const filenameRegex = /^[a-z0-9._]+-[a-z0-9._]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
+                              //test
                               const invalidFiles = results.filter(f => !filenameRegex.test(f.filename));
 
                               if (invalidFiles.length > 0) {
