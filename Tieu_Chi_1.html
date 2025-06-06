@@ -12,6 +12,7 @@
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="icon" href="logoFPT.png" type="image/x-icon">
       <style>
             /* Custom styles */
             .gradient-header {
@@ -201,6 +202,7 @@
             .error-table th:nth-child(2),
             .error-table td:nth-child(2) {
                   width: 25%;
+                  text-align: center !important;
             }
 
             .error-table th:nth-child(3),
@@ -762,7 +764,6 @@
                         .then(results => {
                               // Kiểm tra định dạng tên file phải đúng theo template: gs-nv-kv-cn-yyyy-mm-dd.xlsx
                               const filenameRegex = /^[a-z0-9._]+-[a-z0-9._]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
-                              //test
                               const invalidFiles = results.filter(f => !filenameRegex.test(f.filename));
 
                               if (invalidFiles.length > 0) {
@@ -1038,7 +1039,7 @@
                         employeeEmail.textContent = '-';
                         employeeBranch.textContent = '-';
                         employeeArea.textContent = '-';
-//
+                        //
                         // 👉 Reset biến lưu thông tin
                         employeeData = {};
                   } else {
@@ -1438,6 +1439,7 @@
 
                                     headers.forEach((text, idx) => {
                                           const cell = worksheet.getCell(tableStartRow + 1, tableStartCol + idx);
+                                          cell.alignment = { horizontal: 'center' };
                                           cell.value = text;
                                           cell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
                                           cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } };
@@ -1616,23 +1618,30 @@
                         const tableWrapper = document.createElement('div');
                         tableWrapper.className = 'error-table-container';
 
+                        const errorCountMap = {}; // gom lỗi trùng nhau
+                        (categoryErrors[cat] || []).forEach(err => {
+                              const key = err.detail;
+                              if (!errorCountMap[key]) errorCountMap[key] = 0;
+                              errorCountMap[key]++;
+                        });
+
                         const table = document.createElement('table');
                         table.className = 'error-table';
                         table.innerHTML = `
-      <thead>
-  <tr>
-    <th>STT</th>
-    <th>Ngày vi phạm</th>
-    <th>Chi tiết lỗi</th>
-  </tr>
-</thead>
-<tbody>
-  ${(categoryErrors[cat] || [])
-                                    .map((err, i) => `<tr><td>${i + 1}</td><td>${err.date}</td><td>${err.detail}</td></tr>`)
-                                    .join('')}
-</tbody>
+  <thead>
+    <tr class="text-center">
+      <th>STT</th>
+      <th>Số lần lỗi</th>
+      <th>Chi tiết lỗi</th>
+    </tr>
+  </thead>
+  <tbody>
+    ${Object.entries(errorCountMap)
+                                    .map(([detail, count], idx) =>
+                                          `<tr><td>${idx + 1}</td><td class="text-center">${count}</td><td>${detail}</td></tr>`
+                                    ).join('')}
+  </tbody>`;
 
-    `;//note
                         const scrollWrapper = document.createElement('div');
                         scrollWrapper.className = 'scrollable-error-table';
                         scrollWrapper.appendChild(table);

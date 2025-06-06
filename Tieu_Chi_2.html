@@ -13,6 +13,8 @@
       <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <link rel="icon" href="logoFPT.png" type="image/x-icon">
+
 
       <style>
             .active-menu {
@@ -117,7 +119,7 @@
                                     <i class="fas fa-globe-americas mr-4"></i>
                                     Thống Kê Toàn Quốc
                               </a>
-                        
+
                         </div>
                   </nav>
 
@@ -459,7 +461,8 @@
                         // 📋 Tạo bảng lỗi chi tiết bên phải biểu đồ
                         const tableStartCol = colOffset + 5;
                         const tableStartRow = rowOffset;
-                        const headers = ["STT", "Lỗi chi tiết", "Số lần lỗi"];
+                        const headers = ["STT", "Lỗi chi tiết", "Email nhân viên mắc lỗi"];
+
 
                         const headerRow = sheet.getRow(tableStartRow);
                         headers.forEach((text, idx) => {
@@ -483,16 +486,18 @@
 
                         const cat = chartName;
                         const errors = errorSummary[cat] || {};
-                        const sortedErrors = Object.entries(errors).sort((a, b) => b[1] - a[1]);
+                        const sortedErrors = Object.entries(errors).sort((a, b) => b[1].size - a[1].size);
 
                         for (let j = 0; j < sortedErrors.length; j++) {
-                              const [desc, count] = sortedErrors[j];
-                              const row = sheet.getRow(tableStartRow + 1 + j);
+                              const [desc, emailSet] = sortedErrors[j];
+                              const emailList = Array.from(emailSet).join(", ");
 
+                              const row = sheet.getRow(tableStartRow + 1 + j);
                               row.getCell(tableStartCol).value = j + 1;
                               row.getCell(tableStartCol + 1).value = desc;
-                              row.getCell(tableStartCol + 2).value = count;
+                              row.getCell(tableStartCol + 2).value = emailList;
 
+                              // Định dạng border
                               for (let k = 0; k < 3; k++) {
                                     row.getCell(tableStartCol + k).border = {
                                           top: { style: 'thin' },
@@ -502,8 +507,10 @@
                                     };
                               }
 
+                              row.alignment = { vertical: 'top', wrapText: true }; // ✅ nếu có nhiều email
                               row.commit();
                         }
+
 
                         // 🧾 Ghi tên danh mục bên dưới ảnh
                         const labelRow = sheet.getRow(rowOffset + 13);
@@ -562,7 +569,7 @@
                         if (parts.length != 7) {
                               return showError("Lỗi định dạng tên file", `File <strong>${file.name}</strong> không đúng định dạng.`);
                         }
-                        
+
                         if (!selectedBranch) {
                               selectedBranch = branch;  // Lưu chi nhánh đầu tiên
                         }
@@ -610,6 +617,7 @@
                   const parts = fileName.replace(".xlsx", "").split("-");
                   const supervisor = parts[0] || "N/A";
                   const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";
+                  const emailNhanVien = sheet['B4']?.v?.toString().trim() || "N/A";
                   const area = parts[2] || "N/A";         // 🆕 Khu vực
                   const branch = parts[3] || "N/A";       // 🆕 Chi nhánh
                   const date = parts.slice(4).join("-");  // 🆕 Ngày đánh giá đúng chuẩn yyyy-mm-dd
@@ -633,8 +641,8 @@
 
                         if (result === "KHÔNG") {
                               if (!errorDetails[cat]) errorDetails[cat] = {};
-                              if (!errorDetails[cat][detail]) errorDetails[cat][detail] = 0;
-                              errorDetails[cat][detail]++;
+                              if (!errorDetails[cat][detail]) errorDetails[cat][detail] = new Set();
+                              errorDetails[cat][detail].add(emailNhanVien);
                         }
                   }
 
@@ -693,11 +701,14 @@
                         // 🟦 Gộp lỗi chi tiết
                         for (const [cat, details] of Object.entries(errorDetails)) {
                               if (!errorSummary[cat]) errorSummary[cat] = {};
-                              for (const [desc, count] of Object.entries(details)) {
-                                    if (!errorSummary[cat][desc]) errorSummary[cat][desc] = 0;
-                                    errorSummary[cat][desc] += count;
+                              for (const [desc, emailSet] of Object.entries(details)) {
+                                    if (!errorSummary[cat][desc]) errorSummary[cat][desc] = new Set();
+                                    for (const email of emailSet) {
+                                          errorSummary[cat][desc].add(email);
+                                    }
                               }
                         }
+
 
                   }
 
@@ -761,7 +772,8 @@
 
                   for (const [cat, vals] of Object.entries(categoryTotals)) {
                         const wrapper = document.createElement('div');
-                        wrapper.className = 'flex flex-col lg:flex-row gap-4 items-start bg-white p-4 rounded shadow';
+                        wrapper.className = 'flex flex-col lg:flex-row gap-6 items-start bg-white p-6 rounded-2xl shadow-lg w-full max-w-6xl';
+
 
                         // Biểu đồ tròn
                         const chartWrapper = document.createElement('div');
@@ -780,19 +792,18 @@
 
                         // Bảng chi tiết lỗi
                         const tableWrapper = document.createElement('div');
-                        tableWrapper.className = 'overflow-auto min-w-[420px] max-w-[420px] h-[190px]';
-
+                        tableWrapper.className = 'overflow-auto w-[800px] min-w-[800px] max-w-[800px] max-h-[300px] min-h-[300px]';
 
                         const table = document.createElement('table');
-                        table.className = 'min-w-[300px] text-xs text-left text-gray-700 border rounded';
-                        table.innerHTML = `
-<thead class="bg-gray-200 text-gray-900 sticky top-0 z-10">
+                        table.className = 'w-full text-xs text-left text-gray-700 border rounded';
 
-    <tr>
-        <th class="px-2 py-1 border w-[10%] text-center">STT</th>
-        <th class="px-2 py-1 border w-[70%]">Lỗi chi tiết</th>
-        <th class="px-2 py-1 border w-[20%] text-center">Số lần lỗi</th>
-    </tr>
+                        table.innerHTML = `
+<thead class="text-white sticky top-0 z-10" style="background-color: #174EE3;">
+  <tr>
+    <th class="px-2 py-1 border text-center" style="width: 10%;">STT</th>
+    <th class="px-2 py-1 border" style="width: 40%;">Lỗi chi tiết</th>
+    <th class="px-2 py-1 border text-left" style="width: 50%;">Email Nhân Viên mắc lỗi</th>
+  </tr>
 </thead>
 <tbody></tbody>
 `;
@@ -802,15 +813,17 @@
                         const errorList = errorSummary[cat] || {};
                         const sortedErrors = Object.entries(errorList).sort((a, b) => b[1] - a[1]);
 
-                        sortedErrors.forEach(([desc, count], index) => {
+                        sortedErrors.forEach(([desc, emailSet], index) => {
                               const row = document.createElement('tr');
+                              const emailList = Array.from(emailSet).join(", ");
                               row.innerHTML = `
-            <td class="px-2 py-1 border text-center">${index + 1}</td>
-            <td class="px-2 py-1 border">${desc}</td>
-            <td class="px-2 py-1 border text-center">${count}</td>
-        `;
+    <td class="px-2 py-1 border text-center">${index + 1}</td>
+    <td class="px-2 py-1 border">${desc}</td>
+    <td class="px-2 py-1 border text-left">${emailList}</td>
+  `;
                               tbody.appendChild(row);
                         });
+
 
                         tableWrapper.appendChild(table);
                         wrapper.appendChild(tableWrapper);
