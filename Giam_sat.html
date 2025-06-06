@@ -553,9 +553,59 @@
                         const data = new Uint8Array(e.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonDataRaw = XLSX.utils.sheet_to_json(firstSheet, { raw: true, defval: "" });
 
-                        // ✅ Chuẩn hóa tên cột: bỏ khoảng trắng dư
+                        // ✅ 1. Kiểm tra tổng số cột thực tế trong sheet
+                        const maxColumnCount = XLSX.utils.decode_range(firstSheet['!ref']).e.c + 1;
+                        if (maxColumnCount > 4) {
+                              importStatus.classList.remove('hidden');
+                              importStatus.classList.add('fade-in');
+                              importStatus.innerHTML = `
+              <p class="text-red-600 font-medium text-sm sm:text-base">
+                  <i class="fas fa-exclamation-circle mr-1 sm:mr-2"></i>
+                  ❌ File có ${maxColumnCount} cột. Chỉ chấp nhận tối đa 4 cột (Danh mục 1 → Danh mục 4).
+              </p>`;
+                              errorTreeContainer.classList.add('hidden');
+                              noDataMessage.classList.remove('hidden');
+                              return;
+                        }
+
+                        // ✅ 2. Lấy dòng tiêu đề (header)
+                        const headerRow = XLSX.utils.sheet_to_json(firstSheet, {
+                              header: 1,
+                              range: 0
+                        })[0] || [];
+
+                        const trimmedHeaders = headerRow.map(h => (h || "").toString().trim());
+                        const validColumns = ["Danh mục 1", "Danh mục 2", "Danh mục 3", "Danh mục 4"];
+
+                        // ✅ 3. Kiểm tra tiêu đề dòng đầu
+                        const isValidFormat =
+                              trimmedHeaders.length >= 1 &&
+                              trimmedHeaders.length <= 4 &&
+                              trimmedHeaders.every(h =>
+                                    validColumns.includes(h) &&
+                                    typeof h === "string" &&
+                                    h.trim() !== "" &&
+                                    isNaN(h)
+                              );
+
+                        importStatus.classList.remove('hidden');
+                        importStatus.classList.add('fade-in');
+
+                        if (!isValidFormat) {
+                              importStatus.innerHTML = `
+              <p class="text-red-600 font-medium text-sm sm:text-base">
+                  <i class="fas fa-exclamation-circle mr-1 sm:mr-2"></i>
+                  ❌ File không hợp lệ. Dòng đầu tiên phải có từ 1 đến 4 tiêu đề, là chữ, không để trống, không phải số, và chỉ được gồm: "Danh mục 1", "Danh mục 2", "Danh mục 3", "Danh mục 4".<br>
+                  ⛔ Tiêu đề hiện tại: ${trimmedHeaders.join(", ") || "Không có"}
+              </p>`;
+                              errorTreeContainer.classList.add('hidden');
+                              noDataMessage.classList.remove('hidden');
+                              return;
+                        }
+
+                        // ✅ 4. Nếu hợp lệ → xử lý dữ liệu
+                        const jsonDataRaw = XLSX.utils.sheet_to_json(firstSheet, { raw: true, defval: "" });
                         const jsonData = jsonDataRaw.map(row => {
                               const cleanRow = {};
                               Object.keys(row).forEach(key => {
@@ -565,28 +615,6 @@
                               return cleanRow;
                         });
 
-                        // ✅ Chỉ kiểm tra dòng đầu tiên có đủ 4 cột
-                        const requiredFields = ["Danh mục 1", "Danh mục 2", "Danh mục 3", "Danh mục 4"];
-                        const isValidFormat = jsonData.length > 0 &&
-                              requiredFields.every(field => jsonData[0].hasOwnProperty(field));
-
-                        importStatus.classList.remove('hidden');
-                        importStatus.classList.add('fade-in');
-
-                        if (!isValidFormat) {
-                              const actualFields = Object.keys(jsonData[0] || {}).join('", "');
-
-                              importStatus.innerHTML = `
-        <p class="text-red-600 font-medium text-sm sm:text-base">
-            <i class="fas fa-exclamation-circle mr-1 sm:mr-2"></i>
-            File danh mục lỗi không đạt yêu cầu.
-        </p>`;
-                              errorTreeContainer.classList.add('hidden');
-                              noDataMessage.classList.remove('hidden');
-                              return;
-                        }
-
-                        // ✅ Nếu hợp lệ
                         errorCategories = processErrorData(jsonData);
                         importStatus.innerHTML = `
             <p class="text-green-600 font-medium text-sm sm:text-base">
@@ -599,6 +627,7 @@
 
                   reader.readAsArrayBuffer(file);
             }
+
 
             function processErrorData(data) {
                   const categories = [];
