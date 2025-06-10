@@ -255,6 +255,8 @@
                                                       </tr>
                                                 </thead>
                                                 <tbody id="branchReportBody"></tbody>
+                                                <tfoot id="branchReportFooter"
+                                                      class="hidden bg-orange-100 font-semibold text-gray-900">
                                           </table>
                                     </div>
                               </div>
@@ -473,6 +475,38 @@
                         }
 
                   });
+                  // Tính tổng các cột
+                  let totalCriteriaSum = 0, coSum = 0, khongSum = 0, chuaSum = 0;
+
+                  document.querySelectorAll("#branchReportBody tr").forEach(tr => {
+                        totalCriteriaSum += Number(tr.children[6].textContent);
+                        coSum += Number(tr.children[7].textContent);
+                        khongSum += Number(tr.children[8].textContent);
+                        chuaSum += Number(tr.children[9].textContent);
+                  });
+
+                  // Thêm dòng tổng cộng
+                  const footerRow = [
+                        'TỔNG CỘNG',
+                        '', '', '', '', '',
+                        totalCriteriaSum,
+                        coSum,
+                        khongSum,
+                        chuaSum
+                  ];
+                  sheet.addRow(footerRow);
+
+                  // Định dạng dòng tổng cộng
+                  const lastRow = sheet.lastRow;
+                  lastRow.font = { bold: true };
+                  lastRow.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: { argb: 'FFFFE0B2' } // Màu cam nhạt
+                  };
+
+                  // Gộp ô cho cột "TỔNG CỘNG"
+                  sheet.mergeCells(`A${lastRow.number}:F${lastRow.number}`);
 
 
                   // 🖼 Chèn biểu đồ
@@ -1032,9 +1066,34 @@
                         branchReportBody.appendChild(row);
                         index++;
                   }
+                  updateBranchReportFooter();
 
 
             });
+            // Thêm hàm tính tổng và hiển thị footer
+            function updateBranchReportFooter() {
+                  const footer = document.getElementById('branchReportFooter');
+                  footer.innerHTML = '';
+                  footer.classList.remove('hidden');
+                  let totalCriteriaSum = 0, coSum = 0, khongSum = 0, chuaSum = 0;
+
+                  document.querySelectorAll("#branchReportBody tr").forEach(tr => {
+                        totalCriteriaSum += Number(tr.children[6].textContent);
+                        coSum += Number(tr.children[7].textContent);
+                        khongSum += Number(tr.children[8].textContent);
+                        chuaSum += Number(tr.children[9].textContent);
+                  });
+
+                  const footerRow = document.createElement('tr');
+                  footerRow.innerHTML = `
+        <td class="py-2 px-4 text-center" colspan="6">TỔNG CỘNG</td>
+        <td class="py-2 px-4 text-center">${totalCriteriaSum}</td>
+        <td class="py-2 px-4 text-center">${coSum}</td>
+        <td class="py-2 px-4 text-center">${khongSum}</td>
+        <td class="py-2 px-4 text-center">${chuaSum}</td>
+    `;
+                  footer.appendChild(footerRow);
+            }
       </script>
 </body>
 

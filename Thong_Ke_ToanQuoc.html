@@ -251,6 +251,8 @@
                                     </tr>
                                 </thead>
                                 <tbody id="branchReportBody"></tbody>
+                                <tfoot id="branchReportFooter" class="hidden bg-orange-100 font-semibold text-gray-900">
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -464,9 +466,39 @@
                 for (let i = 1; i <= 11; i++) {
                     sheet.getColumn(i).alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
                 }
-
-
             });
+            // Tính tổng các cột
+            let totalCriteriaSum = 0, coSum = 0, khongSum = 0, chuaSum = 0;
+
+            document.querySelectorAll("#branchReportBody tr").forEach(tr => {
+                totalCriteriaSum += Number(tr.children[7].textContent);
+                coSum += Number(tr.children[8].textContent);
+                khongSum += Number(tr.children[9].textContent);
+                chuaSum += Number(tr.children[10].textContent);
+            });
+
+            // Thêm dòng tổng cộng
+            const footerRow = [
+                'TỔNG CỘNG',
+                '', '', '', '', '', '',
+                totalCriteriaSum,
+                coSum,
+                khongSum,
+                chuaSum
+            ];
+            sheet.addRow(footerRow);
+
+            // Định dạng dòng tổng cộng
+            const lastRow = sheet.lastRow;
+            lastRow.font = { bold: true };
+            lastRow.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: 'FFFFE0B2' } // Màu cam nhạt
+            };
+
+            // Gộp ô cho cột "TỔNG CỘNG"
+            sheet.mergeCells(`A${lastRow.number}:G${lastRow.number}`);
 
 
             // 🖼 Chèn biểu đồ
@@ -892,11 +924,11 @@
 
                 // Bảng chi tiết lỗi
                 const tableWrapper = document.createElement('div');
-                tableWrapper.className = 'overflow-auto min-w-[420px] max-w-[420px] h-[190px]';
+                tableWrapper.className = 'overflow-auto w-[800px] min-w-[800px] max-w-[800px] h-[240px]';
 
 
                 const table = document.createElement('table');
-                table.className = 'min-w-[300px] text-xs text-left text-gray-700 border rounded';
+                table.className = 'w-full text-xs text-left text-gray-700 border rounded';
                 table.innerHTML = `
 <thead class="bg-gray-200 text-gray-900 sticky top-0 z-10">
 
@@ -1024,8 +1056,34 @@
                 index++;
             }
 
+            updateBranchReportFooter();
 
         });
+        // Thêm hàm tính tổng và hiển thị footer
+        function updateBranchReportFooter() {
+            const footer = document.getElementById('branchReportFooter');
+            footer.innerHTML = '';
+            footer.classList.remove('hidden');
+
+            let totalCriteriaSum = 0, coSum = 0, khongSum = 0, chuaSum = 0;
+
+            document.querySelectorAll("#branchReportBody tr").forEach(tr => {
+                totalCriteriaSum += Number(tr.children[7].textContent);
+                coSum += Number(tr.children[8].textContent);
+                khongSum += Number(tr.children[9].textContent);
+                chuaSum += Number(tr.children[10].textContent);
+            });
+
+            const footerRow = document.createElement('tr');
+            footerRow.innerHTML = `
+        <td class="py-2 px-4 text-center" colspan="7">TỔNG CỘNG</td>
+        <td class="py-2 px-4 text-center">${totalCriteriaSum}</td>
+        <td class="py-2 px-4 text-center">${coSum}</td>
+        <td class="py-2 px-4 text-center">${khongSum}</td>
+        <td class="py-2 px-4 text-center">${chuaSum}</td>
+    `;
+            footer.appendChild(footerRow);
+        }
     </script>
 </body>
 
