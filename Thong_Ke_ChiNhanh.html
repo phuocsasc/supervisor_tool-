@@ -520,7 +520,7 @@
 
                         for (let j = 0; j < sortedErrors.length; j++) {
                               const [desc, emailSet] = sortedErrors[j];
-                              const emailList = Array.from(emailSet).join(", ");
+                              const emailList = Array.from(emailSet).join(" ; ");
 
                               const row = sheet.getRow(tableStartRow + 1 + j);
                               row.getCell(tableStartCol).value = j + 1;
@@ -537,7 +537,7 @@
                                     };
                               }
 
-                              row.alignment = { vertical: 'top', wrapText: true }; // ✅ nếu có nhiều email
+                              row.alignment = { vertical: 'top', wrapText: false }; // ✅ nếu có nhiều email
                               row.commit();
                         }
 
@@ -546,8 +546,8 @@
                         const labelRow = sheet.getRow(rowOffset + 13);
                         labelRow.getCell(colOffset + 1).value = chartName;
                         sheet.mergeCells(labelRow.number, colOffset + 1, labelRow.number, colOffset + 3);
-                        labelRow.font = { bold: true };
-                        labelRow.alignment = { horizontal: "center" };
+                        labelRow.font = { bold: false };
+                        // labelRow.alignment = { horizontal: "left" };
                         labelRow.commit();
 
                         // 📏 Tính hàng tiếp theo
@@ -766,7 +766,7 @@
                   const dataNA = [];
 
                   for (const { fullName, branch, CÓ, KHÔNG, CHUA, count, totalCriteria } of summaryMap.values()) {
-                        labels.push(`${fullName} (${branch})`);
+                        labels.push(`${fullName}`);
 
                         const tc = totalCriteria || 1; // đề phòng chia 0
                         dataYes.push(Math.round((CÓ / tc) * 10000) / 100);

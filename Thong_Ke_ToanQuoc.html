@@ -539,8 +539,8 @@
                 const labelRow = sheet.getRow(rowOffset + 13);
                 labelRow.getCell(colOffset + 1).value = chartName;
                 sheet.mergeCells(labelRow.number, colOffset + 1, labelRow.number, colOffset + 3);
-                labelRow.font = { bold: true };
-                labelRow.alignment = { horizontal: "center" };
+                labelRow.font = { bold: false };
+                // labelRow.alignment = { horizontal: "center" };
                 labelRow.commit();
 
                 // 📏 Tính hàng tiếp theo
