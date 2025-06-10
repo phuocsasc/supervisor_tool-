@@ -51,6 +51,7 @@
             .active-menu {
                   font-weight: 600;
                   background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+                  color: black !important;
 
                   border-radius: 8px;
                   /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -58,9 +59,15 @@
                   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             }
 
+            .menu-item {
+                  color: white;
+                  font-weight: 600;
+            }
+
             .menu-item:hover {
                   font-weight: 600;
                   background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+                  color: black !important;
 
                   border-radius: 8px;
                   /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -86,14 +93,14 @@
             }
 
             @media (max-width: 768px) {
-                  .sidebar {
+                  #sidebar {
                         transform: translateX(-100%);
                         position: absolute;
                         z-index: 50;
                         height: 100vh;
                   }
 
-                  .sidebar.open {
+                  #sidebar.open {
                         transform: translateX(0);
                   }
 
@@ -375,7 +382,21 @@
             const totalCoEl = document.getElementById('totalCo');
             const totalKhongEl = document.getElementById('totalKhong');
             const totalChuaEl = document.getElementById('totalChua');
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                  document.getElementById('sidebar').classList.toggle('open');
+                  document.getElementById('overlay').classList.toggle('open');
+            });
+            document.getElementById('overlay').addEventListener('click', () => {
+                  document.getElementById('sidebar').classList.remove('open');
+                  document.getElementById('overlay').classList.remove('open');
+            });
 
+            document.querySelectorAll('#sidebar a').forEach(link => {
+                  link.addEventListener('click', () => {
+                        document.getElementById('sidebar').classList.remove('open');
+                        document.getElementById('overlay').classList.remove('open');
+                  });
+            });
             // Store files and their metadata
             const filesMetadata = [];
             let currentEmail = null;
@@ -592,7 +613,10 @@
                                           legend: { display: false },
                                           datalabels: {
                                                 color: '#fff',
-                                                font: { weight: 'bold' },
+                                                font: {
+                                                      weight: 'bold',
+                                                      size: 26
+                                                },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                                       const percent = total ? ((value / total) * 100).toFixed(1) : 0;

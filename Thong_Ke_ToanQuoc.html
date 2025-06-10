@@ -18,6 +18,7 @@
         .active-menu {
             font-weight: 600;
             background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+            color: black !important;
 
             border-radius: 8px;
             /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -25,9 +26,15 @@
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         }
 
+        .menu-item {
+            color: white;
+            font-weight: 600;
+        }
+
         .menu-item:hover {
             font-weight: 600;
             background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+            color: black !important;
 
             border-radius: 8px;
             /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -54,14 +61,14 @@
 
 
         @media (max-width: 768px) {
-            .sidebar {
+            #sidebar {
                 transform: translateX(-100%);
                 position: absolute;
                 z-index: 50;
                 height: 100vh;
             }
 
-            .sidebar.open {
+            #sidebar.open {
                 transform: translateX(0);
             }
 
@@ -299,6 +306,22 @@
         const errorTitle = document.getElementById('errorTitle');
         const errorMessage = document.getElementById('errorMessage');
         const closeErrorBtn = document.getElementById('closeErrorBtn');
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        });
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+        });
+
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('overlay').classList.remove('open');
+            });
+        });
+
 
         function showError(title, message) {
             errorTitle.textContent = title;
@@ -361,7 +384,7 @@
             // 🟦 Tên chi nhánh
             // Lấy tên chi nhánh từ dòng đầu tiên có sẵn trong bảng
             const firstBranchRow = document.querySelector("#branchReportBody tr");
-            const branchName = "ToanQuoc";
+            const branchName = "Toan Quoc";
 
 
 
@@ -374,7 +397,7 @@
             const dd = String(now.getDate()).padStart(2, '0');
 
             // Gộp tên file
-            const fileName = `ThongKeKhuVuc_${branchName}_${yyyy}-${mm}-${dd}.xlsx`;
+            const fileName = `ThongKeToanQuoc_${yyyy}-${mm}-${dd}.xlsx`;
             const titleRow = sheet.addRow([branchName]);
             sheet.mergeCells(`A1:K1`);
             titleRow.font = { bold: true, size: 14, color: { argb: 'FF1F4E78' } };
@@ -424,6 +447,25 @@
                     tds[10].textContent.trim()  // CHƯA KIỂM TRA
                 ];
                 sheet.addRow(rowData);
+                sheet.columns = [
+                    { key: 'stt', width: 8 },
+                    { key: 'emailGiamSat', width: 25 },
+                    { key: 'tenNhanVien', width: 25 },
+                    { key: 'emailNV', width: 25 },
+                    { key: 'khuVuc', width: 15 },
+                    { key: 'chiNhanh', width: 15 },
+                    { key: 'ngayDanhGia', width: 15 },
+                    { key: 'tongTieuChi', width: 15 },
+                    { key: 'co', width: 15 },
+                    { key: 'khong', width: 15 },
+                    { key: 'chuaKT', width: 22 }
+                ];
+                // Căn giữa toàn bộ cột (từ A đến K = 11 cột)
+                for (let i = 1; i <= 11; i++) {
+                    sheet.getColumn(i).alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+                }
+
+
             });
 
 
@@ -451,7 +493,7 @@
                 const labelRow = sheet.getRow(chartStartRow + 21);
                 labelRow.getCell(1).value = "Biểu đồ đánh giá theo nhân viên";
                 sheet.mergeCells(`A${chartStartRow + 21}:H${chartStartRow + 21}`); // đồng nhất dòng
-                labelRow.font = { bold: true, size: 12 };
+                labelRow.font = { bold: true, size: 26 };
                 labelRow.alignment = { horizontal: "center" };
                 labelRow.commit();
 
@@ -522,6 +564,13 @@
                     row.getCell(tableStartCol).value = j + 1;
                     row.getCell(tableStartCol + 1).value = desc;
                     row.getCell(tableStartCol + 2).value = count;
+
+                    // Căn giữa cột STT
+                    sheet.getColumn(tableStartCol).alignment = { horizontal: 'center' };
+
+                    // Căn giữa cột "Số lần lỗi"
+                    sheet.getColumn(tableStartCol + 2).alignment = { horizontal: 'center' };
+
 
                     for (let k = 0; k < 3; k++) {
                         row.getCell(tableStartCol + k).border = {
@@ -896,7 +945,10 @@
                             legend: { display: false },
                             datalabels: {
                                 color: '#fff',
-                                font: { weight: 'bold' },
+                                font: {
+                                    weight: 'bold',
+                                    size: 26
+                                },
                                 formatter: (value, ctx) => {
                                     const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                     return value > 0

@@ -20,6 +20,7 @@
             .active-menu {
                   font-weight: 600;
                   background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+                  color: black !important;
 
                   border-radius: 8px;
                   /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -27,9 +28,15 @@
                   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             }
 
+            .menu-item {
+                  color: white;
+                  font-weight: 600;
+            }
+
             .menu-item:hover {
                   font-weight: 600;
                   background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+                  color: black !important;
 
                   border-radius: 8px;
                   /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -55,14 +62,14 @@
             }
 
             @media (max-width: 768px) {
-                  .sidebar {
+                  #sidebar {
                         transform: translateX(-100%);
                         position: absolute;
                         z-index: 50;
                         height: 100vh;
                   }
 
-                  .sidebar.open {
+                  #sidebar.open {
                         transform: translateX(0);
                   }
 
@@ -235,7 +242,8 @@
                                                 <thead class="bg-orange-600 text-white sticky top-0 z-10">
                                                       <tr>
                                                             <th class="py-2 px-4 bg-orange-600">STT</th>
-                                                            <th class="py-2 px-4 bg-orange-600">Email người giám sát</th>
+                                                            <th class="py-2 px-4 bg-orange-600">Email người giám sát
+                                                            </th>
                                                             <th class="py-2 px-4 bg-orange-600">Tên nhân viên</th>
                                                             <th class="py-2 px-4 bg-orange-600">Email</th>
                                                             <th class="py-2 px-4 bg-orange-600">Chi nhánh</th>
@@ -302,6 +310,21 @@
             const errorTitle = document.getElementById('errorTitle');
             const errorMessage = document.getElementById('errorMessage');
             const closeErrorBtn = document.getElementById('closeErrorBtn');
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                  document.getElementById('sidebar').classList.toggle('open');
+                  document.getElementById('overlay').classList.toggle('open');
+            });
+            document.getElementById('overlay').addEventListener('click', () => {
+                  document.getElementById('sidebar').classList.remove('open');
+                  document.getElementById('overlay').classList.remove('open');
+            });
+
+            document.querySelectorAll('#sidebar a').forEach(link => {
+                  link.addEventListener('click', () => {
+                        document.getElementById('sidebar').classList.remove('open');
+                        document.getElementById('overlay').classList.remove('open');
+                  });
+            });
 
             function showError(title, message) {
                   errorTitle.textContent = title;
@@ -426,6 +449,29 @@
                               tds[9].textContent.trim()  // CHƯA KIỂM TRA
                         ];
                         sheet.addRow(rowData);
+                        sheet.columns = [
+                              { key: 'stt', width: 8 },
+                              { key: 'emailGiamSat', width: 25 },
+                              { key: 'tenNhanVien', width: 25 },
+                              { key: 'emailNV', width: 25 },
+                              { key: 'chiNhanh', width: 15 },
+                              { key: 'ngayDanhGia', width: 15 },
+                              { key: 'tongTieuChi', width: 15 },
+                              { key: 'co', width: 22 },
+                              { key: 'khong', width: 15 },
+                              { key: 'chuaKT', width: 22 }
+                        ];
+                        // Căn giữa toàn bộ cột (từ A đến j = 10 cột)
+                        for (let i = 1; i <= 10; i++) {
+                              if (i === 8) {
+                                    // Cột số 8: căn lề trái
+                                    sheet.getColumn(i).alignment = { horizontal: 'left', vertical: 'middle', wrapText: false };
+                              } else {
+                                    // Các cột còn lại: căn giữa
+                                    sheet.getColumn(i).alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+                              }
+                        }
+
                   });
 
 
@@ -453,7 +499,7 @@
                         const labelRow = sheet.getRow(chartStartRow + 21);
                         labelRow.getCell(1).value = "Biểu đồ đánh giá theo nhân viên";
                         sheet.mergeCells(`A${chartStartRow + 21}:H${chartStartRow + 21}`); // đồng nhất dòng
-                        labelRow.font = { bold: true, size: 12 };
+                        labelRow.font = { bold: true, size: 26 };
                         labelRow.alignment = { horizontal: "center" };
                         labelRow.commit();
 
@@ -520,12 +566,18 @@
 
                         for (let j = 0; j < sortedErrors.length; j++) {
                               const [desc, emailSet] = sortedErrors[j];
-                              const emailList = Array.from(emailSet).join(" ; ");
+                              const emailList = Array.from(emailSet).join(" // ");
 
                               const row = sheet.getRow(tableStartRow + 1 + j);
                               row.getCell(tableStartCol).value = j + 1;
                               row.getCell(tableStartCol + 1).value = desc;
                               row.getCell(tableStartCol + 2).value = emailList;
+
+                              // Căn giữa cột STT
+                              sheet.getColumn(tableStartCol).alignment = { horizontal: 'center' };
+
+                              // Căn giữa cột "Số lần lỗi"
+                              // sheet.getColumn(tableStartCol + 2).alignment = { horizontal: 'left' };
 
                               // Định dạng border
                               for (let k = 0; k < 3; k++) {
@@ -902,7 +954,10 @@
                                           legend: { display: false },
                                           datalabels: {
                                                 color: '#fff',
-                                                font: { weight: 'bold' },
+                                                font: {
+                                                      weight: 'bold',
+                                                      size: 26
+                                                },
                                                 formatter: (value, ctx) => {
                                                       const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                                       return value > 0

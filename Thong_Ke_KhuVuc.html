@@ -19,6 +19,7 @@
         .active-menu {
             font-weight: 600;
             background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+            color: black !important;
 
             border-radius: 8px;
             /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -26,9 +27,15 @@
             box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
         }
 
+        .menu-item {
+            color: white;
+            font-weight: 600;
+        }
+
         .menu-item:hover {
             font-weight: 600;
             background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+            color: black !important;
 
             border-radius: 8px;
             /* tùy chọn nếu bạn muốn làm mềm góc */
@@ -44,7 +51,7 @@
 
         .admin-bg {
             background-image: url(background_nav.jpg);
-            
+
             background-size: cover;
             /* co giãn ảnh để phủ hết phần tử */
             background-repeat: no-repeat;
@@ -54,14 +61,14 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar {
+            #sidebar {
                 transform: translateX(-100%);
                 position: absolute;
                 z-index: 50;
                 height: 100vh;
             }
 
-            .sidebar.open {
+            #sidebar.open {
                 transform: translateX(0);
             }
 
@@ -109,7 +116,7 @@
                 </div>
                 <span class="text-xl font-bold text-white">QUẢN TRỊ VIÊN</span>
             </div>
-        
+
             <!-- Navigation -->
             <nav>
                 <div class="space-y-2">
@@ -121,30 +128,35 @@
                         <i class="fas fa-layer-group mr-3"></i>
                         Gom Nhóm Dữ Liệu
                     </a>
-                    <a href="Thong_Ke_NhanVien.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
+                    <a href="Thong_Ke_NhanVien.html"
+                        class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                         <i class="fas fa-users mr-3"></i>
                         Thống Kê Nhân Viên
                     </a>
-                    <a href="Thong_Ke_NguoiGiamSat.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
+                    <a href="Thong_Ke_NguoiGiamSat.html"
+                        class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                         <i class="fas fa-user-tie mr-3"></i>
                         Thống Kê Người Giám Sát
                     </a>
-                    <a href="Thong_Ke_ChiNhanh.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
+                    <a href="Thong_Ke_ChiNhanh.html"
+                        class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                         <i class="fas fa-code-branch mr-4"></i>
                         Thống Kê Chi Nhánh
                     </a>
-                    <a href="Thong_Ke_KhuVuc.html" class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 ">
+                    <a href="Thong_Ke_KhuVuc.html"
+                        class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 ">
                         <i class="fas fa-map-marked-alt mr-4"></i>
                         Thống Kê Khu Vực
                     </a>
-                    <a href="Thong_Ke_ToanQuoc.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
+                    <a href="Thong_Ke_ToanQuoc.html"
+                        class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                         <i class="fas fa-globe-americas mr-4"></i>
                         Thống Kê Toàn Quốc
                     </a>
-        
+
                 </div>
             </nav>
-        
+
             <!-- Logout button at bottom -->
             <div class="absolute bottom-0 left-0 right-0 p-4">
                 <a href="index.html"
@@ -296,7 +308,21 @@
         const errorTitle = document.getElementById('errorTitle');
         const errorMessage = document.getElementById('errorMessage');
         const closeErrorBtn = document.getElementById('closeErrorBtn');
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('open');
+        });
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').classList.remove('open');
+        });
 
+        document.querySelectorAll('#sidebar a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('open');
+                document.getElementById('overlay').classList.remove('open');
+            });
+        });
         function showError(title, message) {
             errorTitle.textContent = title;
             errorMessage.innerHTML = message;
@@ -355,7 +381,6 @@
                 for (let i = 0; i < 14; i++) sheet.addRow([]);
             };
 
-            // 🟦 Tên chi nhánh
             // Lấy tên chi nhánh từ dòng đầu tiên có sẵn trong bảng
             const firstBranchRow = document.querySelector("#branchReportBody tr");
             const branchNameRaw = firstBranchRow?.querySelector("td:nth-child(5)")?.textContent || "ChiNhanh";
@@ -421,6 +446,23 @@
                     tds[10].textContent.trim()  // CHƯA KIỂM TRA
                 ];
                 sheet.addRow(rowData);
+                sheet.columns = [
+                    { key: 'stt', width: 8 },
+                    { key: 'emailGiamSat', width: 25 },
+                    { key: 'tenNhanVien', width: 25 },
+                    { key: 'emailNV', width: 25 },
+                    { key: 'khuVuc', width: 15 },
+                    { key: 'chiNhanh', width: 15 },
+                    { key: 'ngayDanhGia', width: 15 },
+                    { key: 'tongTieuChi', width: 15 },
+                    { key: 'co', width: 15 },
+                    { key: 'khong', width: 15 },
+                    { key: 'chuaKT', width: 22 }
+                ];
+                // Căn giữa toàn bộ cột (từ A đến K = 11 cột)
+                for (let i = 1; i <= 11; i++) {
+                    sheet.getColumn(i).alignment = { horizontal: 'center', vertical: 'middle', wrapText: false };
+                }
             });
 
 
@@ -448,7 +490,7 @@
                 const labelRow = sheet.getRow(chartStartRow + 21);
                 labelRow.getCell(1).value = "Biểu đồ đánh giá theo nhân viên";
                 sheet.mergeCells(`A${chartStartRow + 21}:H${chartStartRow + 21}`); // đồng nhất dòng
-                labelRow.font = { bold: true, size: 12 };
+                labelRow.font = { bold: true, size: 26 };
                 labelRow.alignment = { horizontal: "center" };
                 labelRow.commit();
 
@@ -519,6 +561,13 @@
                     row.getCell(tableStartCol).value = j + 1;
                     row.getCell(tableStartCol + 1).value = desc;
                     row.getCell(tableStartCol + 2).value = count;
+
+                    // Căn giữa cột STT
+                    sheet.getColumn(tableStartCol).alignment = { horizontal: 'center' };
+
+                    // Căn giữa cột "Số lần lỗi"
+                    sheet.getColumn(tableStartCol + 2).alignment = { horizontal: 'center' };
+
 
                     for (let k = 0; k < 3; k++) {
                         row.getCell(tableStartCol + k).border = {
@@ -907,7 +956,10 @@
                             legend: { display: false },
                             datalabels: {
                                 color: '#fff',
-                                font: { weight: 'bold' },
+                                font: {
+                                    weight: 'bold',
+                                    size: 26
+                                },
                                 formatter: (value, ctx) => {
                                     const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
                                     return value > 0
