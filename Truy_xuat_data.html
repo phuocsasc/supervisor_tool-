@@ -55,17 +55,42 @@
                   margin-right: 6px;
             }
 
+
             .active-menu {
-                  background-color: #3b82f6;
-                  color: white;
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
+                  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             }
 
-            .active-menu:hover {
-                  background-color: #2563eb !important;
+            .menu-item:hover {
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
             }
 
-            .sidebar {
+            #sidebar {
                   transition: all 0.3s;
+                  box-shadow: rgba(0, 0, 0, 0.24) 5px 8px 18px;
+
+
+            }
+
+            .admin-bg {
+                  background-image: url(background_nav.jpg);
+
+                  background-size: cover;
+                  /* co giãn ảnh để phủ hết phần tử */
+                  background-repeat: no-repeat;
+                  /* không lặp ảnh */
+                  background-position: center;
+                  /* căn giữa ảnh nền */
             }
 
             @media (max-width: 768px) {
@@ -98,11 +123,11 @@
       </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen bg-gradient-to-b from-orange-200 to-white">
       <div class="flex h-screen overflow-hidden">
             <!-- Mobile menu button -->
             <div class="md:hidden fixed top-4 left-4 z-50">
-                  <button id="menuToggle" class="p-2 rounded-md bg-blue-500 text-white">
+                  <button id="menuToggle" class="p-2 rounded-md bg-orange-500 text-white">
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
@@ -112,59 +137,64 @@
 
             <!-- Sidebar -->
             <div id="sidebar"
-                  class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
+                  class="sidebar admin-bg text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
                   <!-- Logo -->
                   <div class="flex items-center space-x-2 px-4">
-                        <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
-                        <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
+                        <div class="flex justify-between items-center">
+                              <div class="flex items-center space-x-2">
+                                    <div class="w-10 h-8  flex items-center justify-center">
+                                          <img src="logoFPT.png" alt="">
+                                    </div>
+                              </div>
+                        </div>
+                        <span class="text-xl font-bold text-white">QUẢN TRỊ VIÊN</span>
                   </div>
 
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
-                              <a href="admin.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                              <a href="admin.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
                                     Trang Chủ
                               </a>
                               <a href="Truy_xuat_data.html"
-                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-layer-group mr-3"></i>
                                     Gom Nhóm Dữ Liệu
                               </a>
                               <a href="Thong_Ke_NhanVien.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-users mr-3"></i>
                                     Thống Kê Nhân Viên
                               </a>
                               <a href="Thong_Ke_NguoiGiamSat.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-user-tie mr-3"></i>
                                     Thống Kê Người Giám Sát
                               </a>
                               <a href="Thong_Ke_ChiNhanh.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-code-branch mr-4"></i>
                                     Thống Kê Chi Nhánh
                               </a>
                               <a href="Thong_Ke_KhuVuc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-map-marked-alt mr-4"></i>
                                     Thống Kê Khu Vực
                               </a>
                               <a href="Thong_Ke_ToanQuoc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-globe-americas mr-4"></i>
                                     Thống Kê Toàn Quốc
                               </a>
-                        
+
                         </div>
                   </nav>
 
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
-                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600 shadow-md hover:shadow-lg">
                               <i class="fas fa-sign-out-alt mr-3"></i>
                               Thoát
                         </a>
@@ -179,7 +209,7 @@
                         <div id="" class="container mx-auto px-2 py-4">
                               <div class="container px-4 max-w-8xl">
                                     <header class="mb-8">
-                                          <h1 class="text-3xl font-bold text-blue-600 mb-2">
+                                          <h1 class="text-3xl font-bold text-orange-600 mb-2">
                                                 <i class="fas fa-layer-group mr-3"></i>
                                                 GOM NHÓM DỮ LIỆU
                                           </h1>
@@ -190,10 +220,10 @@
 
                                     <div class="bg-white rounded-xl shadow-md p-6 mb-8">
                                           <div id="drop-zone"
-                                                class="drop-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 hover:border-blue-400">
+                                                class="drop-zone border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer transition-all duration-300 hover:border-orange-400">
                                                 <div class="flex flex-col items-center justify-center">
                                                       <svg xmlns="http://www.w3.org/2000/svg"
-                                                            class="h-12 w-12 text-blue-500 mb-4" fill="none"
+                                                            class="h-12 w-12 text-orange-500 mb-4" fill="none"
                                                             viewBox="0 0 24 24" stroke="currentColor">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                   stroke-width="2"
@@ -202,7 +232,7 @@
                                                       <h3 class="text-lg font-medium text-gray-700 mb-2">Kéo thả file
                                                             Excel vào đây</h3>
                                                       <button id="file-input-btn"
-                                                            class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Chọn
+                                                            class="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-4 rounded-lg transition duration-200">Chọn
                                                             File</button>
                                                       <p class="text-gray-400 mt-4">Chỉ hỗ trợ file Excel .xlsx đúng
                                                             định dạng mà người giám sát cung cấp</p>
@@ -219,19 +249,19 @@
                                                       <div class="flex space-x-4">
                                                             <label class="inline-flex items-center">
                                                                   <input type="checkbox" checked disabled
-                                                                        class="form-checkbox text-blue-500 rounded border-gray-300"
+                                                                        class="form-checkbox text-orange-500 rounded border-gray-300"
                                                                         id="supervisor-option">
                                                                   <span class="ml-2 text-gray-700">Người giám sát</span>
                                                             </label>
                                                             <label class="inline-flex items-center">
                                                                   <input type="checkbox" checked disabled
-                                                                        class="form-checkbox text-blue-500 rounded border-gray-300"
+                                                                        class="form-checkbox text-orange-500 rounded border-gray-300"
                                                                         id="employee-option">
                                                                   <span class="ml-2 text-gray-700">Nhân viên</span>
                                                             </label>
                                                             <label class="inline-flex items-center">
                                                                   <input type="checkbox" checked disabled
-                                                                        class="form-checkbox text-blue-500 rounded border-gray-300"
+                                                                        class="form-checkbox text-orange-500 rounded border-gray-300"
                                                                         id="branch-option">
                                                                   <span class="ml-2 text-gray-700">Chi nhánh</span>
                                                             </label>
@@ -246,7 +276,7 @@
                                                 <h2 class="text-xl font-semibold text-gray-800">Xử lý</h2>
                                                 <div class="flex space-x-2">
                                                       <button id="refresh-btn"
-                                                            class="flex items-center text-gray-600 hover:text-blue-600">
+                                                            class="flex items-center text-gray-600 hover:text-orange-600">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1"
                                                                   viewBox="0 0 20 20" fill="currentColor">
                                                                   <path fill-rule="evenodd"
@@ -269,13 +299,13 @@
                                           </div>
                                           <div class="mb-4">
                                                 <div class="flex justify-between mb-1">
-                                                      <span class="text-sm font-medium text-blue-600"
+                                                      <span class="text-sm font-medium text-orange-600"
                                                             id="progress-status">Sẵn sàng</span>
                                                       <span class="text-sm font-medium text-gray-600"
                                                             id="progress-percent">0%</span>
                                                 </div>
                                                 <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                                      <div class="bg-blue-600 h-2.5 rounded-full progress-bar"
+                                                      <div class="bg-orange-600 h-2.5 rounded-full progress-bar"
                                                             id="progress-bar" style="width: 0%">
                                                       </div>
                                                 </div>
@@ -316,10 +346,10 @@
                                                                   id="error-count">0</span>
                                                       </div>
                                                 </div>
-                                                <div class="bg-blue-50 p-4 rounded-lg">
+                                                <div class="bg-orange-50 p-4 rounded-lg">
                                                       <div class="flex items-center justify-between">
-                                                            <span class="text-blue-600 font-medium">Tổng số file</span>
-                                                            <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
+                                                            <span class="text-orange-600 font-medium">Tổng số file</span>
+                                                            <span class="bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full"
                                                                   id="total-count">0</span>
                                                       </div>
                                                 </div>
@@ -509,7 +539,7 @@
                         progressBar.style.width = '0%';
                         progressStatus.textContent = 'Đang xử lý...';
                         progressPercent.textContent = '0%';
-                        progressBar.className = 'bg-blue-600 h-2.5 rounded-full progress-bar';
+                        progressBar.className = 'bg-orange-600 h-2.5 rounded-full progress-bar';
                         resultsSection.style.display = 'none';
                   }
 

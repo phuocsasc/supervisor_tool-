@@ -163,7 +163,7 @@
 
             .error-table th {
                   background-color: #3b82f6;
-                  /* xanh dương Tailwind: blue-500 */
+                  /* xanh dương Tailwind: orange-500 */
                   color: white;
                   font-weight: bold;
             }
@@ -213,16 +213,40 @@
             }
 
             .active-menu {
-                  background-color: #3b82f6;
-                  color: white;
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
+                  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             }
 
-            .active-menu:hover {
-                  background-color: #2563eb !important;
+            .menu-item:hover {
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
             }
 
-            .sidebar {
+            #sidebar {
                   transition: all 0.3s;
+                  box-shadow: rgba(0, 0, 0, 0.24) 5px 8px 18px;
+
+
+            }
+
+            .admin-bg {
+                  background-image: url(background_nav.jpg);
+
+                  background-size: cover;
+                  /* co giãn ảnh để phủ hết phần tử */
+                  background-repeat: no-repeat;
+                  /* không lặp ảnh */
+                  background-position: center;
+                  /* căn giữa ảnh nền */
             }
 
             @media (max-width: 768px) {
@@ -255,13 +279,13 @@
       </style>
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="min-h-screen bg-gradient-to-b from-orange-200 to-white">
 
 
       <div class="flex h-screen overflow-hidden">
             <!-- Mobile menu button -->
             <div class="md:hidden fixed top-4 left-4 z-50">
-                  <button id="menuToggle" class="p-2 rounded-md bg-blue-500 text-white">
+                  <button id="menuToggle" class="p-2 rounded-md bg-orange-500 text-white">
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
@@ -271,48 +295,53 @@
 
             <!-- Sidebar -->
             <div id="sidebar"
-                  class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
+                  class="sidebar admin-bg text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
                   <!-- Logo -->
                   <div class="flex items-center space-x-2 px-4">
-                        <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
-                        <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
+                        <div class="flex justify-between items-center">
+                              <div class="flex items-center space-x-2">
+                                    <div class="w-10 h-8  flex items-center justify-center">
+                                          <img src="logoFPT.png" alt="">
+                                    </div>
+                              </div>
+                        </div>
+                        <span class="text-xl font-bold text-white">QUẢN TRỊ VIÊN</span>
                   </div>
 
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
-                              <a href="admin.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                              <a href="admin.html" class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
                                     Trang Chủ
                               </a>
                               <a href="Truy_xuat_data.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-layer-group mr-3"></i>
                                     Gom Nhóm Dữ Liệu
                               </a>
                               <a href="Thong_Ke_NhanVien.html"
-                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-users mr-3"></i>
                                     Thống Kê Nhân Viên
                               </a>
                               <a href="Thong_Ke_NguoiGiamSat.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-user-tie mr-3"></i>
                                     Thống Kê Người Giám Sát
                               </a>
                               <a href="Thong_Ke_ChiNhanh.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-code-branch mr-4"></i>
                                     Thống Kê Chi Nhánh
                               </a>
                               <a href="Thong_Ke_KhuVuc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-map-marked-alt mr-4"></i>
                                     Thống Kê Khu Vực
                               </a>
                               <a href="Thong_Ke_ToanQuoc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-globe-americas mr-4"></i>
                                     Thống Kê Toàn Quốc
                               </a>
@@ -323,7 +352,7 @@
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
-                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600 shadow-md hover:shadow-lg">
                               <i class="fas fa-sign-out-alt mr-3"></i>
                               Thoát
                         </a>
@@ -341,7 +370,7 @@
                                     <div class="">
                                           <div class="flex items-center justify-between">
                                                 <div class="">
-                                                      <h1 class="text-3xl font-bold text-blue-600 flex items-center">
+                                                      <h1 class="text-3xl font-bold text-orange-600 flex items-center">
                                                             <i class="fas fa-users mr-3"></i>
                                                             THỐNG KÊ DỮ LIỆU THEO TỪNG NHÂN VIÊN
                                                       </h1>
@@ -359,9 +388,9 @@
                                           <div id="dropzone"
                                                 class="dropzone rounded-xl p-8 mb-6 text-center cursor-pointer transition-all duration-300">
                                                 <div class="flex flex-col items-center justify-center">
-                                                      <div class="bg-blue-100 p-4 rounded-full mb-4">
+                                                      <div class="bg-orange-100 p-4 rounded-full mb-4">
                                                             <i
-                                                                  class="fas fa-cloud-upload-alt text-blue-500 text-3xl"></i>
+                                                                  class="fas fa-cloud-upload-alt text-orange-500 text-3xl"></i>
                                                       </div>
                                                       <h3 class="mt-2 text-lg font-medium text-gray-800">Kéo & thả file
                                                             Excel vào đây</h3>
@@ -434,7 +463,7 @@
                                                                   <i class="fas fa-rotate-left mr-1"></i> Làm mới
                                                             </button>
                                                             <button id="runBtn"
-                                                                  class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md flex items-center transition duration-200 shadow-md hover:shadow-lg pulse">
+                                                                  class="bg-orange-600 hover:bg-orange-700 text-white font-medium py-2 px-4 rounded-md flex items-center transition duration-200 shadow-md hover:shadow-lg pulse">
                                                                   <i class="fas fa-cogs mr-2"></i>
                                                                   Xử lý dữ liệu
                                                             </button>
@@ -449,9 +478,9 @@
                                           <div id="processingSection" class="hidden fade-in">
                                                 <!-- Employee Info -->
                                                 <div id="employeeInfo"
-                                                      class="bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-xl mb-8 border border-blue-100">
+                                                      class="bg-gradient-to-r from-orange-50 to-indigo-50 p-5 rounded-xl mb-8 border border-orange-100">
                                                       <h3
-                                                            class="text-lg font-semibold mb-3 text-blue-800 flex items-center">
+                                                            class="text-lg font-semibold mb-3 text-orange-800 flex items-center">
                                                             <i class="fas fa-user-circle mr-2"></i>
                                                             Thông tin nhân viên
                                                       </h3>
@@ -567,7 +596,7 @@
                                                                                     0
                                                                               </td>
                                                                               <td id="totalRate"
-                                                                                    class="px-6 py-3 text-sm font-medium text-blue-600">
+                                                                                    class="px-6 py-3 text-sm font-medium text-orange-600">
                                                                                     0%
                                                                               </td>
                                                                         </tr>
@@ -586,7 +615,7 @@
                                                             </h3>
                                                             <div class="flex space-x-2">
                                                                   <button id="lineChartBtn"
-                                                                        class="bg-blue-100 text-blue-600 px-2 py-1 rounded text-xs font-medium">
+                                                                        class="bg-orange-100 text-orange-600 px-2 py-1 rounded text-xs font-medium">
                                                                         <i class="fas fa-chart-line"></i> Đường
                                                                   </button>
                                                                   <!-- <button id="barChartBtn" disabled hidden
@@ -971,7 +1000,7 @@
                         fileInfo.className = 'flex items-center';
 
                         const fileIcon = document.createElement('div');
-                        fileIcon.className = 'mr-3 text-blue-500';
+                        fileIcon.className = 'mr-3 text-orange-500';
                         fileIcon.innerHTML = `
                     <i class="fas fa-file-excel text-xl"></i>
                 `;
@@ -1102,11 +1131,11 @@
 
                   // Update active button styles
                   if (type === 'line') {
-                        lineChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                        lineChartBtn.className = 'bg-orange-100 text-orange-600 px-3 py-1 rounded text-sm font-medium flex items-center';
                         // barChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
                   } else {
                         lineChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
-                        // barChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                        // barChartBtn.className = 'bg-orange-100 text-orange-600 px-3 py-1 rounded text-sm font-medium flex items-center';
                   }
 
                   progressChart.config.type = type;
@@ -1132,7 +1161,7 @@
                   }
 
                   // Set line chart as default
-                  lineChartBtn.className = 'bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm font-medium flex items-center';
+                  lineChartBtn.className = 'bg-orange-100 text-orange-600 px-3 py-1 rounded text-sm font-medium flex items-center';
                   // barChartBtn.className = 'bg-gray-100 text-gray-600 px-3 py-1 rounded text-sm font-medium flex items-center';
 
                   progressChart = new Chart(ctx, {

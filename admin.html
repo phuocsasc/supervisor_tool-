@@ -10,16 +10,40 @@
       <link rel="icon" href="logoFPT.png" type="image/x-icon">
       <style>
             .active-menu {
-                  background-color: #3b82f6;
-                  color: white;
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
+                  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
             }
 
-            .active-menu:hover {
-                  background-color: #2563eb !important;
+            .menu-item:hover {
+                  font-weight: 600;
+                  background: linear-gradient(to right, rgb(255, 255, 255), rgba(189, 230, 237, 0.805));
+
+                  border-radius: 8px;
+                  /* tùy chọn nếu bạn muốn làm mềm góc */
+                  transition: background 0.3s ease;
             }
 
-            .sidebar {
+            #sidebar {
                   transition: all 0.3s;
+                  box-shadow: rgba(0, 0, 0, 0.24) 5px 8px 18px;
+
+
+            }
+
+            .admin-bg {
+                  background-image: url(background_nav.jpg);
+
+                  background-size: cover;
+                  /* co giãn ảnh để phủ hết phần tử */
+                  background-repeat: no-repeat;
+                  /* không lặp ảnh */
+                  background-position: center;
+                  /* căn giữa ảnh nền */
             }
 
             @media (max-width: 768px) {
@@ -50,17 +74,18 @@
                   }
 
             }
+
             .menu-bg {
                   background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
             }
       </style>
 </head>
 
-<body class="bg-gray-100 font-sans">
+<body class="min-h-screen bg-gradient-to-b from-orange-200 to-white">
       <div class="flex h-screen overflow-hidden">
             <!-- Mobile menu button -->
             <div class="md:hidden fixed top-4 left-4 z-50">
-                  <button id="menuToggle" class="p-2 rounded-md bg-blue-500 text-white">
+                  <button id="menuToggle" class="p-2 rounded-md bg-orange-500 text-white">
                         <i class="fas fa-bars"></i>
                   </button>
             </div>
@@ -70,59 +95,65 @@
 
             <!-- Sidebar -->
             <div id="sidebar"
-                  class="sidebar bg-white text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
+                  class="sidebar admin-bg text-gray-800 w-64 space-y-6 py-7 px-2 absolute inset-y-0 left-0 transform md:relative md:translate-x-0 shadow-lg">
                   <!-- Logo -->
                   <div class="flex items-center space-x-2 px-4">
-                        <i class="fas fa-shield-alt text-blue-500 text-2xl"></i>
-                        <span class="text-xl font-bold text-blue-500">QUẢN TRỊ VIÊN</span>
+                        <div class="flex justify-between items-center">
+                              <div class="flex items-center space-x-2">
+                                    <div class="w-10 h-8  flex items-center justify-center">
+                                          <img src="logoFPT.png" alt="">
+                                    </div>
+                              </div>
+                        </div>
+                        <span class="text-xl font-bold text-white">QUẢN TRỊ VIÊN</span>
                   </div>
 
                   <!-- Navigation -->
                   <nav>
                         <div class="space-y-2">
                               <a href="admin.html"
-                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="active-menu menu-item block py-2.5 px-2 rounded transition duration-200">
                                     <i class="fas fa-tachometer-alt mr-3"></i>
                                     Trang Chủ
                               </a>
                               <a href="Truy_xuat_data.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-layer-group mr-3"></i>
                                     Gom Nhóm Dữ Liệu
                               </a>
                               <a href="Thong_Ke_NhanVien.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-users mr-3"></i>
                                     Thống Kê Nhân Viên
                               </a>
                               <a href="Thong_Ke_NguoiGiamSat.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-user-tie mr-3"></i>
                                     Thống Kê Người Giám Sát
                               </a>
                               <a href="Thong_Ke_ChiNhanh.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-code-branch mr-4"></i>
                                     Thống Kê Chi Nhánh
                               </a>
                               <a href="Thong_Ke_KhuVuc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-map-marked-alt mr-4"></i>
                                     Thống Kê Khu Vực
                               </a>
                               <a href="Thong_Ke_ToanQuoc.html"
-                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 hover:bg-blue-500 hover:text-white">
+                                    class="menu-item block py-2.5 px-2 rounded transition duration-200 ">
                                     <i class="fas fa-globe-americas mr-4"></i>
                                     Thống Kê Toàn Quốc
                               </a>
-                              
+
                         </div>
                   </nav>
 
                   <!-- Logout button at bottom -->
                   <div class="absolute bottom-0 left-0 right-0 p-4">
                         <a href="index.html"
-                              class="block py-2.5 px-4 rounded transition duration-200 bg-red-500 text-white hover:bg-red-600">
+                              class="block py-2.5 px-4 rounded transition duration-200 bg-gradient-to-r from-pink-500 to-red-500 text-white hover:from-pink-600 hover:to-red-600 shadow-md hover:shadow-lg">
                               <i class="fas fa-sign-out-alt mr-3"></i>
                               Thoát
                         </a>
@@ -130,17 +161,18 @@
             </div>
 
             <!-- Main content -->
-            <main class="flex-1 overflow-y-auto p-8">
-                  <div class="bg-white rounded-lg shadow p-6">
-                        <h1 class="text-2xl font-bold text-green-500 mb-4">CHÀO MỪNG BẠN ĐÃ TRUY CẬP THÀNH CÔNG VÀO QUẢN TRỊ VIÊN
+            <main class="flex-1 overflow-y-auto p-2">
+                  <div class="bg-white rounded-lg shadow p-12">
+                        <h1 class="text-3xl font-bold text-green-500 mb-2">CHÀO MỪNG BẠN ĐÃ TRUY CẬP THÀNH CÔNG VÀO QUẢN
+                              TRỊ VIÊN
                         </h1>
                         <p class="text-gray-600">Lựa chọn thống kê dữ liệu theo từng tiêu chí bạn muốn!</p>
-                        <!-- <p class="text-blue-700">Vui lòng chọn 1 chức năng từ thanh menu bên trái</p> -->
+                        <!-- <p class="text-orange-700">Vui lòng chọn 1 chức năng từ thanh menu bên trái</p> -->
 
 
                         <!-- Content will be loaded here based on menu selection -->
                         <div id="contentArea" class="mt-8">
-                              <div class="bg-blue-50 border-l-4 border-yellow-500 p-4">
+                              <div class="bg-orange-50 border-l-4 border-yellow-500 p-4">
                                     <p class="text-lg text-yellow-600">Lưu ý: Hệ thống chỉ nhận các file excel theo đúng
                                           định dạng</p>
                               </div>
