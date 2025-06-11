@@ -882,17 +882,34 @@
                         options: {
                               responsive: true,
                               plugins: {
-                                    legend: { display: false },
+                                    legend: { display: true },
                                     datalabels: {
-                                          color: '#fff',
-                                          font: { weight: 'bold' },
-                                          formatter: (value, ctx) => {
-                                                const total = ctx.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-                                                return value > 0 ? `${Math.round((value / total) * 100)}%` : '';
+                                          anchor: 'end',
+                                          align: 'top',
+                                          color: '#000',
+                                          font: { weight: 'bold', size: 16 },
+                                          formatter: function (value) {
+                                                return value.toFixed(2) + '%';
+                                          }
+                                    }
+                              },
+                              scales: {
+                                    y: {
+                                          beginAtZero: true,
+                                          max: 100,
+                                          ticks: {
+                                                callback: function (value) {
+                                                      return value + '%';
+                                                }
+                                          },
+                                          title: {
+                                                display: true,
+                                                text: 'Tỷ lệ (%)'
                                           }
                                     }
                               }
                         },
+                        plugins: [ChartDataLabels]
 
                   });
 
