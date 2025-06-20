@@ -442,10 +442,10 @@
                         const fileName = file.name;
                         const parts = fileName.replace('.xlsx', '').split('-');
 
-                        if (parts.length !== 7) {
-                              showEmailError(`File <strong>${file.name}</strong> không đúng định dạng <code>emailGT-emailNV-KhuV-ChiN-yyyy-mm-dd.xlsx</code>.`);
-                              return;
-                        }
+                        // if (parts.length !== 7) {
+                        //       showEmailError(`File <strong>${file.name}</strong> không đúng định dạng <code>emailGT-emailNV-KhuV-ChiN-yyyy-mm-dd.xlsx</code>.`);
+                        //       return;
+                        // }
 
                         const fileEmail = parts[0].trim();
 
@@ -499,6 +499,37 @@
                   const container = document.getElementById('pieChartContainer');
                   container.innerHTML = ''; // Xóa biểu đồ cũ nếu có
                   container.classList.remove('hidden');
+                  const passedCriteriaMap = {}; // { category: Set of passed descriptions }
+                  const allCriteriaMap = {}; // { description: { total: 0, passed: 0 } }
+
+                  processedData.dataRows.forEach(row => {
+                        const sheet = row.sheet;
+                        if (!sheet) return;
+
+                        for (let r = 9; ; r++) {
+                              const catCell = sheet[`B${r}`];
+                              const resultCell = sheet[`F${r}`];
+                              if (!catCell || !resultCell) break;
+
+                              const cat = (catCell?.v || '').toString().trim();
+                              const result = (resultCell?.v || '').toUpperCase();
+                              const d2 = (sheet[`C${r}`]?.v || '').toString().trim();
+                              const d3 = (sheet[`D${r}`]?.v || '').toString().trim();
+                              const d4 = (sheet[`E${r}`]?.v || '').toString().trim();
+                              const description = [d2, d3, d4].filter(s => s).join(' => ');
+
+                              const key = `${cat}||${description}`;
+
+                              if (!allCriteriaMap[key]) {
+                                    allCriteriaMap[key] = { total: 0, passed: 0 };
+                              }
+
+                              allCriteriaMap[key].total += 1;
+                              if (result === 'CÓ') {
+                                    allCriteriaMap[key].passed += 1;
+                              }
+                        }
+                  });
 
                   const grid = document.createElement('div');
                   grid.className = 'flex flex-col items-center gap-6';
@@ -524,7 +555,7 @@
                         chartContainer.appendChild(title);
                         wrapper.appendChild(chartContainer);
 
-                        // === Bảng lỗi
+                        // === Bảng tiêu chí CÓ Đạt
                         const tableWrapper = document.createElement('div');
                         // tableWrapper.className = 'w-full md:w-1/2 overflow-x-auto max-h-[12rem] overflow-y-auto custom-scroll';
                         tableWrapper.className = 'w-full md:w-[1000px] overflow-x-auto max-h-[12rem] overflow-y-auto custom-scroll';
@@ -539,63 +570,46 @@
                         table.className = 'min-w-full table-fixed bg-white border border-gray-300 rounded-lg shadow text-sm';
 
                         table.innerHTML = `
-<thead class="bg-orange-700 text-white">
+<thead class="bg-green-600 text-white">
   <tr>
     <th class="px-3 py-2 border border-gray-300" style="width:6%">STT</th>
-    <th class="px-3 py-2 border border-gray-300" style="width:23%">Email nhân viên</th>
-    <th class="px-3 py-2 border border-gray-300" style="width:15%">Ngày vi phạm</th>
-    <th class="px-3 py-2 border border-gray-300" style="width:56%">Chi tiết lỗi</th>
+    <th class="px-3 py-2 border border-gray-300" colspan="3">Tên tiêu chí đạt</th>
   </tr>
 </thead>
 <tbody id="errorTableBody${i}"></tbody>
 `;
 
 
+
                         tableWrapper.appendChild(table);
                         wrapper.appendChild(tableWrapper);
                         grid.appendChild(wrapper);
 
-                        // === Dữ liệu lỗi KHÔNG
+                        // === Dữ liệu tiêu chí ĐẠT CÓ
                         const tbody = table.querySelector(`#errorTableBody${i}`);
+                        const seen = new Set();
                         let stt = 1;
-                        processedData.dataRows.forEach(row => {
-                              const sheet = row.sheet;
-                              if (!sheet) return;
 
-                              for (let r = 9; ; r++) {
-                                    const catCell = sheet[`B${r}`];
-                                    const resultCell = sheet[`F${r}`];
-                                    const detailCell = sheet[`D${r}`];
-                                    if (!catCell || !resultCell) break;
+                        Object.entries(allCriteriaMap).forEach(([key, stats]) => {
+                              const [catName, description] = key.split('||');
+                              if (catName !== cat) return;
 
-                                    const catVal = (catCell?.v || '').toString().trim();
-                                    const resultVal = (resultCell?.v || '').toUpperCase();
-                                    if (catVal === cat && resultVal === 'KHÔNG') {
-                                          const d2 = (sheet[`C${r}`]?.v || '').toString().trim();
-                                          const d3 = (sheet[`D${r}`]?.v || '').toString().trim();
-                                          const d4 = (sheet[`E${r}`]?.v || '').toString().trim();
-                                          const parts = [d2, d3, d4].filter(s => s);
-                                          const mainText = parts.slice(0, -1).join(' => ');
-                                          const lastPart = parts.slice(-1)[0] || '';
+                              const { total, passed } = stats;
+                              const isFullyPassed = total === passed;
 
-                                          const detailHTML = `
-    ${mainText ? `${mainText} => ` : ''}
-    <span class="text-red-600 font-medium">${lastPart}</span>
-`;
+                              if (isFullyPassed && !seen.has(description)) {
+                                    seen.add(description);
 
-
-                                          const tr = document.createElement('tr');
-                                          tr.innerHTML = `
-  <td class="px-3 py-2 border border-gray-300 text-center">${stt++}</td>
-  <td class="px-3 py-2 border border-gray-300">${row.email}</td>
-  <td class="px-3 py-2 border border-gray-300 text-center">${row.date}</td>
-  <td class="px-3 py-2 border border-gray-300 break-words">${detailHTML}</td>
-`;
-
-                                          tbody.appendChild(tr);
-                                    }
+                                    const tr = document.createElement('tr');
+                                    tr.innerHTML = `
+            <td class="px-3 py-2 border border-gray-300 text-center">${stt++}</td>
+            <td class="px-3 py-2 border border-gray-300" colspan="3">${description}</td>
+        `;
+                                    tbody.appendChild(tr);
                               }
                         });
+
+
 
                         // === Vẽ biểu đồ
                         new Chart(canvas, {
@@ -1089,7 +1103,14 @@
                         let colOffset = 1;
                         let rowOffset = ws.rowCount + 3;
                         let maxRowOffset = rowOffset;
-                        const chartPairs = document.querySelectorAll('#pieChartContainer .flex');
+                        const seenTitles = new Set();
+                        const chartPairs = Array.from(document.querySelectorAll('#pieChartContainer .flex')).filter(pair => {
+                              const title = pair.querySelector('div.font-semibold')?.textContent?.trim();
+                              if (!title || seenTitles.has(title)) return false;
+                              seenTitles.add(title);
+                              return true;
+                        });
+
                         for (const pair of chartPairs) {
                               const canvas = pair.querySelector('canvas');
                               const table = pair.querySelector('table');
@@ -1129,7 +1150,7 @@
                                     );
 
                                     if (headers.length > 0) {
-                                          ws.getCell(tableStartRow, tableStartCol).value = `Bảng lỗi chi tiết - ${title}`;
+                                          ws.getCell(tableStartRow, tableStartCol).value = `Bảng tiêu chí đạt - ${title}`;
                                           ws.mergeCells(tableStartRow, tableStartCol, tableStartRow, tableStartCol + headers.length - 1);
                                           ws.getCell(tableStartRow, tableStartCol).font = { bold: true };
 

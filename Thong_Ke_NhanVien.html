@@ -820,10 +820,10 @@
                               const filenameRegex = /^[a-z0-9._]+-[a-z0-9._]+-[a-z0-9]+-[a-z0-9]+-\d{4}-\d{2}-\d{2}\.xlsx$/i;
                               const invalidFiles = results.filter(f => !filenameRegex.test(f.filename));
 
-                              if (invalidFiles.length > 0) {
-                                    showError('Tên file không hợp lệ', `Các file sau không đúng định dạng: ${invalidFiles.map(f => f.filename).join(', ')}`);
-                                    return;
-                              }
+                              // if (invalidFiles.length > 0) {
+                              //       showError('Tên file không hợp lệ', `Các file sau không đúng định dạng: ${invalidFiles.map(f => f.filename).join(', ')}`);
+                              //       return;
+                              // }
 
                               // Kiểm tra tất cả file (cũ và mới) có cùng email
                               const allEmails = [...allFiles.map(f => f.email), ...results.map(f => f.email)];

@@ -670,9 +670,9 @@
                 const area = parts[2] || "N/A";
                 const branch = parts[3] || "N/A";
 
-                if (parts.length != 7) {
-                    return showError("Lỗi định dạng tên file", `File <strong>${file.name}</strong> không đúng định dạng.`);
-                }
+                // if (parts.length != 7) {
+                //     return showError("Lỗi định dạng tên file", `File <strong>${file.name}</strong> không đúng định dạng.`);
+                // }
 
                 if (!selectedFiles.has(file.name)) {
                     selectedFiles.set(file.name, file);
@@ -714,7 +714,8 @@
             const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";
             const area = parts[2] || "N/A";         // 🆕 Khu vực
             const branch = parts[3] || "N/A";       // 🆕 Chi nhánh
-            const date = parts.slice(4).join("-");  // 🆕 Ngày đánh giá đúng chuẩn yyyy-mm-dd
+            // const date = parts.slice(4).join("-");  // 🆕 Ngày đánh giá đúng chuẩn yyyy-mm-dd
+            const date = sheet['B6']?.v?.toString().trim() || "N/A";  // 🆕 Lấy từ ô B6 thay vì tên file
 
             const fullName = rows[2]?.[1] || "N/A";
 
