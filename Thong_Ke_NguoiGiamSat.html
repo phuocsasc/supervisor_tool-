@@ -447,7 +447,7 @@
                         //       return;
                         // }
 
-                        const fileEmail = parts[0].trim();
+                        const fileEmail = parts[0].trim().toLowerCase();
 
                         if (currentEmail === null) {
                               currentEmail = fileEmail; // Gán email từ file đầu tiên
@@ -730,7 +730,7 @@
                                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
 
                                     // Get supervisor email from cell B2
-                                    const currentEmail = sheet['B2']?.v || '';
+                                    const currentEmail = (sheet['B2']?.v || '').toString().trim().toLowerCase();
                                     if (!currentEmail) {
                                           showEmailError(`File ${file.name}: Thiếu email người giám sát ở ô B2`);
                                           continue;

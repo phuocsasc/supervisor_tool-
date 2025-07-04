@@ -733,7 +733,7 @@
                   let totalCriteria = 0;
                   const parts = fileName.replace(".xlsx", "").split("-");
                   const supervisor = parts[0] || "N/A";
-                  const email = parts[1] ? `${parts[1]}@gmail.com` : "N/A";
+                  const email = sheet['B4']?.v?.toString().trim() || "N/A";
                   const emailNhanVien = sheet['B4']?.v?.toString().trim() || "N/A";
                   const area = parts[2] || "N/A";         // 🆕 Khu vực
                   const branch = parts[3] || "N/A";       // 🆕 Chi nhánh
@@ -1071,7 +1071,7 @@
 
                         row.innerHTML = `
         <td class="py-2 px-4 text-center">${index}</td>
-        <td class="py-2 px-4">${supervisor}@gmail.com</td>
+        <td class="py-2 px-4">${supervisor}</td>
         <td class="py-2 px-4">${fullName}</td> 
         <td class="py-2 px-4">${email}</td>
         <td class="py-2 px-4">${branch}</td>
