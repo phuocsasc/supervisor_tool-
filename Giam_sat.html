@@ -174,7 +174,7 @@
                   box-shadow: 0 0 0 2px #3b82f6;
             }
 
-            .border-table{
+            .border-table {
                   border: 1px solid rgb(8, 36, 217);
             }
       </style>
@@ -185,7 +185,8 @@
             <header class="mb-4 sm:mb-6 flex justify-between items-center">
                   <div class="text-center w-full sm:w-auto">
                         <h1 class="text-xl sm:text-3xl font-bold text-blue-800">HỆ THỐNG GIÁM SÁT NHÂN VIÊN</h1>
-                        <p class="text-gray-900 text-sm sm:text-base mt-1 sm:mt-2 font-semibold">Công cụ hỗ trợ giám sát và đánh giá
+                        <p class="text-gray-900 text-sm sm:text-base mt-1 sm:mt-2 font-semibold">Công cụ hỗ trợ giám sát
+                              và đánh giá
                               chất lượng KTV</p>
                   </div>
 
@@ -442,6 +443,10 @@
                               class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded flex items-center justify-center btn-hover">
                               <i class="fas fa-times mr-2"></i> KHÔNG (Lỗi)
                         </button>
+                        <button id="modalResetBtn"
+                              class="bg-gray-400 hover:bg-gray-500 text-white py-2 px-4 rounded flex items-center justify-center btn-hover col-span-2">
+                              <i class="fas fa-undo mr-2"></i> BỎ CHỌN (Chưa kiểm tra)
+                        </button>
                   </div>
                   <div id="noteContainer" class="hidden mt-3">
                         <textarea id="noteInput" class="w-full p-2 border border-gray-300 rounded text-sm"
@@ -505,6 +510,9 @@
             const modalYesBtn = document.getElementById('modalYesBtn');
             const modalNoBtn = document.getElementById('modalNoBtn');
             const closeErrorModal = document.getElementById('closeErrorModal');
+
+            const modalResetBtn = document.getElementById('modalResetBtn');
+
 
             // Event Listeners
             selectFileBtn.addEventListener('click', () => errorFileInput.click());
@@ -1371,6 +1379,37 @@
                   modalYesBtn.classList.remove('hidden');
                   modalNoBtn.classList.remove('hidden');
                   errorModal.classList.add('hidden');
+            });
+
+            modalResetBtn.addEventListener('click', () => {
+                  if (!currentErrorForModal) return;
+
+                  // Xóa đánh giá
+                  delete currentEvaluations[currentErrorForModal.name];
+                  delete currentEvaluationsNote[currentErrorForModal.name];
+
+                  // Cập nhật giao diện
+                  const categoryElements = document.querySelectorAll('.tree-item span');
+                  let targetElement = null;
+                  for (let el of categoryElements) {
+                        if (el.textContent.includes(currentErrorForModal.name)) {
+                              targetElement = el.closest('.tree-item > div:first-child');
+                              break;
+                        }
+                  }
+
+                  if (targetElement) {
+                        // Xóa badge đánh giá nếu có
+                        const oldBadge = targetElement.querySelector('.evaluation-badge');
+                        if (oldBadge) oldBadge.remove();
+
+                        // Xóa lớp màu nền
+                        targetElement.classList.remove('has-error', 'no-error');
+                  }
+
+                  errorModal.classList.add('hidden');
+                  resetErrorModal();
+                  currentErrorForModal = null;
             });
 
       </script>
